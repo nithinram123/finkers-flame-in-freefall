@@ -49,6 +49,14 @@ export default function PsiSources({ investigations }) {
                 <th scope="row">{item.acronym}</th>
                 <td data-label="Accession">
                   <PsiTag investigation={item} />
+                  {item.doi && (
+                    <a
+                      className="psi-doi"
+                      href={`https://doi.org/${item.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
+                    >
+                      Dataset DOI
+                    </a>
+                  )}
                 </td>
                 <td data-label="Area">{item.area}</td>
                 <td data-label="Oxygen">{value(item.o2, 1, '%')}</td>

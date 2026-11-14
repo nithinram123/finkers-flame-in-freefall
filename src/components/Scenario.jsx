@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ScenarioResult from './ScenarioResult.jsx';
 import { Field, PageTitle } from './ui.jsx';
+import { scenarioProfiles } from '../lib/scenario.mjs';
+import { presetLinks } from './missionDestinations.mjs';
 
 export default function Scenario({ dataset, scenario, run, onInspect }) {
   const [oxygen, setOxygen] = useState(scenario.oxygen);
@@ -67,6 +69,15 @@ export default function Scenario({ dataset, scenario, run, onInspect }) {
   ) : (
     <>
       <PageTitle title="Mission Scenarios" description="Set the conditions in your crew cabin." />
+      <nav aria-label="Habitat presets" className="scenario-presets">
+        {scenarioProfiles
+          .filter(({ id }) => id !== 'custom')
+          .map(({ id, name }) => (
+            <a key={id} className="button" href={presetLinks[id]}>
+              {name}
+            </a>
+          ))}
+      </nav>
       {controls}
     </>
   );

@@ -78,7 +78,7 @@ def main():
             "startDate": s.get("Investigation Start Date", ""),
             "endDate": s.get("Investigation End Date", ""),
             "doi": d.get("doi", ""),
-            "psiPage": f"https://psi.nasa.gov/physci/repo/data/investigation/{acc}",
+            "psiPage": f"https://psi.nasa.gov/physci/repo/data/investigations/{acc}",
             "totalDataGB": round((d.get("totalFileSize") or 0) / 1e9, 1),
             "experimentalTables": tables,
             "publications": [

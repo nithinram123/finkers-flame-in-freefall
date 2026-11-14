@@ -12,23 +12,14 @@ const examples = [
   'What has NASA never tested that a Moon base needs?',
 ];
 
-export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' }) {
+export default function Ask({ dataset, habitat, onInspect, initialQuestion = '', claudeStatus }) {
   const [question, setQuestion] = useState(initialQuestion.slice(0, 500));
   const [result, setResult] = useState(null);
   const [pending, setPending] = useState(false);
-  const [enabled, setEnabled] = useState(null);
   const request = useRef(null);
   const rowIndex = new Map(dataset.records.map((row) => [row.id, row]));
   useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/ask', { signal: controller.signal })
-      .then((response) => response.json())
-      .then((status) => setEnabled(status.enabled === true))
-      .catch(() => {
-        if (!controller.signal.aborted) setEnabled(false);
-      });
     return () => {
-      controller.abort();
       request.current?.abort();
     };
   }, []);
@@ -43,7 +34,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
     const evidence = analystEvidence(dataset, text, habitat);
     const matches = evidence.rows;
     const fallback = offlineAssessment(evidence);
-    if (enabled === false) {
+    if (claudeStatus !== true) {
       setResult({ text, matches, claims: [], offline: fallback });
       setPending(false);
       return;
@@ -95,11 +86,14 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
       <PageTitle
         eyebrow="Ask the evidence"
         title="What would you like to know?"
-        description="Ask about the experiments. Each generated claim links back to the NASA PSI records used."
+        description="Find NASA experiments and inspect their source rows. Questions opened from a habitat use that cabin’s selected conditions."
       />
-      {enabled === false && (
-        <Notice>Offline mode. Search and compare the NASA source records.</Notice>
-      )}
+      <Notice>
+        {claudeStatus
+          ? 'Claude can receive your question, selected cabin conditions and matching public NASA records.'
+          : 'Local evidence search uses the NASA snapshot in your browser.'}{' '}
+        <a href="/data-sources#apis">How this works</a>
+      </Notice>
       <form className="ask-form" onSubmit={ask}>
         <Field label="Your question">
           <textarea
@@ -113,11 +107,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
         </Field>
         <button className="primary" type="submit" disabled={pending || !question.trim()}>
           <Search size={17} aria-hidden="true" />{' '}
-          {pending
-            ? 'Reading the evidence…'
-            : enabled === false
-              ? 'Find evidence'
-              : 'Ask the evidence'}
+          {pending ? 'Reading the evidence…' : claudeStatus ? 'Ask the evidence' : 'Find evidence'}
         </button>
       </form>
       <div className="suggestions">
@@ -162,7 +152,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
           )}
           {result.offline && (
             <article className="answer-card">
-              <span className="eyebrow">Offline mode</span>
+              <span className="eyebrow">Local evidence search</span>
               <h2>{result.text}</h2>
               <p>{result.offline}</p>
             </article>

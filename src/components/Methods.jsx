@@ -1,8 +1,13 @@
 import { buildPsi } from '../lib/psi.mjs';
+import { useEffect } from 'react';
 import PsiSources from './PsiSources.jsx';
 import { Notice, PageTitle } from './ui.jsx';
 
-export default function Methods({ dataset }) {
+export default function Methods({ dataset, claudeStatus }) {
+  useEffect(() => {
+    if (window.location.hash === '#apis') document.getElementById('apis')?.scrollIntoView();
+  }, []);
+
   return (
     <>
       <PageTitle
@@ -18,6 +23,67 @@ export default function Methods({ dataset }) {
         <span>Source-linked explorer</span>
       </div>
       <section className="methods-content">
+        <section id="apis" aria-labelledby="apis-title">
+          <h2 id="apis-title">Data and APIs</h2>
+          <dl className="method-api-list">
+            <div>
+              <dt>NASA Physical Sciences Informatics (PSI)</dt>
+              <dd>
+                The explorer reads a bundled snapshot of NASA combustion metadata and CSVs. The
+                project’s refresh script uses PSI’s <code>/geode-py/ws</code> search, investigation
+                and study-download endpoints. The public dashboard serves the snapshot from{' '}
+                <a href="/data/combustion.json">/data/combustion.json</a>.
+                <a href="https://science.nasa.gov/physical-sciences-informatics-psi/history-of-physical-science-informatics/">
+                  {' '}
+                  NASA PSI reference
+                </a>
+                <details>
+                  <summary>NASA endpoints used by the refresh script</summary>
+                  <ul>
+                    <li>
+                      <code>GET /repo/search</code> searches for Combustion Science investigations.
+                    </li>
+                    <li>
+                      <code>GET /repo/investigations/{'{accession}'}</code> retrieves metadata and
+                      table references.
+                    </li>
+                    <li>
+                      <code>GET /studies/{'{accession}'}/download</code> resolves the download link
+                      for an original CSV.
+                    </li>
+                  </ul>
+                </details>
+              </dd>
+            </div>
+            <div>
+              <dt>Ask the Evidence</dt>
+              <dd>
+                <code>GET /api/ask</code> reports whether Claude is configured. When enabled,
+                <code> POST /api/ask</code> can send your question, scenario and retrieved public
+                NASA rows to Anthropic’s{' '}
+                <a href="https://platform.claude.com/docs/en/api/messages">Messages API</a>.
+                Citation IDs are checked against retrieved rows. Local source search is the
+                fallback.
+                <strong className="method-api-status">
+                  {claudeStatus === true
+                    ? 'This deployment: Claude configured'
+                    : claudeStatus === false
+                      ? 'This deployment: Local evidence search'
+                      : 'This deployment: Checking connection'}
+                </strong>
+              </dd>
+            </div>
+            <div>
+              <dt>FLEX neural model</dt>
+              <dd>
+                The build trains and evaluates a small network on PSI-69 droplet burn times. The{' '}
+                <a href="/neural#neural-audit">model check</a> reads the held-out estimates from
+                <a href="/data/neural.json"> /data/neural.json</a>. Its scope is burn duration
+                within the FLEX study.
+              </dd>
+            </div>
+          </dl>
+        </section>
         <h2>What is included</h2>
         <p>
           The supplied archive contains {dataset.stats.investigations} investigations and{' '}
@@ -72,8 +138,8 @@ export default function Methods({ dataset }) {
         <p>
           {dataset.siDisclosure} OpenAI Codex assisted implementation, normalization, documentation
           and plain-English descriptions. Source measurements and outcomes come from NASA. Ask sends
-          retrieved source rows to Claude when the server is configured. Each displayed claim must
-          cite a retrieved row. Local evidence search remains available when Claude is unavailable.
+          retrieved source rows to Claude when the server is configured. A citation identifies the
+          records Claude referenced. Check the raw rows when a claim matters.
         </p>
         <h2>Tools & attribution</h2>
         <p>

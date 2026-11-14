@@ -2,7 +2,7 @@ import { searchEvidence } from './evidence.mjs';
 import { questionScenario, scenarioCoverage } from './scenario.mjs';
 
 export function analystEvidence(dataset, question, scenario) {
-  const habitat = questionScenario(question) || scenario;
+  const habitat = scenario || questionScenario(question);
   const coverage = habitat ? scenarioCoverage(dataset.records, habitat) : null;
   const nearby = coverage?.nearby || [];
   const closest = nearby.slice().sort((a, b) => {

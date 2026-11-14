@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { scalar, classify } from '../scripts/normalize.mjs';
+import { analystEvidence } from '../src/lib/analyst.mjs';
+import { readScenario } from '../src/lib/scenario.mjs';
 import {
   chartRecords,
   searchEvidence,
@@ -12,6 +14,14 @@ import {
 const dataset = JSON.parse(
   fs.readFileSync(new URL('../public/data/combustion.json', import.meta.url), 'utf8'),
 );
+
+test('a question from the customized Moon Base keeps those cabin conditions', () => {
+  const cabin = readScenario(new URLSearchParams({ preset: 'moon', oxygen: 29, pressure: 0.72 }));
+  const result = analystEvidence(dataset, 'What did NASA test near Moon Base?', cabin);
+  assert.equal(result.habitat.oxygen, 29);
+  assert.equal(result.habitat.atm, 0.72);
+  assert.equal(analystEvidence(dataset, 'What did NASA test near Moon Base?').habitat.oxygen, 34);
+});
 
 test('units convert without interpreting ranges, sets, notes or blanks as scalar values', () => {
   assert.equal(scalar('20 cm/s'), 20);

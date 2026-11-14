@@ -120,7 +120,7 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
         <h2>What the evidence says</h2>
         <p>
           <strong>Evidence:</strong> {exact.length} tests fall inside the cabin window and{' '}
-          {nearby.length} are nearby.
+          {nearby.length - exact.length} more fall within the wider window.
         </p>
         <p>
           <strong>Interpretation:</strong> Compare fuel, geometry and airflow before drawing
@@ -132,6 +132,20 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
         </p>
         <a className="button primary" href={analystUrl(question, scenario)}>
           Ask the AI about this habitat
+        </a>{' '}
+        <a
+          className="button"
+          href={
+            '/neural?' +
+            new URLSearchParams({
+              preset: scenario.id,
+              oxygen: scenario.oxygen,
+              pressure: scenario.atm,
+              gravity: scenario.gravityG,
+            })
+          }
+        >
+          Inspect matches in the Neural Lab
         </a>
       </section>
       <details className="legacy-evidence">

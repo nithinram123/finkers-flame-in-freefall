@@ -1,100 +1,140 @@
-import { useState } from 'react';
-import {
-  ArrowRight,
-  ChartScatter,
-  Globe2,
-  MapPin,
-  MessageCircle,
-  Moon,
-  SlidersHorizontal,
-  Satellite,
-  Truck,
-} from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, Database, Orbit } from 'lucide-react';
 import { FlameDemo } from './Habitat.jsx';
-import { isPaired } from '../lib/habitat.mjs';
-import { scenarioProfiles } from '../lib/scenario.mjs';
+import { readScenario, scenarioCoverage, scenarioProfiles } from '../lib/scenario.mjs';
 import { analystUrl } from '../lib/routes.mjs';
+import MissionMap from './MissionMap.jsx';
+import { presetLinks } from './missionDestinations.mjs';
+import './orbit.css';
 
-const icons = [Satellite, Moon, Truck, Globe2, SlidersHorizontal];
-const steps = [
-  [MapPin, 'Pick a habitat'],
-  [ChartScatter, 'See the risks'],
-  [MessageCircle, 'Ask the AI'],
-];
+const moon = readScenario(new URLSearchParams({ preset: 'moon' }));
 
-export default function Home({ dataset }) {
-  const [question, setQuestion] = useState('');
+export default function Home({ dataset, dataError }) {
+  const coverage = dataset && scenarioCoverage(dataset.records, moon);
+  const wider = coverage && coverage.nearby.length - coverage.exact.length;
   return (
-    <div className="mission-home">
-      <header className="mission-intro">
-        <h1>How dangerous is fire where your crew will live?</h1>
-        <p>
-          Pick a habitat. We compare its air with{' '}
-          {dataset.records.filter(isPaired).length.toLocaleString('en')} paired fire test records
-          from {dataset.investigations.length} NASA investigations and show the risks, the evidence
-          and the gaps.
-        </p>
-      </header>
-      <div className="mission-cards">
-        {scenarioProfiles.map((habitat, index) => {
-          const Icon = icons[index];
-          return (
-            <a key={habitat.id} className="mission-card" href={'/scenario?preset=' + habitat.id}>
-              <Icon size={26} aria-hidden="true" strokeWidth={1.6} />
-              <strong>{habitat.name}</strong>
-              <small>
-                {habitat.id === 'custom'
-                  ? 'Set your own cabin air and gravity'
-                  : habitat.oxygen +
-                    '% O₂ · ' +
-                    habitat.atm.toFixed(habitat.atm === 1 ? 1 : 2) +
-                    ' atm · ' +
-                    habitat.gravityG +
-                    ' g'}
-              </small>
-              {habitat.note && <small>({habitat.note})</small>}
+    <div className="orbit-home">
+      <section className="orbit-hero">
+        <div className="orbit-intro">
+          <h1>
+            Flame in <br />
+            Freefall
+          </h1>
+          <p>
+            Explore what NASA’s combustion experiments can tell us about fire in a crewed habitat.
+          </p>
+          <div className="orbit-hero-actions">
+            <a className="orbit-action" href="#flight-path">
+              Follow the flight path <ArrowDown size={17} aria-hidden="true" />
             </a>
-          );
-        })}
-      </div>
-      <section className="mission-steps" aria-labelledby="mission-steps-title">
-        <h2 id="mission-steps-title">How it works</h2>
-        <ol>
-          {steps.map(([Icon, label]) => (
-            <li key={label}>
-              <Icon size={18} aria-hidden="true" />
-              {label}
-            </li>
-          ))}
-        </ol>
-      </section>
-      <form
-        className="mission-ask"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (question.trim()) window.location.assign(analystUrl(question.trim()));
-        }}
-      >
-        <label htmlFor="home-question">Ask the AI</label>
-        <div>
-          <input
-            id="home-question"
-            maxLength={500}
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Why does fire behave differently in space?"
-            required
-          />
-          <button className="primary" type="submit">
-            Ask <ArrowRight size={16} aria-hidden="true" />
-          </button>
+            <a className="orbit-quiet-link" href={presetLinks.moon}>
+              Open Moon Base <ArrowUpRight size={17} aria-hidden="true" />
+            </a>
+          </div>
+          <a className="orbit-source-link" href="/data-sources#apis">
+            <Database size={16} aria-hidden="true" /> NASA PSI snapshot and APIs
+          </a>
         </div>
-      </form>
-      <p>
-        <a href="/neural">Neural Evidence Lab</a> · Trace a measurement and see how a small model
-        performs against a simple baseline.
-      </p>
-      <FlameDemo />
+        <MissionMap />
+      </section>
+
+      <nav className="orbit-quick" aria-label="Quick destinations">
+        <strong>Quick destinations</strong>
+        <a href="/scenario">
+          Habitat Risk <ArrowUpRight size={15} aria-hidden="true" />
+        </a>
+        <a href="/explorer">
+          Experiments <ArrowUpRight size={15} aria-hidden="true" />
+        </a>
+        <a href="/neural">
+          Neural Lab <ArrowUpRight size={15} aria-hidden="true" />
+        </a>
+        <a href="/analyst">
+          Ask the Evidence <ArrowUpRight size={15} aria-hidden="true" />
+        </a>
+      </nav>
+
+      <section className="orbit-flight" id="flight-path" aria-labelledby="flight-path-title">
+        <div className="orbit-flight-title">
+          <Orbit size={24} aria-hidden="true" />
+          <h2 id="flight-path-title">Follow the evidence</h2>
+        </div>
+        <ol>
+          <li>
+            <div>
+              <h3>Set the cabin</h3>
+              <p>
+                Start with a habitat or enter oxygen, pressure, and gravity for your own scenario.
+              </p>
+            </div>
+            <div className="orbit-habitats">
+              {scenarioProfiles.map(({ id, name }) => (
+                <a key={id} href={presetLinks[id]}>
+                  {name} <ArrowUpRight size={15} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Find the evidence gap</h3>
+              <p>
+                The Moon Base preset asks which tests come close to 34% oxygen and 0.57 atmospheres.
+                Matching air is a starting point for choosing experiments to review.
+              </p>
+            </div>
+            <div className="orbit-readout">
+              {coverage ? (
+                <dl>
+                  <div>
+                    <dt>Close Moon Base matches</dt>
+                    <dd>{coverage.exact.length}</dd>
+                  </div>
+                  <div>
+                    <dt>Wider matches</dt>
+                    <dd>{wider}</dd>
+                  </div>
+                  <div>
+                    <dt>Tests with both measurements</dt>
+                    <dd>{coverage.paired.length}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p role="status">
+                  {dataError
+                    ? 'The NASA snapshot could not load. Reopen the page to retry.'
+                    : 'Loading NASA experiment counts…'}
+                </p>
+              )}
+              <a href="/neural?preset=moon">
+                Inspect the original records <ArrowRight size={16} aria-hidden="true" />
+              </a>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Check what the model learned</h3>
+              <p>
+                Compare the FLEX neural network with a simple baseline on NASA droplet tests held
+                out from training.
+              </p>
+            </div>
+            <div className="orbit-habitats">
+              <a href="/neural#neural-audit">
+                Open the FLEX model check <ArrowUpRight size={15} aria-hidden="true" />
+              </a>
+              <a href={analystUrl('What has NASA tested near the Moon Base atmosphere?', moon)}>
+                Ask about Moon Base <ArrowUpRight size={15} aria-hidden="true" />
+              </a>
+              <a href="/data-sources#apis">
+                See data and API details <ArrowUpRight size={15} aria-hidden="true" />
+              </a>
+            </div>
+          </li>
+        </ol>
+        <div className="orbit-demo">
+          <FlameDemo />
+        </div>
+      </section>
     </div>
   );
 }

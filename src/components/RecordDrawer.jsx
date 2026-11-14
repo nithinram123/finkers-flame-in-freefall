@@ -81,9 +81,7 @@ export default function RecordDrawer({ dataset, records, onClose }) {
           <a href={`/data/${encodeURIComponent(table.file)}`} download>
             Original CSV
           </a>
-          <a href={`#/record/${record.id}`} onClick={onClose}>
-            Link to row
-          </a>
+          <a href={`/record/${record.id}`}>Link to row</a>
         </div>
         <RecordFields record={record} table={table} />
       </div>

@@ -260,6 +260,11 @@ function ModelAudit({ records, onInspect }) {
 }
 
 export default function Neural({ dataset, onInspect, query }) {
+  useEffect(() => {
+    if (window.location.hash === '#neural-audit') {
+      document.getElementById('neural-audit')?.scrollIntoView();
+    }
+  }, []);
   const initial = query.size ? query : new URLSearchParams({ preset: 'moon' });
   const [profile, setProfile] = useState(initial.get('preset') || 'custom');
   const [windowId, setWindowId] = useState(null);
@@ -297,9 +302,6 @@ export default function Neural({ dataset, onInspect, query }) {
   return (
     <div className="neural-lab">
       <header className="neural-heading">
-        <span className="neural-kicker">
-          <Network size={16} aria-hidden="true" /> Flame in Freefall / Research tools
-        </span>
         <h1>Neural Evidence Lab</h1>
         <p>
           Find out what NASA actually tested near your cabin conditions, then see how well a neural
@@ -317,25 +319,19 @@ export default function Neural({ dataset, onInspect, query }) {
       </header>
       <ol className="neural-pipeline" aria-label="Evidence workflow">
         {[
-          [CircleGauge, '01', 'Cabin conditions', 'Set the atmosphere'],
-          [Database, '02', 'NASA measurements', 'Trace the source'],
-          [Network, '03', 'FLEX model check', 'Compare against a baseline'],
-        ].map(([Icon, step, title, hint]) => (
-          <li key={step}>
+          [CircleGauge, 'Cabin conditions', '#neural-coverage'],
+          [Database, 'NASA measurements', '#neural-records'],
+          [Network, 'FLEX model check', '#neural-audit'],
+        ].map(([Icon, title, target]) => (
+          <li key={target}>
             <Icon size={21} aria-hidden="true" />
-            <div>
-              <span>
-                {step} / {hint}
-              </span>
-              <strong>{title}</strong>
-            </div>
+            <a href={target}>{title}</a>
           </li>
         ))}
       </ol>
       <section className="neural-panel" aria-labelledby="neural-coverage">
         <div className="neural-panel-head">
           <div>
-            <p className="neural-kicker">01–02 / Observations</p>
             <h2 id="neural-coverage">Where the evidence reaches</h2>
           </div>
           <div className="neural-picker">
@@ -389,7 +385,7 @@ export default function Neural({ dataset, onInspect, query }) {
           </div>
           <CoveragePlot scenario={scenario} coverage={coverage} />
         </div>
-        <div className="neural-records">
+        <div className="neural-records" id="neural-records">
           <div className="neural-record-head">
             <h3>Trace the source</h3>
             <div className="neural-segments" role="group" aria-label="Evidence range">
@@ -453,7 +449,6 @@ export default function Neural({ dataset, onInspect, query }) {
       >
         <div className="neural-panel-head">
           <div>
-            <p className="neural-kicker">03 / Model check</p>
             <h2 id="neural-audit-title">Can the network estimate burn time?</h2>
           </div>
         </div>

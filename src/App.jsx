@@ -69,8 +69,15 @@ function useRoute() {
   };
   const [route, setRoute] = useState(read);
   useEffect(() => {
+    const routeKey = () =>
+      window.location.pathname +
+      window.location.search +
+      (window.location.hash.startsWith('#/') ? window.location.hash : '');
+    let current = routeKey();
     const update = () => {
+      if (routeKey() === current) return;
       setRoute(read());
+      current = routeKey();
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', update);
@@ -86,16 +93,32 @@ function useRoute() {
 export default function App() {
   const [dataset, setDataset] = useState(null);
   const [error, setError] = useState('');
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('flame-comparison') || '[]');
+      return Array.isArray(saved) ? saved.filter((id) => /^PSI-\d+$/.test(id)).slice(0, 3) : [];
+    } catch {
+      return [];
+    }
+  });
   const [inspect, setInspect] = useState(null);
   const [palette, setPalette] = useState(false);
-  const [claude, setClaude] = useState(false);
+  const [claude, setClaude] = useState(null);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('flame-comparison', JSON.stringify(selected));
+    } catch {
+      /* Comparison remains available for the current page. */
+    }
+  }, [selected]);
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/ask', { signal: controller.signal })
       .then((response) => response.json())
       .then((status) => setClaude(status.enabled === true))
-      .catch(() => {});
+      .catch(() => {
+        if (!controller.signal.aborted) setClaude(false);
+      });
     return () => controller.abort();
   }, []);
   const [lastHabitat, setLastHabitat] = useState(() => {
@@ -117,6 +140,7 @@ export default function App() {
       home: 'habitats',
       methods: 'data-sources',
     }[route] || route;
+  const isHome = active === 'habitats' || route === 'habitat';
 
   useEffect(() => {
     const controller = new AbortController();
@@ -167,7 +191,14 @@ export default function App() {
     );
   }
   const props = { dataset, selected, toggleCompare, onInspect: setInspect };
-  let page = dataset ? <Home dataset={dataset} /> : <Loading />;
+  let page = isHome ? (
+    <Home dataset={dataset} dataError={error} />
+  ) : (
+    <div className="empty">
+      <h1>Page not found</h1>
+      <a href="/">Return to the mission map</a>
+    </div>
+  );
   if (dataset)
     switch (route) {
       case 'scenario': {
@@ -181,13 +212,14 @@ export default function App() {
           <Ask
             key={query.toString()}
             {...props}
+            claudeStatus={claude}
             habitat={query.has('preset') ? readScenario(query) : null}
             initialQuestion={query.get('question') || ''}
           />
         );
         break;
       case 'results':
-        page = habitat ? <HabitatResults key={habitat.id} {...props} habitat={habitat} /> : page;
+        if (habitat) page = <HabitatResults key={habitat.id} {...props} habitat={habitat} />;
         break;
       case 'investigations':
         page = <Catalogue {...props} />;
@@ -208,7 +240,9 @@ export default function App() {
         page = <Compare {...props} />;
         break;
       case 'ask':
-        page = <Ask key={habitat?.id || 'general'} {...props} habitat={habitat} />;
+        page = (
+          <Ask key={habitat?.id || 'general'} {...props} habitat={habitat} claudeStatus={claude} />
+        );
         break;
       case 'insights':
         page = <Insights dataset={dataset} />;
@@ -218,7 +252,7 @@ export default function App() {
         break;
       case 'data-sources':
       case 'methods':
-        page = <Methods dataset={dataset} />;
+        page = <Methods dataset={dataset} claudeStatus={claude} />;
         break;
     }
 
@@ -234,12 +268,26 @@ export default function App() {
       >
         Skip to content
       </a>
-      <header className="site-header">
+      <header className="site-header orbit-header">
         <div className="site-header-inner">
           <a className="briefing-brand" href="/">
             <Flame size={25} strokeWidth={1.75} aria-hidden="true" />
             <span>Flame in Freefall</span>
           </a>
+          <nav aria-label="Research tools" className="orbit-header-links">
+            <a href="/scenario" aria-current={active === 'scenario' ? 'page' : undefined}>
+              Habitats
+            </a>
+            <a href="/explorer" aria-current={active === 'explorer' ? 'page' : undefined}>
+              Experiments
+            </a>
+            <a href="/neural" aria-current={active === 'neural' ? 'page' : undefined}>
+              Neural Lab
+            </a>
+            <a href="/data-sources" aria-current={active === 'data-sources' ? 'page' : undefined}>
+              Sources
+            </a>
+          </nav>
           <button
             className="palette-trigger"
             aria-label="Open quick navigation"
@@ -248,6 +296,7 @@ export default function App() {
             onClick={() => setPalette(true)}
           >
             <Search size={19} aria-hidden="true" />
+            <span>Jump to</span>
             <kbd>
               {typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
                 ? '⌘ K'
@@ -256,8 +305,8 @@ export default function App() {
           </button>
         </div>
       </header>
-      <Navigation active={active} claude={claude} key={route} />
-      <main className="briefing-page" id="main-content" tabIndex={-1}>
+      {!isHome && <Navigation active={active} claude={claude} key={route} />}
+      <main className={isHome ? 'orbit-page' : 'briefing-page'} id="main-content" tabIndex={-1}>
         {query.get('demo') === '1' && (
           <nav className="demo-steps" aria-label="Five-minute demo">
             <strong>5-MIN DEMO</strong>
@@ -266,13 +315,13 @@ export default function App() {
             <a href="/analyst?demo=1">3. Ask the AI</a>
           </nav>
         )}
-        {error ? (
+        {error && !isHome ? (
           <div className="empty" role="alert">
             <h1>Research data could not load</h1>
             <p>{error}.</p>
             <button onClick={() => window.location.reload()}>Retry</button>
           </div>
-        ) : !dataset && route !== 'habitats' ? (
+        ) : !dataset && !isHome ? (
           <Loading />
         ) : (
           <Suspense fallback={<Loading />}>{page}</Suspense>
@@ -291,7 +340,7 @@ export default function App() {
               target="_blank"
               rel="noreferrer"
             >
-              View source code on GitHub <ArrowUpRight size={14} />
+              GitHub repository <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
         </footer>

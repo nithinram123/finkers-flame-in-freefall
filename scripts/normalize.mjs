@@ -294,6 +294,8 @@ function main() {
     });
   }
   for (const inv of investigations) {
+    // The archive now uses the plural route. Keep the input snapshot unchanged.
+    inv.psiPage = inv.psiPage?.replace('/repo/data/investigation/', '/repo/data/investigations/');
     const c = config[inv.accession] || [
       'Analysis',
       'Research',

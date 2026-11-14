@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 const primary = [
-  ['Home', '/', 'habitats', Home],
+  ['Mission map', '/', 'habitats', Home],
   ['Habitat Risk', '/scenario', 'scenario', FlaskConical],
   ['Ask the AI', '/analyst', 'analyst', MessageCircle],
   ['Explore Experiments', '/explorer', 'explorer', ChartScatter],
@@ -68,7 +68,7 @@ export default function Navigation({ active, claude }) {
             </a>
           ))}
         </details>
-        {claude && <small className="nav-ai">AI: Claude Haiku</small>}
+        {claude && <small className="nav-ai">Claude configured</small>}
       </nav>
     </div>
   );

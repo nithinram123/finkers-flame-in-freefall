@@ -1,25 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search, X } from 'lucide-react';
-import { habitatProfiles } from '../lib/habitat.mjs';
+import { scenarioProfiles } from '../lib/scenario.mjs';
+import { presetLinks } from './missionDestinations.mjs';
 
 export default function CommandPalette({ dataset, onClose }) {
   const ref = useRef(null);
   const [query, setQuery] = useState('');
   const pages = [
-    ['Choose a habitat', 'habitats'],
-    ['Explore tests', 'explorer'],
+    ['Mission map', ''],
+    ['Habitat Risk and custom scenarios', 'scenario'],
+    ['Explore experiments', 'explorer'],
     ['Neural Evidence Lab', 'neural'],
     ['Browse investigations', 'investigations'],
-    ['Ask the evidence', 'ask'],
+    ['Ask the evidence', 'analyst'],
     ['Compare investigations', 'compare'],
-    ['Sources and methods', 'methods'],
+    ['Data sources and APIs', 'data-sources#apis'],
+    ['Research gaps', 'research-gaps'],
+    ['Insights', 'insights'],
   ];
   const items = [
-    ...pages.map(([name, path]) => ({ name, path })),
-    ...habitatProfiles.map((item) => ({ name: item.name, path: `results/${item.id}` })),
+    ...pages.map(([name, path]) => ({ name, path: '/' + path })),
+    ...scenarioProfiles.map((item) => ({ name: item.name, path: presetLinks[item.id] })),
     ...(dataset?.investigations || []).map((item) => ({
       name: `${item.name} · ${item.accession}`,
-      path: `investigation/${item.accession}`,
+      path: `/investigation/${item.accession}`,
     })),
   ]
     .filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()))
@@ -62,8 +66,7 @@ export default function CommandPalette({ dataset, onClose }) {
                 ref.current.querySelector('.command-results a')?.focus();
               }
               if (event.key === 'Enter' && items[0]) {
-                window.location.hash = `/${items[0].path}`;
-                onClose();
+                window.location.assign(items[0].path);
               }
             }}
           />
@@ -84,7 +87,7 @@ export default function CommandPalette({ dataset, onClose }) {
         >
           {items.length ? (
             items.map(({ name, path }) => (
-              <a key={path} href={`#/${path}`} onClick={onClose}>
+              <a key={path} href={path}>
                 {name}
                 <ArrowRight size={16} />
               </a>
