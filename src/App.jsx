@@ -8,20 +8,23 @@ import RecordDrawer from './components/RecordDrawer.jsx';
 import Ask from './components/Ask.jsx';
 import Methods from './components/Methods.jsx';
 import CommandPalette from './components/CommandPalette.jsx';
-import { HabitatPicker, HabitatResults } from './components/Habitat.jsx';
+import { HabitatResults } from './components/Habitat.jsx';
 import { findHabitat } from './lib/habitat.mjs';
 import Home from './components/Home.jsx';
 import Scenario from './components/Scenario.jsx';
 import { locationRoute } from './lib/routes.mjs';
 import { readScenario } from './lib/scenario.mjs';
+import Navigation, { morePages } from './components/Navigation.jsx';
+import Insights, { ResearchGaps } from './components/Insights.jsx';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
-const navigation = [
-  ['habitats', 'Habitats'],
-  ['explorer', 'Test explorer'],
-  ['investigations', 'Investigations'],
-  ['ask', 'Ask'],
-];
+const titles = {
+  habitats: 'Home',
+  explorer: 'Explore Experiments',
+  scenario: 'Habitat Risk',
+  analyst: 'Ask the AI',
+  ...Object.fromEntries(morePages.map(([label, , route]) => [route, label])),
+};
 
 function Loading() {
   return (
@@ -51,7 +54,14 @@ class ErrorBoundary extends Component {
 }
 
 function useRoute() {
-  const read = () => locationRoute(window.location);
+  const read = () => {
+    const route = locationRoute(window.location);
+    if (route.route === 'scenarios') {
+      window.history.replaceState(null, '', '/scenario' + window.location.search);
+      return { ...route, route: 'scenario' };
+    }
+    return route;
+  };
   const [route, setRoute] = useState(read);
   useEffect(() => {
     const update = () => {
@@ -74,6 +84,7 @@ export default function App() {
   const [selected, setSelected] = useState([]);
   const [inspect, setInspect] = useState(null);
   const [palette, setPalette] = useState(false);
+  const [claude, setClaude] = useState(false);
   const [lastHabitat, setLastHabitat] = useState(() => {
     try {
       return sessionStorage.getItem('flame-habitat');
@@ -84,11 +95,15 @@ export default function App() {
   const { route, id, query } = useRoute();
   const habitat = findHabitat(id) || (route === 'ask' ? findHabitat(lastHabitat) : null);
   const active =
-    route === 'results'
-      ? 'habitats'
-      : ['investigation', 'record', 'compare'].includes(route)
-        ? 'investigations'
-        : route;
+    {
+      results: 'scenario',
+      ask: 'analyst',
+      investigation: 'investigations',
+      record: 'investigations',
+      overview: 'habitats',
+      home: 'habitats',
+      methods: 'data-sources',
+    }[route] || route;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -119,7 +134,7 @@ export default function App() {
   }, [inspect]);
 
   useEffect(() => {
-    document.title = `${navigation.find(([key]) => key === active)?.[1] || 'Sources'} · Flame in Freefall`;
+    document.title = `${titles[active] || 'Flame in Freefall'} · Flame in Freefall`;
     if (route !== 'results' || !habitat) return;
     setLastHabitat(habitat.id);
     try {
@@ -179,6 +194,13 @@ export default function App() {
       case 'ask':
         page = <Ask key={habitat?.id || 'general'} {...props} habitat={habitat} />;
         break;
+      case 'insights':
+        page = <Insights dataset={dataset} />;
+        break;
+      case 'research-gaps':
+        page = <ResearchGaps dataset={dataset} />;
+        break;
+      case 'data-sources':
       case 'methods':
         page = <Methods dataset={dataset} />;
         break;
@@ -198,17 +220,10 @@ export default function App() {
       </a>
       <header className="site-header">
         <div className="site-header-inner">
-          <a className="briefing-brand" href="#/habitats">
+          <a className="briefing-brand" href="/">
             <Flame size={25} strokeWidth={1.75} aria-hidden="true" />
             <span>Flame in Freefall</span>
           </a>
-          <nav className="site-nav" aria-label="Main navigation">
-            {navigation.map(([key, label]) => (
-              <a key={key} href={`#/${key}`} aria-current={active === key ? 'page' : undefined}>
-                {label}
-              </a>
-            ))}
-          </nav>
           <button
             className="palette-trigger"
             aria-label="Open quick navigation"
@@ -225,7 +240,16 @@ export default function App() {
           </button>
         </div>
       </header>
+      <Navigation active={active} claude={claude} key={route} />
       <main className="briefing-page" id="main-content" tabIndex={-1}>
+        {query.get('demo') === '1' && (
+          <nav className="demo-steps" aria-label="Five-minute demo">
+            <strong>5-MIN DEMO</strong>
+            <a href="/?demo=1">1. Pick a habitat</a>
+            <a href="/scenario?preset=moon&demo=1">2. See the risks</a>
+            <a href="/analyst?demo=1">3. Ask the AI</a>
+          </nav>
+        )}
         {error ? (
           <div className="empty" role="alert">
             <h1>Research data could not load</h1>

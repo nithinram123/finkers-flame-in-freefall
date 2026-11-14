@@ -115,3 +115,107 @@
     grid-template-columns: 1fr;
   }
 }
+.mission-navigation {
+  position: absolute;
+  left: max(12px, calc((100vw - 1370px) / 2));
+  top: 96px;
+  width: 190px;
+}
+.mission-navigation nav {
+  display: grid;
+  gap: 3px;
+}
+.mission-navigation nav a,
+.mission-navigation summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  min-height: 44px;
+  color: var(--text);
+  font-size: 13px;
+  border-radius: 8px;
+}
+.mission-navigation nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 650;
+}
+.mission-navigation nav a:hover,
+.mission-navigation summary:hover {
+  background: var(--neutral);
+  text-decoration: none;
+}
+.mission-navigation details a {
+  margin-left: 22px;
+}
+.mission-navigation summary svg:last-child {
+  margin-left: auto;
+}
+.nav-ai {
+  padding: 8px 11px;
+  color: var(--muted);
+}
+.mobile-nav-toggle {
+  display: none;
+}
+.site-header .palette-trigger {
+  margin-left: auto;
+}
+.demo-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.demo-steps a {
+  min-height: 44px;
+  align-content: center;
+}
+.insight-chart {
+  border: 1px solid var(--border);
+  padding: 17px;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+.insight-chart ul {
+  list-style: none;
+  padding: 0;
+}
+.insight-chart li > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.insight-chart meter {
+  width: 100%;
+  height: 13px;
+}
+@media (min-width: 1100px) and (max-width: 1360px) {
+  .briefing-page {
+    margin-left: 210px;
+  }
+}
+@media (max-width: 1099px) {
+  .mission-navigation {
+    position: relative;
+    width: auto;
+    top: auto;
+    left: auto;
+    max-width: 948px;
+    margin: 8px auto 0;
+    padding: 0 16px;
+  }
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+  .mission-navigation nav {
+    display: none;
+  }
+  .mission-navigation nav.is-open {
+    display: grid;
+    margin-top: 5px;
+  }
+}
