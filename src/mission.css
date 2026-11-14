@@ -422,3 +422,45 @@
     overflow-wrap: anywhere;
   }
 }
+.condition-chart svg text {
+  font-size: 13px;
+  fill: #45423e;
+}
+.condition-chart svg .point-count {
+  font-size: 11px;
+  fill: #fff;
+}
+.condition-chart svg .plot-annotation {
+  font-size: 13px;
+  fill: var(--text);
+}
+.condition-chart .fuel-legend {
+  font-size: 13px;
+}
+.condition-chart .fuel-legend li {
+  font-size: 13px;
+}
+.fuel-tone-0,
+.fuel-tone-3 {
+  --fuel-color: var(--accent);
+}
+.fuel-tone-1,
+.fuel-tone-2,
+.fuel-tone-4,
+.fuel-tone-5 {
+  --fuel-color: #595b5c;
+}
+.fuel-tone-2 .point-mark,
+.fuel-tone-4 .point-mark {
+  stroke: #292a2c;
+  stroke-dasharray: 2 2;
+}
+.fuel-tone-3 .point-mark {
+  stroke: #292a2c;
+  stroke-dasharray: 1 2;
+}
+.chart-takeaway {
+  font-size: 14px;
+  margin: 11px 0 0;
+  color: var(--text);
+}

@@ -51,7 +51,7 @@ export default function ConditionChart({
     : `${metrics[x][0]} (${metrics[x][1]})${x === 'pressure' ? ' · log scale' : ''}`;
   const showReference = references && x === 'oxygen' && y === 'pressure';
   const height = width < 480 ? 280 : 345;
-  const plot = { left: 54, right: width - 18, top: 27, bottom: height - 46 };
+  const plot = { left: 51, right: width - 24, top: 27, bottom: height - 46 };
   const transform = (value, key) =>
     key === 'pressure' && !scenarioMode ? Math.log10(value) : value;
   const invert = (value, key) => (key === 'pressure' && !scenarioMode ? 10 ** value : value);

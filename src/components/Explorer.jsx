@@ -162,6 +162,13 @@ export default function Explorer({ dataset, onInspect, initialAccession }) {
           references={ambientPlot}
           onInspect={onInspect}
         />
+        <p className="chart-takeaway">
+          {ambientPlot
+            ? plotted.filter((row) => row.oxygen.value > 30).length +
+              ' plotted tests used more than 30% ambient oxygen. Check pressure before comparing them with a cabin.'
+            : plotted.length +
+              ' records can be compared on these axes. Missing measurements are counted in the panel below.'}
+        </p>
       </section>
       <details className="gap-panel">
         <summary>What we don’t know</summary>
