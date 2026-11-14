@@ -10,8 +10,8 @@ const examples = [
   'Which CFI-G tests recorded failed ignition?',
 ];
 
-export default function Ask({ dataset, habitat, onInspect }) {
-  const [question, setQuestion] = useState('');
+export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' }) {
+  const [question, setQuestion] = useState(initialQuestion.slice(0, 500));
   const [result, setResult] = useState(null);
   const [pending, setPending] = useState(false);
   const [enabled, setEnabled] = useState(null);

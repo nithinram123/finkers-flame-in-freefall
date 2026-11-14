@@ -10,6 +10,10 @@ import Methods from './components/Methods.jsx';
 import CommandPalette from './components/CommandPalette.jsx';
 import { HabitatPicker, HabitatResults } from './components/Habitat.jsx';
 import { findHabitat } from './lib/habitat.mjs';
+import Home from './components/Home.jsx';
+import Scenario from './components/Scenario.jsx';
+import { locationRoute } from './lib/routes.mjs';
+import { readScenario } from './lib/scenario.mjs';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const navigation = [
@@ -47,7 +51,7 @@ class ErrorBoundary extends Component {
 }
 
 function useRoute() {
-  const read = () => window.location.hash.slice(2) || 'habitats';
+  const read = () => locationRoute(window.location);
   const [route, setRoute] = useState(read);
   useEffect(() => {
     const update = () => {
@@ -55,9 +59,13 @@ function useRoute() {
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', update);
-    return () => window.removeEventListener('hashchange', update);
+    window.addEventListener('popstate', update);
+    return () => {
+      window.removeEventListener('hashchange', update);
+      window.removeEventListener('popstate', update);
+    };
   }, []);
-  return route.split('/');
+  return route;
 }
 
 export default function App() {
@@ -73,7 +81,7 @@ export default function App() {
       return null;
     }
   });
-  const [route, id] = useRoute();
+  const { route, id, query } = useRoute();
   const habitat = findHabitat(id) || (route === 'ask' ? findHabitat(lastHabitat) : null);
   const active =
     route === 'results'
@@ -131,9 +139,25 @@ export default function App() {
     );
   }
   const props = { dataset, selected, toggleCompare, onInspect: setInspect };
-  let page = <HabitatPicker />;
+  let page = dataset ? <Home dataset={dataset} /> : <Loading />;
   if (dataset)
     switch (route) {
+      case 'scenario': {
+        const scenario = readScenario(query);
+        const run = query.has('oxygen') || (query.has('preset') && scenario.id !== 'custom');
+        page = <Scenario key={query.toString()} scenario={scenario} run={run} {...props} />;
+        break;
+      }
+      case 'analyst':
+        page = (
+          <Ask
+            key={query.toString()}
+            {...props}
+            habitat={query.has('preset') ? readScenario(query) : null}
+            initialQuestion={query.get('question') || ''}
+          />
+        );
+        break;
       case 'results':
         page = habitat ? <HabitatResults key={habitat.id} {...props} habitat={habitat} /> : page;
         break;
