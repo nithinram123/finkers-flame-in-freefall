@@ -272,3 +272,153 @@
     font-size: 12px;
   }
 }
+.scenario-verdict {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 24%);
+  gap: 18px;
+  border-left: 4px solid var(--accent);
+  padding: 18px 20px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  margin: 0 0 12px;
+}
+.scenario-verdict h2 {
+  font-size: clamp(22px, 4vw, 36px);
+  margin: 7px 0;
+}
+.scenario-verdict p {
+  margin: 0;
+}
+.unrated-score {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+}
+.unrated-score span {
+  font-size: 23px;
+  font-weight: 650;
+}
+.unrated-score small {
+  font-size: 13px;
+}
+.scenario-risks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 26px;
+}
+.scenario-risk {
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 10px;
+}
+.scenario-risk svg {
+  color: var(--accent);
+}
+.scenario-risk h2 {
+  font-size: 18px;
+  margin: 5px 0;
+}
+.scenario-risk p,
+.scenario-chart p {
+  font-size: 14px;
+}
+.psi-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.psi-links a {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.range-references {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 15px;
+}
+.oxygen-ranges {
+  list-style: none;
+  margin: 9px 0 18px;
+  padding: 0;
+}
+.oxygen-ranges li {
+  display: grid;
+  grid-template-columns: minmax(110px, 1.1fr) minmax(100px, 2fr) minmax(75px, auto);
+  align-items: center;
+  gap: 7px;
+  min-height: 39px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+.range-track {
+  position: relative;
+  height: 30px;
+  background: var(--neutral);
+  border-radius: 4px;
+}
+.range-bar,
+.earth-reference,
+.habitat-reference {
+  position: absolute;
+}
+.range-bar {
+  height: 10px;
+  top: 10px;
+  background: #656a6d;
+  min-width: 3px;
+  border-radius: 4px;
+}
+.range-bar.crosses {
+  background: var(--accent);
+}
+.earth-reference,
+.habitat-reference {
+  height: 100%;
+  top: 0;
+  z-index: 1;
+  border-left: 2px dashed #52585d;
+}
+.habitat-reference {
+  border-left: 2px solid var(--accent);
+}
+.scenario-evidence,
+.legacy-evidence {
+  margin: 24px 0;
+}
+.legacy-evidence summary {
+  min-height: 44px;
+  align-content: center;
+}
+.scenario-takeaway {
+  margin: 13px 0;
+  font-weight: 650;
+}
+.scenario-chart p.scenario-takeaway {
+  font-size: clamp(18px, 3vw, 25px);
+}
+.simple-plot .plot-point:focus-visible circle,
+.simple-plot .plot-point:hover circle {
+  stroke: var(--accent);
+  stroke-width: 2px;
+}
+@media (max-width: 650px) {
+  .scenario-risks,
+  .scenario-verdict {
+    grid-template-columns: 1fr;
+  }
+  .unrated-score {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    padding: 10px 0 0;
+  }
+  .oxygen-ranges li {
+    grid-template-columns: minmax(77px, 1fr) minmax(50px, 1.4fr) minmax(53px, auto);
+    gap: 5px;
+  }
+  .oxygen-ranges a {
+    overflow-wrap: anywhere;
+  }
+}

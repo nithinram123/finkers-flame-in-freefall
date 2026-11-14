@@ -1,6 +1,24 @@
-import { findHabitat } from './habitat.mjs';
+import { findHabitat, inWindow, isPaired } from './habitat.mjs';
 
 export const kPaPerAtm = 101.325;
+
+export function scenarioCoverage(records, scenario) {
+  const paired = records.filter(isPaired);
+  const bounds = (oxygen, atm) => ({
+    x1: Math.max(0, scenario.oxygen - oxygen),
+    x2: Math.min(100, scenario.oxygen + oxygen),
+    y1: Math.max(0.001, scenario.atm - atm) * kPaPerAtm,
+    y2: (scenario.atm + atm) * kPaPerAtm,
+  });
+  const box = bounds(2, 0.05);
+  const nearbyBox = bounds(6, 0.15);
+  return {
+    paired,
+    box,
+    exact: paired.filter((row) => inWindow(row, box)),
+    nearby: paired.filter((row) => inWindow(row, nearbyBox)),
+  };
+}
 export const scenarioProfiles = [
   { id: 'station', name: 'Spacecraft / Space Station', oxygen: 21, atm: 1, gravityG: 0 },
   { id: 'moon', name: 'Moon Base', oxygen: 34, atm: 0.57, gravityG: 0.16 },

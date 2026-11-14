@@ -26,6 +26,7 @@ export default function Detail({ dataset, accession, selected, toggleCompare, on
         description={investigation.title}
       >
         <SourceLink investigation={investigation} />
+        <PsiTag investigation={investigation} />
         <button
           disabled={selected.length >= 3 && !selected.includes(accession)}
           onClick={() => toggleCompare(accession)}
@@ -149,6 +150,7 @@ export default function Detail({ dataset, accession, selected, toggleCompare, on
           <h2>NASA source record</h2>
           <p>
             <SourceLink investigation={investigation} />
+            <PsiTag investigation={investigation} />
           </p>
           {investigation.doi && (
             <p>

@@ -25,6 +25,9 @@ export default function ConditionChart({
   box,
   references,
   onInspect,
+  mode,
+  boxLabel,
+  experimentNames,
 }) {
   const ref = useRef(null);
   const title = useId();
@@ -39,11 +42,19 @@ export default function ConditionChart({
   }, []);
 
   const groups = useMemo(() => fuelGroups(records), [records]);
+  const scenarioMode = mode === 'scenario';
+  const yLabel = scenarioMode
+    ? 'Air pressure (atm, Earth = 1)'
+    : `${metrics[y][0]} (${metrics[y][1]})${y === 'pressure' ? ' · log scale' : ''}`;
+  const xLabel = scenarioMode
+    ? 'Oxygen in the air (%)'
+    : `${metrics[x][0]} (${metrics[x][1]})${x === 'pressure' ? ' · log scale' : ''}`;
   const showReference = references && x === 'oxygen' && y === 'pressure';
   const height = width < 480 ? 280 : 345;
   const plot = { left: 54, right: width - 18, top: 27, bottom: height - 46 };
-  const transform = (value, key) => (key === 'pressure' ? Math.log10(value) : value);
-  const invert = (value, key) => (key === 'pressure' ? 10 ** value : value);
+  const transform = (value, key) =>
+    key === 'pressure' && !scenarioMode ? Math.log10(value) : value;
+  const invert = (value, key) => (key === 'pressure' && !scenarioMode ? 10 ** value : value);
   function domain(key, lowerBox, upperBox) {
     const values = records.map((row) => row[key].value);
     if (showReference) values.push(cabinPoint[key]);
@@ -52,7 +63,7 @@ export default function ConditionChart({
     const transformed = values.map((value) => transform(value, key));
     const low = Math.min(...transformed);
     const high = Math.max(...transformed);
-    const minSpan = key === 'oxygen' ? 3 : key === 'pressure' ? 0.06 : 2;
+    const minSpan = key === 'oxygen' ? 3 : key === 'pressure' ? (scenarioMode ? 6 : 0.06) : 2;
     const pad = Math.max((high - low) * 0.1, minSpan / 2);
     return [key === 'pressure' ? low - pad : Math.max(0, low - pad), high + pad];
   }
@@ -91,7 +102,7 @@ export default function ConditionChart({
   const largest = points[0];
   const hovered = points.find(({ id }) => active === id);
   return (
-    <div className="condition-chart" ref={ref}>
+    <div className={'condition-chart' + (scenarioMode ? ' simple-plot' : '')} ref={ref}>
       {records.length ? (
         <>
           <svg width="100%" viewBox={`0 0 ${width} ${height}`} role="group" aria-labelledby={title}>
@@ -104,7 +115,7 @@ export default function ConditionChart({
                 <g key={tick}>
                   <path className="plot-grid" d={`M${plot.left},${py}H${plot.right}`} />
                   <text x={plot.left - 8} y={py + 4} textAnchor="end">
-                    {format(invert(tick, y))}
+                    {format(scenarioMode ? tick / 101.325 : invert(tick, y))}
                   </text>
                 </g>
               );
@@ -119,21 +130,29 @@ export default function ConditionChart({
               d={`M${plot.left},${plot.top}V${plot.bottom}H${plot.right}`}
             />
             <text x={plot.left} y={13}>
-              {metrics[y][0]} ({metrics[y][1]}){y === 'pressure' ? ' · log scale' : ''}
+              {yLabel}
             </text>
             <text x={(plot.left + plot.right) / 2} y={height - 7} textAnchor="middle">
-              {metrics[x][0]} ({metrics[x][1]}){x === 'pressure' ? ' · log scale' : ''}
+              {xLabel}
             </text>
-            {showReference && (
-              <g className="plot-reference">
-                <path
-                  d={`M${scaleX(21)},${plot.top}V${plot.bottom}M${plot.left},${scaleY(101.3)}H${plot.right}`}
-                />
-                <text x={Math.min(scaleX(21) + 5, width - 125)} y={plot.top + 11}>
-                  Earth / nominal ISS
-                </text>
-              </g>
-            )}
+            {showReference &&
+              (scenarioMode ? (
+                <g className="plot-reference">
+                  <circle cx={scaleX(21)} cy={scaleY(101.325)} r="5" fill="var(--accent)" />
+                  <text x={Math.min(scaleX(21) + 8, width - 145)} y={scaleY(101.325) - 12}>
+                    Earth / ISS
+                  </text>
+                </g>
+              ) : (
+                <g className="plot-reference">
+                  <path
+                    d={`M${scaleX(21)},${plot.top}V${plot.bottom}M${plot.left},${scaleY(101.3)}H${plot.right}`}
+                  />
+                  <text x={Math.min(scaleX(21) + 5, width - 125)} y={plot.top + 11}>
+                    Earth / nominal ISS
+                  </text>
+                </g>
+              ))}
             {box && (
               <rect
                 className="plot-box"
@@ -145,11 +164,37 @@ export default function ConditionChart({
                 <title>Selected habitat comparison window</title>
               </rect>
             )}
+            {box && boxLabel && (
+              <text
+                className="plot-annotation"
+                x={Math.min(Math.max(scaleX(box.x1), plot.left), width - 146)}
+                y={Math.max(plot.top + 16, scaleY(box.y2) - 7)}
+              >
+                {boxLabel}
+              </text>
+            )}
+            {scenarioMode && (
+              <g aria-hidden="true">
+                {records.map((row) => (
+                  <circle
+                    key={row.id}
+                    cx={scaleX(row.oxygen.value)}
+                    cy={scaleY(row.pressure.value)}
+                    r="2.6"
+                    fill="#687078"
+                    fillOpacity=".42"
+                  />
+                ))}
+              </g>
+            )}
             {[...points].reverse().map((point) => {
               const count = point.rows.length;
               const radius = Math.min(19, 5 + Math.sqrt(count - 1) * 1.9);
               let angle = -Math.PI / 2;
-              const label = `${count} ${count === 1 ? 'record' : 'records'}, ${point.group === 5 ? 'mixed fuels' : groups.find(({ index }) => index === point.group)?.label}`;
+              const sample = point.rows[0];
+              const label = scenarioMode
+                ? `${experimentNames?.[sample.accession] || sample.accession}, ${fuelLabel(sample)}, ${sample.accession}${count > 1 ? ' · ' + count + ' records here' : ''}`
+                : `${count} ${count === 1 ? 'record' : 'records'}, ${point.group === 5 ? 'mixed fuels' : groups.find(({ index }) => index === point.group)?.label}`;
               return (
                 <g
                   key={point.id}
@@ -170,8 +215,11 @@ export default function ConditionChart({
                   }}
                 >
                   <circle cx={point.px} cy={point.py} r={Math.max(radius, 12)} fill="transparent" />
-                  <circle className="point-mark" cx={point.px} cy={point.py} r={radius} />
-                  {point.group === 5 &&
+                  {!scenarioMode && (
+                    <circle className="point-mark" cx={point.px} cy={point.py} r={radius} />
+                  )}
+                  {!scenarioMode &&
+                    point.group === 5 &&
                     [...point.counts]
                       .sort((a, b) => a[0] - b[0])
                       .map(([index, total]) => {
@@ -185,7 +233,7 @@ export default function ConditionChart({
                           />
                         );
                       })}
-                  {count > 2 && (
+                  {!scenarioMode && count > 2 && (
                     <text
                       className="point-count"
                       x={point.px}
@@ -199,7 +247,7 @@ export default function ConditionChart({
                 </g>
               );
             })}
-            {largest?.rows.length > 1 && (
+            {!scenarioMode && largest?.rows.length > 1 && (
               <text
                 className="plot-annotation"
                 x={largest.px > width * 0.67 ? largest.px - 27 : largest.px + 27}
@@ -211,24 +259,28 @@ export default function ConditionChart({
             )}
           </svg>
           <p className="chart-readout" aria-live="off">
-            {hovered
-              ? `${hovered.rows.length} source ${hovered.rows.length === 1 ? 'row' : 'rows'} · ${[...new Set(hovered.rows.map(fuelLabel))].slice(0, 2).join(', ')}`
-              : `${metrics[y][0]} (${metrics[y][1]})${y === 'pressure' ? ' · log scale' : ''}. Select a marker to open its source.`}
+            {hovered && scenarioMode
+              ? `${experimentNames?.[hovered.rows[0].accession] || hovered.rows[0].accession} · ${fuelLabel(hovered.rows[0])} · ${hovered.rows[0].accession} · ${hovered.rows.length} nearby plotted rows`
+              : hovered
+                ? `${hovered.rows.length} source ${hovered.rows.length === 1 ? 'row' : 'rows'} · ${[...new Set(hovered.rows.map(fuelLabel))].slice(0, 2).join(', ')}`
+                : `${yLabel}. Select a marker to open its source.`}
           </p>
-          <ul className="fuel-legend" aria-label="Fuel or material legend">
-            {groups.map((group) => (
-              <li key={group.label}>
-                <i className={`fuel-tone-${group.index}`} />
-                {group.label} <span>{group.count}</span>
-              </li>
-            ))}
-            {points.some((point) => point.group === 5) && (
-              <li>
-                <i className="fuel-tone-5" />
-                Mixed fuels in one cluster
-              </li>
-            )}
-          </ul>
+          {!scenarioMode && (
+            <ul className="fuel-legend" aria-label="Fuel or material legend">
+              {groups.map((group) => (
+                <li key={group.label}>
+                  <i className={`fuel-tone-${group.index}`} />
+                  {group.label} <span>{group.count}</span>
+                </li>
+              ))}
+              {points.some((point) => point.group === 5) && (
+                <li>
+                  <i className="fuel-tone-5" />
+                  Mixed fuels in one cluster
+                </li>
+              )}
+            </ul>
+          )}
         </>
       ) : (
         <p className="chart-empty">No records have both selected measurements.</p>
