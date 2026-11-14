@@ -57,7 +57,11 @@ function useRoute() {
   const read = () => {
     const route = locationRoute(window.location);
     if (route.route === 'scenarios') {
-      window.history.replaceState(null, '', '/scenario' + window.location.search);
+      window.history.replaceState(
+        null,
+        '',
+        '/scenario' + (route.query.size ? '?' + route.query : ''),
+      );
       return { ...route, route: 'scenario' };
     }
     return route;
@@ -270,11 +274,20 @@ export default function App() {
           <Suspense fallback={<Loading />}>{page}</Suspense>
         )}
         <footer className="page-footer">
-          <span>Flame in Freefall · NASA PSI evidence</span>
+          <span>
+            Data:{' '}
+            <a href="https://psi.nasa.gov/" target="_blank" rel="noreferrer">
+              NASA Physical Sciences Informatics
+            </a>{' '}
+            and the published sources on the <a href="/data-sources">Data Sources</a> page.
+          </span>
           <div>
-            <a href="#/compare">Compare</a>
-            <a href="#/methods">
-              Sources & methods <ArrowUpRight size={14} />
+            <a
+              href="https://github.com/nithinram123/flame-in-freefall"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View source code on GitHub <ArrowUpRight size={14} />
             </a>
           </div>
         </footer>

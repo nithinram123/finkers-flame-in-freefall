@@ -72,8 +72,6 @@ export async function handleAsk(request, response, env = process.env) {
     response.setHeader('Allow', 'GET, POST');
     return send(response, 405, { message: 'Use the Ask form to send a question.' });
   }
-  if (!env.ANTHROPIC_API_KEY)
-    return send(response, 503, { message: 'This deployment is in source-search mode.' });
   if (!String(request.headers['content-type'] || '').startsWith('application/json')) {
     return send(response, 415, { message: 'Send a JSON question.' });
   }
@@ -86,6 +84,7 @@ export async function handleAsk(request, response, env = process.env) {
   const question = typeof body?.question === 'string' ? body.question.trim() : '';
   if (!question || question.length > 500)
     return send(response, 400, { message: 'Enter a question of up to 500 characters.' });
+  let evidence;
   try {
     snapshot ??= readFile(resolve(process.cwd(), 'public/data/combustion.json'), 'utf8')
       .then(JSON.parse)
@@ -106,15 +105,9 @@ export async function handleAsk(request, response, env = process.env) {
             }),
           )
         : legacyScenario(body.habitatId);
-    const evidence = analystEvidence(dataset, question, scenario);
+    evidence = analystEvidence(dataset, question, scenario);
     const { rows, habitat, coverage } = evidence;
-    if (!rows.length)
-      return send(response, 200, {
-        answer: offlineAssessment(evidence),
-        sources: [],
-        claims: [],
-        offline: true,
-      });
+    if (!rows.length || !env.ANTHROPIC_API_KEY) return sendOffline(response, evidence);
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       signal: AbortSignal.timeout(17000),
@@ -167,12 +160,13 @@ export async function handleAsk(request, response, env = process.env) {
       }),
     });
     if (!upstream.ok)
-      return send(response, upstream.status === 429 ? 429 : 502, {
-        message:
-          upstream.status === 429
-            ? 'Claude is receiving too many requests. Try again shortly.'
-            : 'Claude could not answer right now. Source matches are still available.',
-      });
+      return sendOffline(
+        response,
+        evidence,
+        upstream.status === 429
+          ? 'Claude is receiving too many requests. Try again shortly.'
+          : 'Claude could not answer right now. Source matches are still available.',
+      );
     const result = await upstream.json();
     const content = result.content
       .filter((block) => block.type === 'text')
@@ -185,31 +179,48 @@ export async function handleAsk(request, response, env = process.env) {
     } catch {
       /* Keep the source-search fallback. */
     }
+    if (!claims.length)
+      return sendOffline(response, evidence, 'The retrieved rows did not support a cited answer.');
     return send(response, 200, {
       claims,
-      answer: claims.length
-        ? claims
-            .map(
-              ({ text, citations }) =>
-                text +
-                ' ' +
-                [...new Set(citations.map(({ accession }) => '[' + accession + ']'))].join(' '),
-            )
-            .join('\n')
-        : offlineAssessment(evidence),
+      answer: claims
+        .map(
+          ({ text, citations }) =>
+            text +
+            ' ' +
+            [...new Set(citations.map(({ accession }) => '[' + accession + ']'))].join(' '),
+        )
+        .join('\n'),
       sources: [
         ...new Map(
           claims.flatMap(({ citations }) => citations).map((source) => [source.id, source]),
         ).values(),
       ],
-      offline: !claims.length,
-      message: claims.length ? undefined : 'The retrieved rows did not support a cited answer.',
+      offline: false,
     });
   } catch {
+    if (evidence)
+      return sendOffline(response, evidence, 'The answer service is temporarily unavailable.');
     return send(response, 502, {
       message: 'The answer service is temporarily unavailable. Browse the source matches below.',
     });
   }
+}
+
+function sendOffline(response, evidence, message) {
+  return send(response, 200, {
+    answer: offlineAssessment(evidence),
+    sources: evidence.rows.map(({ id, accession, label, file, row }) => ({
+      id,
+      accession,
+      label,
+      file,
+      row,
+    })),
+    claims: [],
+    offline: true,
+    message,
+  });
 }
 
 export default function ask(request, response) {

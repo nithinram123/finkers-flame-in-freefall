@@ -29,7 +29,15 @@ export default function Navigation({ active, claude }) {
   const Icon = mobile ? X : Menu;
   const moreActive = morePages.some(([, , key]) => key === active);
   return (
-    <div className="mission-navigation">
+    <div
+      className="mission-navigation"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && mobile) {
+          setMobile(false);
+          event.currentTarget.querySelector('.mobile-nav-toggle')?.focus();
+        }
+      }}
+    >
       <button
         className="mobile-nav-toggle"
         type="button"
@@ -40,17 +48,7 @@ export default function Navigation({ active, claude }) {
         <Icon size={18} aria-hidden="true" />
         {mobile ? 'Close menu' : 'Menu'}
       </button>
-      <nav
-        aria-label="Main navigation"
-        id="mission-nav"
-        className={mobile ? 'is-open' : ''}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && mobile) {
-            setMobile(false);
-            document.querySelector('.mobile-nav-toggle')?.focus();
-          }
-        }}
-      >
+      <nav aria-label="Main navigation" id="mission-nav" className={mobile ? 'is-open' : ''}>
         {primary.map(([label, href, key, Symbol]) => (
           <a key={key} href={href} aria-current={key === active ? 'page' : undefined}>
             <Symbol size={17} aria-hidden="true" />
