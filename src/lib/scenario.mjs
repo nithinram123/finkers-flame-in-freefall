@@ -15,6 +15,7 @@ export function scenarioCoverage(records, scenario) {
   return {
     paired,
     box,
+    nearbyBox,
     exact: paired.filter((row) => inWindow(row, box)),
     nearby: paired.filter((row) => inWindow(row, nearbyBox)),
   };

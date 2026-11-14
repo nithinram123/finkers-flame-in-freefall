@@ -90,6 +90,10 @@ export default function Home({ dataset }) {
           </button>
         </div>
       </form>
+      <p>
+        <a href="/neural">Neural Evidence Lab</a> · Trace a measurement and see how a small model
+        performs against a simple baseline.
+      </p>
       <FlameDemo />
     </div>
   );

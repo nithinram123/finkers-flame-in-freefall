@@ -8,6 +8,7 @@ export default function CommandPalette({ dataset, onClose }) {
   const pages = [
     ['Choose a habitat', 'habitats'],
     ['Explore tests', 'explorer'],
+    ['Neural Evidence Lab', 'neural'],
     ['Browse investigations', 'investigations'],
     ['Ask the evidence', 'ask'],
     ['Compare investigations', 'compare'],

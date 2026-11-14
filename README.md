@@ -31,7 +31,10 @@ npm run preview
 - Original-column inspector and original CSV downloads for every nonempty record.
 - CSV export with source filenames and CSV row references.
 - Claude answers with citations to specific PSI source rows when configured, with local evidence search available as a fallback.
+- [Neural Evidence Lab](/neural) compares cabin conditions to actual NASA records and audits a small, build-time neural model on held-out FLEX burn durations.
 - Sources, methods, limitations and SI disclosure in the application.
+
+The [judging review and demo checklist](JUDGING_REVIEW.md) map the project to all five 2026 criteria and ten global awards.
 
 ## Data and scientific boundaries
 
@@ -46,6 +49,7 @@ Ranges, multiple values, instrument settings and unresolved text are not convert
 ```text
 data/                 Original NASA metadata and tables
 scripts/normalize.mjs Reproducible classifications, units, provenance, audit
+scripts/build-neural.mjs Grouped hold-out evaluation for FLEX burn duration
 scripts/fetch_psi.py   Original user-supplied NASA refresh script (Python 3.8+)
 src/components/       Catalogue, details, comparison, charts, evidence search
 src/lib/evidence.mjs  Pure selectors, filters and export utilities

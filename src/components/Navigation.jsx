@@ -17,6 +17,7 @@ const primary = [
   ['Explore Experiments', '/explorer', 'explorer', ChartScatter],
 ];
 export const morePages = [
+  ['Neural Evidence Lab', '/neural', 'neural'],
   ['Experiment Analysis', '/investigations', 'investigations'],
   ['Compare', '/compare', 'compare'],
   ['Insights', '/insights', 'insights'],

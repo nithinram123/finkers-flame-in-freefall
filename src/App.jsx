@@ -18,6 +18,7 @@ import Navigation, { morePages } from './components/Navigation.jsx';
 import Insights, { ResearchGaps } from './components/Insights.jsx';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
+const Neural = lazy(() => import('./components/Neural.jsx'));
 const titles = {
   habitats: 'Home',
   explorer: 'Explore Experiments',
@@ -199,6 +200,9 @@ export default function App() {
         break;
       case 'explorer':
         page = <Explorer key={id || 'all'} {...props} initialAccession={id} />;
+        break;
+      case 'neural':
+        page = <Neural {...props} key={query.toString()} query={query} />;
         break;
       case 'compare':
         page = <Compare {...props} />;
