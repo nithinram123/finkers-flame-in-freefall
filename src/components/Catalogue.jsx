@@ -1,3 +1,4 @@
+import { PsiTag } from './PsiSources.jsx';
 import { useMemo, useState } from 'react';
 import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react';
 import { filterInvestigations, rangeLabel } from '../lib/evidence.mjs';
@@ -120,7 +121,7 @@ export default function Catalogue({ dataset, selected, toggleCompare }) {
         {filtered.map((investigation) => (
           <article className="investigation-card" key={investigation.accession}>
             <div className="card-top">
-              <span className="source-id">{investigation.accession}</span>
+              <PsiTag investigation={investigation} />
               <Badge>{investigation.fuelType}</Badge>
             </div>
             <h3>

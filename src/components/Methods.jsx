@@ -1,3 +1,5 @@
+import { buildPsi } from '../lib/psi.mjs';
+import PsiSources from './PsiSources.jsx';
 import { Notice, PageTitle } from './ui.jsx';
 
 export default function Methods({ dataset }) {
@@ -81,6 +83,7 @@ export default function Methods({ dataset }) {
           project.
         </p>
       </section>
+      <PsiSources investigations={buildPsi(dataset).investigations} />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { buildPsi } from '../src/lib/psi.mjs';
 // SI-assisted normalization. NASA source files are preserved unchanged in data/tables.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -349,6 +350,7 @@ function main() {
   };
   fs.mkdirSync(path.join(root, 'public/data'), { recursive: true });
   fs.writeFileSync(path.join(root, 'public/data/combustion.json'), JSON.stringify(dataset));
+  fs.writeFileSync(path.join(root, 'public/data/psi.json'), JSON.stringify(buildPsi(dataset)));
   fs.writeFileSync(
     path.join(root, 'public/data/source-manifest.json'),
     JSON.stringify(manifest, null, 2),

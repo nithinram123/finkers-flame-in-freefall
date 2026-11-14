@@ -1,3 +1,4 @@
+import { PsiTag } from './PsiSources.jsx';
 import { useState } from 'react';
 import { rangeLabel } from '../lib/evidence.mjs';
 import { Badge, Empty, Notice, PageTitle, SourceLink } from './ui.jsx';
