@@ -85,6 +85,14 @@ export default function App() {
   const [inspect, setInspect] = useState(null);
   const [palette, setPalette] = useState(false);
   const [claude, setClaude] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/ask', { signal: controller.signal })
+      .then((response) => response.json())
+      .then((status) => setClaude(status.enabled === true))
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
   const [lastHabitat, setLastHabitat] = useState(() => {
     try {
       return sessionStorage.getItem('flame-habitat');

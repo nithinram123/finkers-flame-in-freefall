@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
-import { searchEvidence } from '../lib/evidence.mjs';
+import { analystEvidence, offlineAssessment } from '../lib/analyst.mjs';
 import { HabitatContext } from './Habitat.jsx';
 import { Badge, Empty, Field, Measurement, Notice, PageTitle } from './ui.jsx';
 
 const examples = [
-  'Which FLEX tests report methanol extinction?',
-  'What did SAME measure about smoke?',
-  'Which CFI-G tests recorded failed ignition?',
+  'Is a Moon base more dangerous for fire than the Space Station?',
+  'What should a Mars base use to put out fires?',
+  'Why does fire behave differently in space?',
+  'Which materials are safest for a crew cabin?',
+  'What has NASA never tested that a Moon base needs?',
 ];
 
 export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' }) {
@@ -38,7 +40,14 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
     setQuestion(value);
     setPending(true);
     setResult(null);
-    const matches = searchEvidence(dataset, text);
+    const evidence = analystEvidence(dataset, text, habitat);
+    const matches = evidence.rows;
+    const fallback = offlineAssessment(evidence);
+    if (enabled === false) {
+      setResult({ text, matches, claims: [], offline: fallback });
+      setPending(false);
+      return;
+    }
     const controller = new AbortController();
     request.current = controller;
     try {
@@ -46,16 +55,34 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
-        body: JSON.stringify({ question: text, habitatId: habitat?.id }),
+        body: JSON.stringify({
+          question: text,
+          habitatId: habitat?.id,
+          scenario: habitat?.atm
+            ? {
+                id: habitat.id,
+                oxygen: habitat.oxygen,
+                atm: habitat.atm,
+                gravityG: habitat.gravityG,
+              }
+            : undefined,
+        }),
       });
       const answer = await response.json();
-      setResult({ text, matches, claims: response.ok ? answer.claims : [], note: answer.message });
+      setResult({
+        text,
+        matches,
+        claims: response.ok ? answer.claims : [],
+        note: answer.message,
+        offline: !response.ok || answer.offline ? fallback : undefined,
+      });
     } catch {
       if (!controller.signal.aborted)
         setResult({
           text,
           matches,
           claims: [],
+          offline: fallback,
           note: 'The answer service is unavailable. Browse the matching source records below.',
         });
     } finally {
@@ -71,9 +98,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
         description="Ask about the experiments. Each generated claim links back to the NASA PSI records used."
       />
       {enabled === false && (
-        <Notice>
-          Live answers are unavailable here. You can still search the NASA source records.
-        </Notice>
+        <Notice>Offline mode. Search and compare the NASA source records.</Notice>
       )}
       <form className="ask-form" onSubmit={ask}>
         <Field label="Your question">
@@ -82,7 +107,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="How did changing oxygen affect the FLEX tests?"
             rows={4}
-            maxLength={600}
+            maxLength={500}
             required
           />
         </Field>
@@ -133,6 +158,13 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '' 
                   </div>
                 </div>
               ))}
+            </article>
+          )}
+          {result.offline && (
+            <article className="answer-card">
+              <span className="eyebrow">Offline mode</span>
+              <h2>{result.text}</h2>
+              <p>{result.offline}</p>
             </article>
           )}
           {result.note && <Notice>{result.note}</Notice>}
