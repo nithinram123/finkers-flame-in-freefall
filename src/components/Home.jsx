@@ -7,7 +7,7 @@ import {
   MessageCircle,
   Moon,
   SlidersHorizontal,
-  Space,
+  Satellite,
   Truck,
 } from 'lucide-react';
 import { FlameDemo } from './Habitat.jsx';
@@ -15,7 +15,7 @@ import { isPaired } from '../lib/habitat.mjs';
 import { scenarioProfiles } from '../lib/scenario.mjs';
 import { analystUrl } from '../lib/routes.mjs';
 
-const icons = [Space, Moon, Truck, Globe2, SlidersHorizontal];
+const icons = [Satellite, Moon, Truck, Globe2, SlidersHorizontal];
 const steps = [
   [MapPin, 'Pick a habitat'],
   [ChartScatter, 'See the risks'],
