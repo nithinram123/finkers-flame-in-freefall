@@ -3,7 +3,7 @@ import { rangeLabel } from '../lib/evidence.mjs';
 import { Badge, Empty, Notice, PageTitle, SourceLink } from './ui.jsx';
 import Records from './Records.jsx';
 
-export default function Detail({ dataset, accession, selected, toggleCompare }) {
+export default function Detail({ dataset, accession, selected, toggleCompare, onInspect }) {
   const [tab, setTab] = useState('Overview');
   const investigation = dataset.investigations.find((item) => item.accession === accession);
   if (!investigation)
@@ -135,7 +135,12 @@ export default function Detail({ dataset, accession, selected, toggleCompare }) 
             All nonempty source rows are available here, including summaries, notes and flagged
             duplicates. Open a row to inspect its original column values.
           </Notice>
-          <Records records={records} tables={dataset.tables} key={accession} />
+          <Records
+            records={records}
+            tables={dataset.tables}
+            key={accession}
+            onInspect={onInspect}
+          />
         </>
       )}
       {tab === 'Sources' && (

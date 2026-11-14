@@ -22,15 +22,15 @@ npm run preview
 
 `npm run build` regenerates `public/data` from the original inputs before compiling the app. No API key, database or NASA login is required for the current MVP.
 
-## Available in the MVP
+## Available in the briefing
 
 - Catalogue of all 24 investigations, filtered by fuel, hardware and safety area.
 - Investigation objectives, methods, SI-assisted plain-English descriptions, reported condition ranges, measurements and publications.
 - Comparison of two or three investigations with missing measurements identified.
-- Scatter plots of scalar oxygen, pressure, airflow and burn duration, coloured by source-reported outcomes.
+- Clustered plots of oxygen, log pressure, airflow and burn duration, grouped by fuel or material. Coverage indicators track reported outcomes and measurements.
 - Original-column inspector and original CSV downloads for every nonempty record.
 - CSV export with source filenames and CSV row references.
-- Keyword evidence search with citations to specific PSI source rows. This is visibly labelled source-search mode; it is not a live language-model answer service.
+- Claude answers with citations to specific PSI source rows when configured, with local evidence search available as a fallback.
 - Sources, methods, limitations and SI disclosure in the application.
 
 ## Data and scientific boundaries
@@ -55,12 +55,22 @@ public/data/          Generated browser data (ignored in Git)
 
 Refreshing from NASA is optional and may change the snapshot. The original Python script fetches metadata and table records without downloading the full underlying video archive. After refresh, regenerate and review the audit before publishing.
 
-## Next functional steps
+## Habitat briefing
 
-1. Add a server-only SI answer endpoint after the team chooses a provider. Configure credentials directly in Vercel; never use a frontend `VITE_` secret.
-2. Design habitat ranking after the team owns and confirms its research angle, relevance rules and scoring method.
-3. Review scientific interpretations with publications or a subject-matter expert.
-4. Complete visual, keyboard and responsive browser QA, then prepare the submission and demo.
+Choose one of five cabin scenarios. ISS uses nominal conditions. Other presets are illustrative and use the challenge brief or NASA exploration atmosphere examples. The ranking uses the nearest measured test in ambient oxygen and pressure, with a window of ±2 oxygen percentage points and ±10% pressure. It ranks atmosphere similarity. Surface gravity, fuel, airflow and equipment remain separate considerations.
+
+The chart groups nearby points by screen position without discarding any rows. Markers open the original values and source citation. Earth and nominal ISS share a reference. Data coverage counts and explicit gaps describe the supplied snapshot.
+
+## Enable Claude on Vercel
+
+1. Import the GitHub repository into your Vercel team.
+2. In **Project Settings → Environment Variables**, add `ANTHROPIC_API_KEY` as a sensitive environment variable for Production and any Preview environment that should use Claude. Set `ANTHROPIC_MODEL` if you want to override the default Haiku model.
+3. Redeploy and check `GET /api/ask`. It reports `{"enabled":true}` when a key is configured. Ask a supported question such as “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row.
+4. Set an Anthropic workspace spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
+
+For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.
+
+The request sends the question, selected scenario and up to ten relevant public NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
 
 ## SI use and originality
 
@@ -70,8 +80,8 @@ OpenAI Codex assisted source inspection, normalization code, React implementatio
 
 - [NASA PSI repository](https://psi.nasa.gov/physci/repo/search?q=combustion); individual PSI links and dataset/publication DOIs are provided in the app.
 - [NASA combustion science](https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/).
-- [React](https://react.dev/), [Vite](https://vite.dev/), [Recharts](https://recharts.github.io/), [Lucide](https://lucide.dev/), [csv-parse](https://csv.js.org/parse/), [Prettier](https://prettier.io/).
-- [IBM Plex](https://github.com/IBM/plex), loaded through Google Fonts with a sans-serif fallback.
+- [React](https://react.dev/), [Vite](https://vite.dev/), [Lucide](https://lucide.dev/), [csv-parse](https://csv.js.org/parse/), [Prettier](https://prettier.io/).
+- [Inter](https://rsms.me/inter/), loaded through Google Fonts with a sans-serif fallback.
 - The user's previously supplied frontend design skills informed the framed-sheet visual direction. See `DESIGN.md`.
 
 Original code is SI-assisted project work. Third-party packages and NASA data retain their respective terms. This independent project does not imply NASA endorsement.

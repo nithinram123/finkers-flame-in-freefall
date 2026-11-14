@@ -1,5 +1,31 @@
 import { Empty, Notice, PageTitle } from './ui.jsx';
 
+export function RecordFields({ record, table }) {
+  return (
+    <>
+      {record.flags.length > 0 && <Notice>{record.flags.join('. ')}.</Notice>}
+      <div className="table-scroll">
+        <table className="raw-record">
+          <thead>
+            <tr>
+              <th scope="col">Original column</th>
+              <th scope="col">Original value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {table.headers.map((header, index) => (
+              <tr key={index}>
+                <th scope="row">{header}</th>
+                <td>{record.values[index] || <span className="muted">Empty in source</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
 export default function RecordDetail({ dataset, id }) {
   const record = dataset.records.find((item) => item.id === id);
   if (!record)
@@ -24,29 +50,7 @@ export default function RecordDetail({ dataset, id }) {
         </a>
       </PageTitle>
       <p className="source-filename">{table.file}</p>
-      {record.flags.length > 0 && <Notice>{record.flags.join('. ')}.</Notice>}
-      <div className="table-scroll">
-        <table className="raw-record">
-          <thead>
-            <tr>
-              <th>Original column</th>
-              <th>Original value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {table.headers.map((header, index) => (
-              <tr key={`${index}-${header}`}>
-                <th scope="row">{header}</th>
-                <td>{record.values[index] || <span className="muted">Empty in source</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="muted">
-        The identifier locates a CSV record, including quoted multiline fields. It is not
-        necessarily a physical line number or a distinct physical experiment.
-      </p>
+      <RecordFields record={record} table={table} />
     </>
   );
 }

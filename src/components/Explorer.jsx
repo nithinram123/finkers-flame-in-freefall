@@ -1,192 +1,200 @@
 import { useMemo, useState } from 'react';
-import {
-  CartesianGrid,
-  ResponsiveContainer,
-  Scatter,
-  ScatterChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { chartRecords, isTest } from '../lib/evidence.mjs';
-import { Empty, Field, Notice, PageTitle } from './ui.jsx';
+import { coverage, inWindow } from '../lib/habitat.mjs';
+import ConditionChart, { metrics } from './ConditionChart.jsx';
+import FilterMenu from './FilterMenu.jsx';
 import Records from './Records.jsx';
+import { PageTitle } from './ui.jsx';
 
-const metrics = {
-  oxygen: ['Initial oxygen', '%'],
-  pressure: ['Initial pressure', 'kPa'],
-  airflow: ['Airflow', 'cm/s'],
-  burnTime: ['Burn duration', 's'],
-};
-const colors = ['#146477', '#a55c28', '#566e98', '#55675c', '#8b556b', '#6b6577'];
+const defaults = { accession: '', x: 'oxygen', y: 'pressure', basis: 'ambient' };
+const axes = Object.entries(metrics).map(([key, [label, unit]]) => [key, `${label} (${unit})`]);
+const oxygenOptions = [
+  ['ambient', 'Ambient chamber'],
+  ['burner oxidizer', 'Burner stream'],
+];
+const earthWindow = { x1: 19, x2: 23, y1: 91.17, y2: 111.43 };
 
-function PointTooltip({ active, payload, x, y }) {
-  const record = payload?.[0]?.payload;
-  if (!active || !record) return null;
+export function Coverage({ records }) {
+  const counts = coverage(records);
   return (
-    <div className="chart-tooltip">
-      <strong>
-        {record.accession} · {record.label}
-      </strong>
-      <span>{record.fuel || 'Fuel not reported'}</span>
-      <span>
-        {metrics[x][0]}: {record[x].raw} → {record.x} {metrics[x][1]}
-      </span>
-      <span>
-        {metrics[y][0]}: {record[y].raw} → {record.y} {metrics[y][1]}
-      </span>
-      <span>
-        {record.outcome} · source row {record.row}
-      </span>
-    </div>
+    <section aria-label="Data coverage" className="coverage-strip">
+      {[
+        ['oxygen', 'Scalar oxygen'],
+        ['pressure', 'Scalar pressure'],
+        ['outcome', 'Outcome reported'],
+        ['ranges', 'Ranges or lists'],
+      ].map(([key, label]) => (
+        <div className="coverage-item" key={key}>
+          <span>{label}</span>
+          <strong>
+            {counts[key]} <small>/ {counts.total}</small>
+          </strong>
+          <progress aria-label={label} value={counts[key]} max={counts.total || 1} />
+        </div>
+      ))}
+    </section>
   );
 }
 
-export default function Explorer({ dataset }) {
-  const [accession, setAccession] = useState('PSI-69');
-  const [x, setX] = useState('oxygen');
-  const [y, setY] = useState('pressure');
-  const [basis, setBasis] = useState('ambient');
+export default function Explorer({ dataset, onInspect, initialAccession }) {
+  const [filters, setFilters] = useState({ ...defaults, accession: initialAccession || '' });
+  const options = [
+    ['', 'All investigations'],
+    ...dataset.investigations
+      .filter((item) => item.testRecordCount)
+      .map((item) => [item.accession, item.name]),
+  ];
+  const oxygenRelevant = filters.x === 'oxygen' || filters.y === 'oxygen';
+  const eligible = useMemo(
+    () =>
+      dataset.records.filter(
+        (record) =>
+          isTest(record) && (!filters.accession || record.accession === filters.accession),
+      ),
+    [dataset, filters.accession],
+  );
+  const scope = useMemo(
+    () => (oxygenRelevant ? eligible.filter((row) => row.oxygenBasis === filters.basis) : eligible),
+    [eligible, oxygenRelevant, filters.basis],
+  );
   const plotted = useMemo(
     () =>
-      chartRecords(dataset.records, { accession, basis, x, y }).map((record) => ({
-        ...record,
-        x: record[x].value,
-        y: record[y].value,
-      })),
-    [dataset, accession, basis, x, y],
+      chartRecords(eligible, filters).filter((row) =>
+        [filters.x, filters.y].every((key) => key !== 'pressure' || row.pressure.value > 0),
+      ),
+    [eligible, filters],
   );
-  const eligible = dataset.records.filter(
-    (record) => isTest(record) && (!accession || record.accession === accession),
-  );
-  const outcomes = [...new Set(plotted.map((record) => record.outcome))];
+  const ambientPlot =
+    filters.x === 'oxygen' && filters.y === 'pressure' && filters.basis === 'ambient';
+  const nearby = ambientPlot ? plotted.filter((row) => inWindow(row, earthWindow)).length : 0;
+  const oxygenLevels = [...new Set(plotted.map((row) => row.oxygen.value))].sort((a, b) => a - b);
+  const narrowOxygen = ambientPlot && oxygenLevels.length > 0 && oxygenLevels.length <= 3;
+  const adjust = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
+  const chips = [
+    ['accession', options.find(([key]) => key === filters.accession)?.[1]],
+    ['x', axes.find(([key]) => key === filters.x)?.[1]],
+    ['y', axes.find(([key]) => key === filters.y)?.[1]],
+    ['basis', oxygenOptions.find(([key]) => key === filters.basis)?.[1]],
+  ].filter(([key]) => filters[key] !== defaults[key] && (key !== 'basis' || oxygenRelevant));
   return (
     <>
       <PageTitle
-        eyebrow="Measured conditions"
-        title="Explore the test data"
-        description="Inspect source measurements. Open a point or table record to inspect the original values."
+        eyebrow="NASA PSI research"
+        title="What did NASA test?"
+        description="Explore measured conditions and open any record to see the original NASA data."
       />
-      <div className="explorer-controls">
-        <Field label="Investigation">
-          <select value={accession} onChange={(event) => setAccession(event.target.value)}>
-            <option value="">All investigations</option>
-            {dataset.investigations
-              .filter((item) => item.testRecordCount > 0)
-              .map((item) => (
-                <option value={item.accession} key={item.accession}>
-                  {item.name}
-                </option>
-              ))}
-          </select>
-        </Field>
-        <Field label="Horizontal axis">
-          <select value={x} onChange={(event) => setX(event.target.value)}>
-            {Object.entries(metrics).map(([key, [name, unit]]) => (
-              <option value={key} key={key}>
-                {name} ({unit})
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Vertical axis">
-          <select value={y} onChange={(event) => setY(event.target.value)}>
-            {Object.entries(metrics).map(([key, [name, unit]]) => (
-              <option value={key} key={key}>
-                {name} ({unit})
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Oxygen location">
-          <select value={basis} onChange={(event) => setBasis(event.target.value)}>
-            <option value="ambient">Ambient / chamber</option>
-            <option value="burner oxidizer">Inverse burner stream</option>
-          </select>
-        </Field>
-      </div>
-      <Notice>
-        {plotted.length} of {eligible.length} deduplicated test records have the selected scalar
-        measurements{x === 'oxygen' || y === 'oxygen' ? ' and oxygen location' : ''}. Ranges,
-        summaries and missing values are excluded.{' '}
-        {basis === 'burner oxidizer' &&
-          'Burner-stream oxygen cannot be interpreted as cabin oxygen.'}
-      </Notice>
-      <section className="chart-panel" aria-label={`${metrics[y][0]} against ${metrics[x][0]}`}>
-        <div className="section-heading">
-          <h2>
-            {metrics[y][0]} vs. {metrics[x][0].toLowerCase()}
-          </h2>
-          <span className="muted">Colour: reported outcome</span>
+      <section aria-label="Chart filters" className="filters-panel">
+        <div className="section-kicker">
+          <SlidersHorizontal size={16} aria-hidden="true" /> Filter the evidence
         </div>
-        {plotted.length ? (
-          <>
-            <div className="chart-wrap">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 18, right: 24, bottom: 35, left: 18 }}>
-                  <CartesianGrid vertical={false} stroke="#e8edef" />
-                  <XAxis
-                    type="number"
-                    dataKey="x"
-                    name={metrics[x][0]}
-                    unit={` ${metrics[x][1]}`}
-                    tick={{ fontSize: 12 }}
-                    label={{
-                      value: `${metrics[x][0]} (${metrics[x][1]})`,
-                      position: 'bottom',
-                      offset: 16,
-                    }}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="y"
-                    name={metrics[y][0]}
-                    unit={` ${metrics[y][1]}`}
-                    tick={{ fontSize: 12 }}
-                    width={85}
-                  />
-                  <Tooltip content={<PointTooltip x={x} y={y} />} />
-                  {outcomes.map((outcome, index) => (
-                    <Scatter
-                      key={outcome}
-                      name={outcome}
-                      data={plotted.filter((record) => record.outcome === outcome)}
-                      fill={colors[index % colors.length]}
-                      fillOpacity={0.65}
-                      onClick={(record) => {
-                        if (record?.id) window.location.hash = `/record/${record.id}`;
-                      }}
-                      isAnimationActive={false}
-                      cursor="pointer"
-                    />
-                  ))}
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="chart-legend">
-              {outcomes.map((outcome, index) => (
-                <span key={outcome}>
-                  <i style={{ backgroundColor: colors[index % colors.length] }} />
-                  {outcome} ({plotted.filter((record) => record.outcome === outcome).length})
-                </span>
-              ))}
-            </div>
-          </>
-        ) : (
-          <Empty title="No compatible measurements">
-            Try another investigation or axis. Missing values remain unfilled.
-          </Empty>
+        <div className="explorer-controls">
+          <FilterMenu
+            label="Investigation"
+            options={options}
+            value={filters.accession}
+            onChange={(value) => adjust('accession', value)}
+          />
+          <FilterMenu
+            label="Horizontal axis"
+            options={axes}
+            value={filters.x}
+            onChange={(value) => adjust('x', value)}
+          />
+          <FilterMenu
+            label="Vertical axis"
+            options={axes}
+            value={filters.y}
+            onChange={(value) => adjust('y', value)}
+          />
+          {oxygenRelevant && (
+            <FilterMenu
+              label="Oxygen location"
+              options={oxygenOptions}
+              value={filters.basis}
+              onChange={(value) => adjust('basis', value)}
+            />
+          )}
+        </div>
+        {chips.length > 0 && (
+          <div className="filter-chips">
+            {chips.map(([key, label]) => (
+              <button
+                type="button"
+                key={key}
+                aria-label={`Remove ${label} filter`}
+                onClick={() => adjust(key, defaults[key])}
+              >
+                {label}
+                <X size={14} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
         )}
-        <p className="chart-caption">
-          Points represent source rows and can overlap. These observations do not estimate habitat
-          fire probability. The table below provides a keyboard-accessible alternative.
-        </p>
       </section>
+      <Coverage records={scope} />
+      <section className="chart-panel evidence-plot" aria-label="Measured test conditions">
+        <header className="plot-heading">
+          <span className="eyebrow">Measured conditions</span>
+          <h2>
+            {narrowOxygen
+              ? `These tests cover ${oxygenLevels.map((value) => `${Number(value.toFixed(2))}%`).join(' and ')} oxygen.`
+              : ambientPlot && plotted.length
+                ? nearby === plotted.length
+                  ? 'Every plotted test sits near Earth and ISS conditions.'
+                  : nearby > plotted.length / 2
+                    ? 'Most plotted tests sit near Earth and ISS conditions.'
+                    : nearby === 0
+                      ? 'No plotted tests sit near Earth and ISS conditions.'
+                      : 'The plotted tests span several cabin conditions.'
+                : `${metrics[filters.y][0]} and ${metrics[filters.x][0].toLowerCase()}`}
+          </h2>
+          <p>
+            {ambientPlot
+              ? `${nearby} of ${plotted.length} plotted records fall within 2 oxygen percentage points and 10% pressure of the Earth / nominal ISS reference.`
+              : `${plotted.length} of ${scope.length} records report both measurements.`}
+          </p>
+        </header>
+        <ConditionChart
+          records={plotted}
+          x={filters.x}
+          y={filters.y}
+          references={ambientPlot}
+          onInspect={onInspect}
+        />
+      </section>
+      <details className="gap-panel">
+        <summary>What we don’t know</summary>
+        <div>
+          <p>
+            {scope.length - plotted.length} of {scope.length} records in this selection lack a
+            usable pair of measurements. {scope.length - coverage(scope).outcome} lack a reported
+            outcome.
+          </p>
+          {ambientPlot && (
+            <p>
+              {plotted.filter((row) => row.pressure.value < 70.3 && row.oxygen.value >= 30).length}{' '}
+              plotted records combine at least 30% ambient oxygen with pressure below 70.3 kPa.
+            </p>
+          )}
+          {filters.basis === 'burner oxidizer' && oxygenRelevant && (
+            <p>
+              Burner oxygen describes the gas fed to the flame. Habitat comparisons use the
+              surrounding chamber’s oxygen.
+            </p>
+          )}
+          <p>
+            The snapshot gives no direct lunar or Martian surface-gravity validation. Empty regions
+            describe this selection’s coverage.
+          </p>
+        </div>
+      </details>
       <Records
         records={plotted}
         tables={dataset.tables}
         title="Plotted source records"
-        key={`${accession}-${x}-${y}-${basis}`}
+        onInspect={onInspect}
+        key={Object.values(filters).join('-')}
       />
     </>
   );

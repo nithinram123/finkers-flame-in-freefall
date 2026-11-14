@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react';
 import { filterInvestigations, rangeLabel } from '../lib/evidence.mjs';
-import { Badge, Empty, Field, PageTitle, SourceLink } from './ui.jsx';
+import { Badge, Empty, PageTitle, SourceLink } from './ui.jsx';
+import FilterMenu from './FilterMenu.jsx';
 
 export default function Catalogue({ dataset, selected, toggleCompare }) {
   const [filters, setFilters] = useState({ query: '', fuel: '', area: '', hardware: '' });
@@ -51,45 +52,39 @@ export default function Catalogue({ dataset, selected, toggleCompare }) {
         </label>
         <div className="filter-row">
           <SlidersHorizontal size={16} aria-hidden="true" />
-          <Field label="Fuel">
-            <select
-              value={filters.fuel}
-              onChange={(event) => setFilter('fuel', event.target.value)}
-            >
-              <option value="">All fuel types</option>
-              {['Solid', 'Liquid', 'Gas', 'Dust / aerosol', 'Analysis'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Safety area">
-            <select
-              value={filters.area}
-              onChange={(event) => setFilter('area', event.target.value)}
-            >
-              <option value="">All safety areas</option>
-              {['Prevention', 'Detection', 'Suppression', 'Research'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Hardware">
-            <select
-              value={filters.hardware}
-              onChange={(event) => setFilter('hardware', event.target.value)}
-            >
-              <option value="">All hardware</option>
-              {[
-                ...new Set(
-                  dataset.investigations.map((investigation) => investigation.hardwareGroup),
-                ),
-              ]
+          <FilterMenu
+            label="Fuel"
+            value={filters.fuel}
+            options={[
+              ['', 'All fuel types'],
+              ...[...new Set(dataset.investigations.map((item) => item.fuelType))]
                 .sort()
-                .map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-            </select>
-          </Field>
+                .map((value) => [value, value]),
+            ]}
+            onChange={(value) => setFilter('fuel', value)}
+          />
+          <FilterMenu
+            label="Safety area"
+            value={filters.area}
+            options={[
+              ['', 'All safety areas'],
+              ...[...new Set(dataset.investigations.flatMap((item) => item.areas))]
+                .sort()
+                .map((value) => [value, value]),
+            ]}
+            onChange={(value) => setFilter('area', value)}
+          />
+          <FilterMenu
+            label="Hardware"
+            value={filters.hardware}
+            options={[
+              ['', 'All hardware'],
+              ...[...new Set(dataset.investigations.map((item) => item.hardwareGroup))]
+                .sort()
+                .map((value) => [value, value]),
+            ]}
+            onChange={(value) => setFilter('hardware', value)}
+          />
           {(filters.query || filters.fuel || filters.area || filters.hardware) && (
             <button
               className="text-button"
@@ -98,6 +93,21 @@ export default function Catalogue({ dataset, selected, toggleCompare }) {
               Clear filters
             </button>
           )}
+        </div>
+        <div className="filter-chips">
+          {['fuel', 'area', 'hardware']
+            .filter((key) => filters[key])
+            .map((key) => (
+              <button
+                type="button"
+                key={key}
+                aria-label={'Remove ' + filters[key] + ' filter'}
+                onClick={() => setFilter(key, '')}
+              >
+                {filters[key]}
+                <X size={14} aria-hidden="true" />
+              </button>
+            ))}
         </div>
       </section>
       <div className="section-heading">

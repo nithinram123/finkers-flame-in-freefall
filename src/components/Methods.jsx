@@ -69,15 +69,16 @@ export default function Methods({ dataset }) {
         <h2>Use of Super Intelligence</h2>
         <p>
           {dataset.siDisclosure} OpenAI Codex assisted implementation, normalization, documentation
-          and plain-English descriptions. Source measurements and outcomes come from NASA. Ask
-          currently performs local evidence search and labels that mode visibly.
+          and plain-English descriptions. Source measurements and outcomes come from NASA. Ask sends
+          retrieved source rows to Claude when the server is configured. Each displayed claim must
+          cite a retrieved row. Local evidence search remains available when Claude is unavailable.
         </p>
         <h2>Tools & attribution</h2>
         <p>
           NASA Physical Sciences Informatics (PSI) provides research metadata and experimental
-          tables. React, Vite, Recharts, Lucide and csv-parse support this application. IBM Plex
-          fonts are by IBM. Visual direction follows the user's previously supplied frontend design
-          skills. This is an independent Space Apps project.
+          tables. React, Vite, Lucide and csv-parse support this application. The interface uses
+          Inter and follows the project's briefing design. This is an independent Space Apps
+          project.
         </p>
       </section>
     </>

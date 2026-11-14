@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Empty, ExportButton, Measurement } from './ui.jsx';
 
-export default function Records({ records, tables = [], title = 'Source records' }) {
+export default function Records({ records, tables = [], title = 'Source records', onInspect }) {
   const [page, setPage] = useState(0);
   const pageSize = 20;
   const lastPage = Math.max(0, Math.ceil(records.length / pageSize) - 1);
@@ -73,9 +73,18 @@ export default function Records({ records, tables = [], title = 'Source records'
                 {visible.map((record) => (
                   <tr key={record.id} className={record.duplicateOf ? 'duplicate-row' : ''}>
                     <td>
-                      <a className="source-id" href={`#/record/${record.id}`}>
-                        {record.label}
-                      </a>
+                      {onInspect ? (
+                        <button
+                          className="text-button source-id"
+                          onClick={() => onInspect([record])}
+                        >
+                          {record.label}
+                        </button>
+                      ) : (
+                        <a className="source-id" href={`#/record/${record.id}`}>
+                          {record.label}
+                        </a>
+                      )}
                       {record.duplicateOf && <small>Duplicate retained</small>}
                     </td>
                     <td>{record.kind}</td>
@@ -96,7 +105,17 @@ export default function Records({ records, tables = [], title = 'Source records'
                     </td>
                     <td>{record.outcome}</td>
                     <td>
-                      <a href={`#/record/${record.id}`}>
+                      <a
+                        href={`#/record/${record.id}`}
+                        onClick={
+                          onInspect
+                            ? (event) => {
+                                event.preventDefault();
+                                onInspect([record]);
+                              }
+                            : undefined
+                        }
+                      >
                         {record.accession}
                         <small>CSV row {record.row}</small>
                       </a>

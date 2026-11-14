@@ -16,6 +16,12 @@ export function scalar(raw, factor = 1) {
   return m ? Math.round(Number(m[1]) * factor * 1e6) / 1e6 : null;
 }
 const config = {
+  'PSI-159': [
+    'Gas',
+    'Prevention',
+    'ACME / CIR',
+    'Study cool gaseous flames in normal and inverse configurations. Inverse tests report oxygen in the burner stream.',
+  ],
   'PSI-10': [
     'Gas',
     'Prevention',

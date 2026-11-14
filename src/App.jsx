@@ -1,25 +1,28 @@
 import { Component, Suspense, lazy, useEffect, useState } from 'react';
-import { BookOpen, ChartScatter, Columns3, Database, Flame, Info, Search } from 'lucide-react';
+import { ArrowUpRight, Flame, Search } from 'lucide-react';
 import Catalogue from './components/Catalogue.jsx';
 import Detail from './components/Detail.jsx';
 import Compare from './components/Compare.jsx';
 import RecordDetail from './components/RecordDetail.jsx';
+import RecordDrawer from './components/RecordDrawer.jsx';
 import Ask from './components/Ask.jsx';
 import Methods from './components/Methods.jsx';
+import CommandPalette from './components/CommandPalette.jsx';
+import { HabitatPicker, HabitatResults } from './components/Habitat.jsx';
+import { findHabitat } from './lib/habitat.mjs';
+
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const navigation = [
-  ['investigations', 'Investigations', BookOpen],
-  ['explorer', 'Test explorer', ChartScatter],
-  ['compare', 'Compare', Columns3],
-  ['ask', 'Ask the evidence', Search],
-  ['methods', 'Sources & methods', Database],
+  ['habitats', 'Habitats'],
+  ['explorer', 'Test explorer'],
+  ['investigations', 'Investigations'],
+  ['ask', 'Ask'],
 ];
 
 function Loading() {
   return (
     <div className="loading-state" role="status">
-      <h1>Loading research evidence…</h1>
-      <div className="skeleton" />
+      <h1>Loading NASA evidence…</h1>
       <div className="skeleton" />
       <div className="skeleton short" />
     </div>
@@ -32,23 +35,23 @@ class ErrorBoundary extends Component {
     return { error };
   }
   render() {
-    if (this.state.error)
-      return (
-        <div className="empty" role="alert">
-          <h1>The explorer could not open</h1>
-          <p>Reload the page to try again.</p>
-          <button onClick={() => window.location.reload()}>Reload explorer</button>
-        </div>
-      );
-    return this.props.children;
+    return this.state.error ? (
+      <div className="empty" role="alert">
+        <h1>The briefing could not open</h1>
+        <button onClick={() => window.location.reload()}>Reload briefing</button>
+      </div>
+    ) : (
+      this.props.children
+    );
   }
 }
 
 function useRoute() {
-  const [route, setRoute] = useState(() => window.location.hash.slice(2) || 'investigations');
+  const read = () => window.location.hash.slice(2) || 'habitats';
+  const [route, setRoute] = useState(read);
   useEffect(() => {
     const update = () => {
-      setRoute(window.location.hash.slice(2) || 'investigations');
+      setRoute(read());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', update);
@@ -61,7 +64,24 @@ export default function App() {
   const [dataset, setDataset] = useState(null);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState([]);
+  const [inspect, setInspect] = useState(null);
+  const [palette, setPalette] = useState(false);
+  const [lastHabitat, setLastHabitat] = useState(() => {
+    try {
+      return sessionStorage.getItem('flame-habitat');
+    } catch {
+      return null;
+    }
+  });
   const [route, id] = useRoute();
+  const habitat = findHabitat(id) || (route === 'ask' ? findHabitat(lastHabitat) : null);
+  const active =
+    route === 'results'
+      ? 'habitats'
+      : ['investigation', 'record', 'compare'].includes(route)
+        ? 'investigations'
+        : route;
+
   useEffect(() => {
     const controller = new AbortController();
     fetch('/data/combustion.json', { signal: controller.signal })
@@ -78,9 +98,29 @@ export default function App() {
       });
     return () => controller.abort();
   }, []);
+
   useEffect(() => {
-    document.title = `${navigation.find(([key]) => key === route)?.[1] || id || 'Investigation'} · Flame in Freefall`;
-  }, [route, id]);
+    const key = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && !inspect) {
+        event.preventDefault();
+        setPalette((open) => !open);
+      }
+    };
+    document.addEventListener('keydown', key);
+    return () => document.removeEventListener('keydown', key);
+  }, [inspect]);
+
+  useEffect(() => {
+    document.title = `${navigation.find(([key]) => key === active)?.[1] || 'Sources'} · Flame in Freefall`;
+    if (route !== 'results' || !habitat) return;
+    setLastHabitat(habitat.id);
+    try {
+      sessionStorage.setItem('flame-habitat', habitat.id);
+    } catch {
+      /* Session remains usable. */
+    }
+  }, [active, route, habitat]);
+
   function toggleCompare(accession) {
     setSelected((previous) =>
       previous.includes(accession)
@@ -90,11 +130,16 @@ export default function App() {
           : previous,
     );
   }
-  const activeRoute = ['investigation', 'record'].includes(route) ? 'investigations' : route;
-  let page;
-  if (dataset) {
-    const props = { dataset, selected, toggleCompare };
+  const props = { dataset, selected, toggleCompare, onInspect: setInspect };
+  let page = <HabitatPicker />;
+  if (dataset)
     switch (route) {
+      case 'results':
+        page = habitat ? <HabitatResults key={habitat.id} {...props} habitat={habitat} /> : page;
+        break;
+      case 'investigations':
+        page = <Catalogue {...props} />;
+        break;
       case 'investigation':
         page = <Detail {...props} accession={id} key={id} />;
         break;
@@ -102,21 +147,19 @@ export default function App() {
         page = <RecordDetail dataset={dataset} id={id} />;
         break;
       case 'explorer':
-        page = <Explorer dataset={dataset} />;
+        page = <Explorer key={id || 'all'} {...props} initialAccession={id} />;
         break;
       case 'compare':
         page = <Compare {...props} />;
         break;
       case 'ask':
-        page = <Ask dataset={dataset} />;
+        page = <Ask key={habitat?.id || 'general'} {...props} habitat={habitat} />;
         break;
       case 'methods':
         page = <Methods dataset={dataset} />;
         break;
-      default:
-        page = <Catalogue {...props} />;
     }
-  }
+
   return (
     <ErrorBoundary>
       <a
@@ -129,73 +172,61 @@ export default function App() {
       >
         Skip to content
       </a>
-      <div className="app-shell">
-        <aside className="sidebar">
-          <a className="brand" href="#/investigations">
-            <Flame size={29} strokeWidth={1.7} />
-            <span>
-              Flame in
-              <br />
-              <strong>Freefall</strong>
-            </span>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <a className="briefing-brand" href="#/habitats">
+            <Flame size={25} strokeWidth={1.75} aria-hidden="true" />
+            <span>Flame in Freefall</span>
           </a>
-          <div className="workspace-label">Combustion evidence explorer</div>
-          <nav aria-label="Main navigation">
-            {navigation.map(([key, label, Icon]) => (
-              <a
-                key={key}
-                className={activeRoute === key ? 'active' : ''}
-                href={`#/${key}`}
-                aria-current={activeRoute === key ? 'page' : undefined}
-              >
-                <Icon size={17} strokeWidth={1.7} />
+          <nav className="site-nav" aria-label="Main navigation">
+            {navigation.map(([key, label]) => (
+              <a key={key} href={`#/${key}`} aria-current={active === key ? 'page' : undefined}>
                 {label}
-                {key === 'compare' && selected.length > 0 && (
-                  <span className="nav-count">{selected.length}</span>
-                )}
               </a>
             ))}
           </nav>
-          <div className="sidebar-foot">
-            <Info size={16} />
-            <p>
-              NASA PSI source data
-              <br />
-              <span>Independent Space Apps project</span>
-            </p>
-            <a href="#/methods">Data & SI disclosure →</a>
-          </div>
-        </aside>
-        <div className="main-frame">
-          <header className="topbar">
-            <span>
-              Research workspace <span className="topbar-divider">/</span>{' '}
-              {navigation.find(([key]) => key === activeRoute)?.[1] || 'Library'}
-            </span>
-            <a href="#/methods">
-              <span className="status-dot" />
-              Source-linked snapshot
-            </a>
-          </header>
-          <main id="main-content" tabIndex="-1" className="main-sheet">
-            {error ? (
-              <div className="empty" role="alert">
-                <h1>Research data could not load</h1>
-                <p>{error}. Reload to retry.</p>
-                <button onClick={() => window.location.reload()}>Retry</button>
-              </div>
-            ) : !dataset ? (
-              <Loading />
-            ) : (
-              <Suspense fallback={<Loading />}>{page}</Suspense>
-            )}
-            <footer className="page-footer">
-              <span>Flame in Freefall · NASA PSI evidence</span>
-              <a href="#/methods">Sources, limitations & SI use</a>
-            </footer>
-          </main>
+          <button
+            className="palette-trigger"
+            aria-label="Open quick navigation"
+            aria-keyshortcuts="Control+K Meta+K"
+            type="button"
+            onClick={() => setPalette(true)}
+          >
+            <Search size={19} aria-hidden="true" />
+            <kbd>
+              {typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
+                ? '⌘ K'
+                : 'Ctrl K'}
+            </kbd>
+          </button>
         </div>
-      </div>
+      </header>
+      <main className="briefing-page" id="main-content" tabIndex={-1}>
+        {error ? (
+          <div className="empty" role="alert">
+            <h1>Research data could not load</h1>
+            <p>{error}.</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        ) : !dataset && route !== 'habitats' ? (
+          <Loading />
+        ) : (
+          <Suspense fallback={<Loading />}>{page}</Suspense>
+        )}
+        <footer className="page-footer">
+          <span>Flame in Freefall · NASA PSI evidence</span>
+          <div>
+            <a href="#/compare">Compare</a>
+            <a href="#/methods">
+              Sources & methods <ArrowUpRight size={14} />
+            </a>
+          </div>
+        </footer>
+      </main>
+      {inspect?.length > 0 && (
+        <RecordDrawer dataset={dataset} records={inspect} onClose={() => setInspect(null)} />
+      )}
+      {palette && <CommandPalette dataset={dataset} onClose={() => setPalette(false)} />}
     </ErrorBoundary>
   );
 }

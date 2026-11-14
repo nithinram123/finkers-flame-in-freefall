@@ -1,93 +1,171 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import { searchEvidence } from '../lib/evidence.mjs';
+import { HabitatContext } from './Habitat.jsx';
 import { Badge, Empty, Field, Measurement, Notice, PageTitle } from './ui.jsx';
-const examples = ['FLEX methanol extinction', 'SAME Kapton smoke', 'CFI-G failed ignition'];
 
-export default function Ask({ dataset }) {
+const examples = [
+  'Which FLEX tests report methanol extinction?',
+  'What did SAME measure about smoke?',
+  'Which CFI-G tests recorded failed ignition?',
+];
+
+export default function Ask({ dataset, habitat, onInspect }) {
   const [question, setQuestion] = useState('');
-  const [submitted, setSubmitted] = useState('');
-  const [matches, setMatches] = useState([]);
-  function search(event, value = question) {
+  const [result, setResult] = useState(null);
+  const [pending, setPending] = useState(false);
+  const [enabled, setEnabled] = useState(null);
+  const request = useRef(null);
+  const rowIndex = new Map(dataset.records.map((row) => [row.id, row]));
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/ask', { signal: controller.signal })
+      .then((response) => response.json())
+      .then((status) => setEnabled(status.enabled === true))
+      .catch(() => {
+        if (!controller.signal.aborted) setEnabled(false);
+      });
+    return () => {
+      controller.abort();
+      request.current?.abort();
+    };
+  }, []);
+
+  async function ask(event, value = question) {
     event?.preventDefault();
+    const text = value.trim();
+    if (!text || pending) return;
     setQuestion(value);
-    setSubmitted(value.trim());
-    setMatches(searchEvidence(dataset, value));
+    setPending(true);
+    setResult(null);
+    const matches = searchEvidence(dataset, text);
+    const controller = new AbortController();
+    request.current = controller;
+    try {
+      const response = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({ question: text, habitatId: habitat?.id }),
+      });
+      const answer = await response.json();
+      setResult({ text, matches, claims: response.ok ? answer.claims : [], note: answer.message });
+    } catch {
+      if (!controller.signal.aborted)
+        setResult({
+          text,
+          matches,
+          claims: [],
+          note: 'The answer service is unavailable. Browse the matching source records below.',
+        });
+    } finally {
+      if (!controller.signal.aborted) setPending(false);
+    }
   }
   return (
     <>
+      {habitat && <HabitatContext habitat={habitat} />}
       <PageTitle
-        eyebrow="Traceable answers"
-        title="Ask the evidence"
-        description="Find source records behind a question and inspect exactly what they contain."
+        eyebrow="Ask the evidence"
+        title="What would you like to know?"
+        description="Ask about the experiments. Each generated claim links back to the NASA PSI records used."
       />
-      <Notice>
-        <strong>Source-search mode.</strong> This MVP searches locally and returns cited evidence. A
-        live SI answer service has not been connected.
-      </Notice>
-      <form className="ask-form" onSubmit={search}>
+      {enabled === false && (
+        <Notice>
+          Live answers are unavailable here. You can still search the NASA source records.
+        </Notice>
+      )}
+      <form className="ask-form" onSubmit={ask}>
         <Field label="Your question">
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Which FLEX records report methanol extinction?"
-            rows="3"
-            maxLength={1500}
+            placeholder="How did changing oxygen affect the FLEX tests?"
+            rows={4}
+            maxLength={600}
             required
           />
         </Field>
-        <button className="primary" type="submit">
-          <Search size={16} />
-          Find evidence
+        <button className="primary" type="submit" disabled={pending || !question.trim()}>
+          <Search size={17} aria-hidden="true" />{' '}
+          {pending
+            ? 'Reading the evidence…'
+            : enabled === false
+              ? 'Find evidence'
+              : 'Ask the evidence'}
         </button>
       </form>
       <div className="suggestions">
-        Try:
         {examples.map((example) => (
-          <button key={example} onClick={() => search(null, example)}>
-            {example} <ArrowRight size={13} />
+          <button type="button" key={example} disabled={pending} onClick={() => ask(null, example)}>
+            {example} <ArrowRight size={14} aria-hidden="true" />
           </button>
         ))}
       </div>
-      {submitted && (
+      {pending && (
+        <div className="notice" role="status">
+          Looking up NASA test records…
+        </div>
+      )}
+      {result && (
         <section className="search-results" aria-live="polite">
-          <div className="section-heading">
-            <h2>Source matches</h2>
-            <span className="muted">{matches.length} shown · keyword relevance</span>
-          </div>
-          <p>
-            Results for “{submitted}”. These matches are evidence to inspect; they do not constitute
-            a generated answer.
-          </p>
-          {matches.length ? (
-            matches.map((record) => (
-              <article className="evidence-match" key={record.id}>
+          {result.claims?.length > 0 && (
+            <article className="answer-card">
+              <span className="eyebrow">Claude · SI-generated</span>
+              <h2>{result.text}</h2>
+              {result.claims.map((claim, index) => (
+                <div className="answer-claim" key={index}>
+                  <p>{claim.text}</p>
+                  <div className="citation-list">
+                    {claim.citations.map((citation) => {
+                      const row = rowIndex.get(citation.id);
+                      return row ? (
+                        <button
+                          key={citation.id}
+                          type="button"
+                          onClick={() => onInspect([row])}
+                          title={`${citation.file}, CSV row ${citation.row}`}
+                        >
+                          {citation.accession} · {citation.label}
+                        </button>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              ))}
+            </article>
+          )}
+          {result.note && <Notice>{result.note}</Notice>}
+          <h2>Source matches</h2>
+          {result.matches.length ? (
+            result.matches.map((row) => (
+              <article className="evidence-match" key={row.id}>
                 <div>
-                  <a href={`#/record/${record.id}`}>
+                  <button type="button" className="text-button" onClick={() => onInspect([row])}>
                     <strong>
-                      {record.investigation} · {record.label}
+                      {row.investigation} · {row.label}
                     </strong>
-                  </a>
-                  <Badge>{record.kind}</Badge>
+                  </button>
+                  <Badge>{row.kind}</Badge>
                 </div>
                 <p>
-                  {record.fuel || 'Material not reported'} · {record.outcome}
+                  {row.fuel || 'Material unreported'} · {row.outcome}
                 </p>
                 <p className="muted">
-                  O₂ <Measurement measurement={record.oxygen} unit="%" /> ({record.oxygenBasis}) ·
-                  Pressure <Measurement measurement={record.pressure} unit="kPa" /> · Airflow{' '}
-                  <Measurement measurement={record.airflow} unit="cm/s" />
+                  O₂ <Measurement measurement={row.oxygen} unit="%" /> ({row.oxygenBasis}) ·{' '}
+                  <Measurement measurement={row.pressure} unit="kPa" />
                 </p>
-                <a className="source-id" href={`#/record/${record.id}`}>
-                  [{record.accession}, {record.file}, CSV row {record.row}]
-                </a>
+                <button
+                  type="button"
+                  className="text-button source-id"
+                  onClick={() => onInspect([row])}
+                >
+                  {row.accession} · CSV row {row.row}
+                </button>
               </article>
             ))
           ) : (
-            <Empty>
-              Try an investigation name, material or outcome. Numeric comparisons require the Test
-              explorer.
-            </Empty>
+            <Empty>Try an investigation name, fuel, material or measured outcome.</Empty>
           )}
         </section>
       )}
