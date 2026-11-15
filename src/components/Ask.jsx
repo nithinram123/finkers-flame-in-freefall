@@ -13,6 +13,7 @@ export default function Ask({
   onInspect,
   initialQuestion = '',
   generationProvider,
+  embedded = false,
 }) {
   const [question, setQuestion] = useState(initialQuestion.slice(0, 500));
   const [result, setResult] = useState(null);
@@ -90,21 +91,26 @@ export default function Ask({
       if (!controller.signal.aborted) setPending(false);
     }
   }
+  const visibleMatches = embedded ? (result?.matches.slice(0, 3) ?? []) : result?.matches;
   return (
     <>
-      {habitat && <HabitatContext habitat={habitat} />}
-      <PageTitle
-        eyebrow="Ask the evidence"
-        title="What would you like to know?"
-        description="Ask about a fuel, a test result, or a cabin. Every result starts with records from NASA Physical Sciences Informatics."
-      />
-      <EvidenceSteps cabin={habitat} current="analyst" />
-      <Notice>
-        {generationProvider
-          ? 'Questions first run against the NASA snapshot. The model receives the selected cabin conditions, computed totals and up to 12 source rows.'
-          : 'Questions run against the NASA snapshot through our evidence API. Generated answers are currently unavailable.'}{' '}
-        <a href="/data-sources#apis">See the data and APIs</a>
-      </Notice>
+      {!embedded && (
+        <>
+          {habitat && <HabitatContext habitat={habitat} />}
+          <PageTitle
+            eyebrow="Ask the evidence"
+            title="What would you like to know?"
+            description="Ask about a fuel, a test result, or a cabin. Every result starts with records from NASA Physical Sciences Informatics."
+          />
+          <EvidenceSteps cabin={habitat} current="analyst" />
+          <Notice>
+            {generationProvider
+              ? 'Questions first run against the NASA snapshot. The model receives the selected cabin conditions, computed totals and up to 12 source rows.'
+              : 'Questions run against the NASA snapshot through our evidence API. Generated answers are currently unavailable.'}{' '}
+            <a href="/data-sources#apis">See the data and APIs</a>
+          </Notice>
+        </>
+      )}
       <form className="ask-form evidence-console" onSubmit={ask}>
         <Field label="Your question">
           <textarea
@@ -112,20 +118,24 @@ export default function Ask({
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="How did changing oxygen affect the FLEX tests?"
-            rows={4}
+            rows={embedded ? 3 : 4}
             maxLength={500}
             required
           />
         </Field>
-        <button className="primary" type="submit" disabled={pending || !question.trim()}>
-          <Search size={17} aria-hidden="true" />{' '}
-          {pending ? 'Reading the evidence…' : 'Find NASA evidence'}
-        </button>
+        <div className="evidence-console-actions">
+          {embedded && <span>NASA PSI</span>}
+          <button className="primary" type="submit" disabled={pending || !question.trim()}>
+            <Search size={17} aria-hidden="true" />{' '}
+            {pending ? 'Reading the evidence…' : 'Find NASA evidence'}
+          </button>
+        </div>
       </form>
       <div className="suggestions">
-        {evidenceQuestions.map((example) => (
+        {(embedded ? evidenceQuestions.slice(0, 2) : evidenceQuestions).map((example, index) => (
           <button type="button" key={example} disabled={pending} onClick={() => ask(null, example)}>
-            {example} <ArrowRight size={14} aria-hidden="true" />
+            {embedded ? ['Methanol extinction', 'Moon Base tests'][index] : example}{' '}
+            <ArrowRight size={14} aria-hidden="true" />
           </button>
         ))}
       </div>
@@ -268,13 +278,13 @@ export default function Ask({
           <p className="muted">
             {Number.isFinite(result.readout?.matches) && (
               <>
-                Showing {result.matches.length} of {result.readout.matches} matching tests.{' '}
+                Showing {visibleMatches.length} of {result.readout.matches} matching tests.{' '}
               </>
             )}
             Use a PSI citation to open the original NASA CSV row.
           </p>
-          {result.matches.length ? (
-            result.matches.map((row) => (
+          {visibleMatches.length ? (
+            visibleMatches.map((row) => (
               <article className="evidence-match" key={row.id}>
                 <div>
                   <button type="button" className="text-button" onClick={() => onInspect([row])}>
@@ -304,6 +314,14 @@ export default function Ask({
             <a href="/data-sources">Open the NASA archive and source inventory</a>
           ) : (
             <Empty>Try an investigation name, fuel, material or measured outcome.</Empty>
+          )}
+          {embedded && result.matches.length > visibleMatches.length && (
+            <a
+              className="button"
+              href={'/analyst?' + new URLSearchParams({ question: result.text })}
+            >
+              Open question in Ask <ArrowRight size={15} aria-hidden="true" />
+            </a>
           )}
         </section>
       )}

@@ -1,12 +1,12 @@
-# Flame in Freefall design
+# Finkers design
 
-The homepage opens on a WebGL Moon set next to the cabin comparison actions. The pointer moves the soft spotlight and changes the rendered surface light. Dragging or the labelled controls turns the globe. A self-hosted still appears immediately and remains available without WebGL.
+The homepage introduces cabin comparison above a cobalt pixel field. The real NASA Ask form and a WebGL Moon share that field. The pointer moves the spotlight and changes the rendered surface light. Dragging or the labelled controls turns the globe. A self-hosted still appears immediately and remains available without WebGL.
 
-Use Inter, navy backgrounds, violet and cyan accents, and a single row of disclosure navigation above the content. Below the scene, adapt the supplied [Astro Association](https://21st.dev/@kedhareswer/library/astro-association) bubble bands, split mission layout, crossing ribbons and numbered dossiers to the NASA evidence and research tools. Keep controls and measurements legible over the panel surfaces. Use line icons and 44 px primary controls.
+Use Inter for interface text, a serif for editorial headings, white surfaces and cobalt accents. A darker case-study panel frames the Moon Base finding. The Finkers mark and NASA Space Apps Challenge caption appear in the header. Use line icons and 44 px primary controls.
 
 The Neural Lab remains available by its existing direct URL for archived references. It is outside the current homepage and navigation.
 
-The landing question panel uses a pixel field and an aperture reveal inspired by the supplied Tessel landing reference. The form opens Ask with the visitor’s question filled in. The research workspace shares the composer’s panel styling. Scroll effects are limited to the landing sections, selected evidence panels and the reading progress line. Reduced-motion preferences disable those effects.
+The landing borrows the editorial spacing, cobalt mosaic and prompt card from the supplied Tessel reference. Ask runs on the landing page and opens original rows from its answers. Below-fold sections use a one-time clipped entrance as they reach the viewport. The reading progress line and mosaic use scroll-driven motion. Reduced-motion preferences disable those effects.
 
 Lead with a short finding. Place measurements, sample counts and source references beneath it. Put experimental detail behind a disclosure or in the source drawer. Format missing values explicitly. Keep initial chamber oxygen separate from burner-stream oxygen.
 

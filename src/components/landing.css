@@ -1,162 +1,179 @@
 .sky-landing {
-  padding: 0 clamp(12px, 3vw, 44px) 0;
-  background: #0c101d;
+  background: var(--surface);
 }
-
-.lunar-landing {
-  --lunar-edge: #3e3a62;
-  --lunar-paper: #13182b;
-  --lunar-type: #f2efff;
-  --lunar-cyan: #9de5ee;
-  --lunar-violet: #c6b0ff;
-  width: min(100%, 1380px);
+.finkers-landing,
+.sky-landing > .page-footer {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+.finkers-landing {
+  border-inline: 1px solid var(--border);
+}
+.finkers-intro {
+  padding: clamp(42px, 7vw, 83px) clamp(16px, 4vw, 44px) clamp(26px, 4vw, 45px);
+  text-align: center;
+}
+.finkers-intro h1 {
+  max-width: 16ch;
   margin: 0 auto;
-  padding-top: clamp(12px, 2vw, 26px);
+  font: 500 clamp(2.85rem, 7vw, 6.3rem) / 0.98 var(--display);
+  letter-spacing: -0.065em;
+  text-wrap: balance;
 }
-
+.finkers-intro p {
+  max-width: 46ch;
+  margin: 20px auto 21px;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  text-wrap: pretty;
+}
+.finkers-intro-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .lunar-hero {
-  --light-x: 74%;
-  --light-y: 43%;
+  --light-x: 73%;
+  --light-y: 48%;
   position: relative;
   isolation: isolate;
   overflow: clip;
-  color: var(--lunar-type);
-  border: 1px solid #343c57;
-  border-radius: 14px;
-  background: radial-gradient(ellipse at 74% 48%, #182039 0, #0a0e1c 48%, #070910 78%);
+  margin-inline: clamp(10px, 3vw, 30px);
+  background: #2748ef;
 }
-
-.lunar-stars,
+.finkers-mosaic,
+.finkers-mosaic canvas,
 .lunar-hero-spot {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: -1;
 }
-.lunar-stars {
-  fill: #b9c8f5;
+.finkers-mosaic {
+  z-index: -3;
+}
+.finkers-mosaic canvas {
+  image-rendering: pixelated;
+}
+.finkers-mosaic-coarse {
+  opacity: 0;
 }
 .lunar-hero-spot {
-  opacity: 0.9;
+  z-index: -1;
   background: radial-gradient(
-    ellipse clamp(180px, 28vw, 460px) clamp(175px, 24vw, 380px) at var(--light-x) var(--light-y),
-    #c6befc34 0,
-    #9b8ce825 28%,
-    #6c69c916 53%,
-    transparent 100%
+    ellipse 39% 80% at var(--light-x) var(--light-y),
+    #e6eeff70,
+    #a5b3ff25 47%,
+    transparent 72%
   );
 }
 .lunar-hero[data-relighting='true'] .lunar-hero-spot {
-  opacity: 1;
+  background: radial-gradient(
+    ellipse 39% 80% at var(--light-x) var(--light-y),
+    #f2f4ff99,
+    #a5b3ff2e 47%,
+    transparent 73%
+  );
 }
-@media (prefers-reduced-motion: no-preference) {
-  .lunar-hero-spot {
-    transition: opacity 180ms ease-out;
-  }
-}
-
 .lunar-hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.14fr);
-  gap: clamp(4px, 1vw, 18px);
-  align-items: center;
-  min-height: min(650px, 68vw);
-  padding: clamp(22px, 4.3vw, 68px) clamp(22px, 5vw, 78px) clamp(20px, 3.8vw, 54px);
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(14px, 3vw, 48px);
+  padding: clamp(17px, 4vw, 48px);
 }
-
-.lunar-hero-copy {
-  position: relative;
-  z-index: 1;
-}
-.lunar-hero-copy h1 {
-  margin: 0 0 23px;
-  font-size: clamp(62px, 8.15vw, 119px);
-  font-weight: 750;
-  letter-spacing: -0.045em;
-  line-height: 0.87;
-}
-.lunar-hero-copy h1 span {
-  display: block;
-}
-.lunar-hero-copy h1 span:last-child {
-  color: #ded3fb;
-}
-.lunar-hero-copy > p {
-  max-width: 41ch;
-  color: #c0c6dd;
-  font-size: clamp(15px, 1.36vw, 18px);
-  line-height: 1.65;
-  margin: 0 0 24px;
-  text-wrap: pretty;
-}
-.lunar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 18px;
-}
-.lunar-hero-copy > .lunar-challenge {
-  margin: 0 0 8px;
-  color: #ded3fb;
-  font-size: clamp(14px, 1.3vw, 17px);
-  font-weight: 650;
-  line-height: 1.35;
-}
-.button.lunar-primary {
-  min-height: 50px;
-  padding: 10px 16px;
-  gap: 12px;
-  color: #141126;
-  background: #c9b5ff;
-  border-color: #d2c1ff;
-  font-weight: 730;
-}
-.button.lunar-primary:hover {
-  color: #110f24;
-  background: #e3d7ff;
-  border-color: #efe8ff;
-}
-.lunar-hero-link,
-.lunar-source {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  gap: 7px;
-  font-weight: 640;
-}
-.lunar-hero-link {
-  color: #e9e3fb;
-}
-.lunar-source {
-  margin-top: 12px;
-  color: #b3bddf;
-  font-size: 12px;
-}
-
-.lunar-scene {
+.landing-ask-console {
   min-width: 0;
+  max-width: 590px;
+  margin-top: clamp(14px, 5vw, 67px);
+  padding: clamp(10px, 2vw, 19px);
+  background: var(--surface);
+  border: 1px solid #ced7ff;
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 5px #ffffff45,
+    0 24px 50px -20px #1720609e;
+}
+.landing-ask-console > h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 4px 12px;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+.landing-ask-console > h2 svg {
+  color: var(--accent);
+}
+.landing-ask-console .ask-form {
+  padding: 10px;
   margin: 0;
+}
+.landing-ask-console .ask-form textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+.evidence-console-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.evidence-console-actions span {
+  margin-right: auto;
+  padding-inline: 3px;
+  color: var(--muted);
+  font:
+    600 0.73rem/1.4 ui-monospace,
+    monospace;
+}
+.landing-ask-console .suggestions {
+  margin: 8px 0 0;
+  gap: 5px;
+}
+.landing-ask-console .suggestions button {
+  font-size: 0.8rem;
+}
+.landing-ask-console .search-results {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.landing-ask-console .search-results h2 {
+  font-size: clamp(1rem, 2vw, 1.26rem);
+}
+.landing-ask-console .search-results a,
+.landing-ask-console .search-results button {
+  overflow-wrap: anywhere;
+}
+.lunar-scene {
+  width: 100%;
+  min-width: 0;
+  max-width: 465px;
+  margin: 0 auto;
 }
 .lunar-scene-art {
   position: relative;
-  width: min(100%, 575px);
+  width: min(100%, 410px);
   aspect-ratio: 1;
   margin-inline: auto;
 }
 .lunar-orbits {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   fill: none;
-  stroke: #969dc46e;
+  stroke: #ffffff90;
   stroke-width: 1;
   pointer-events: none;
 }
 .lunar-orbit-mark {
-  fill: var(--lunar-cyan);
-  stroke: #101429;
+  fill: #fff;
+  stroke: #2239ac;
   stroke-width: 2;
 }
 .lunar-globe,
@@ -192,27 +209,30 @@
 }
 .lunar-object-index {
   position: absolute;
-  right: -1%;
+  right: 0;
   bottom: 5%;
   padding: 4px 8px;
-  color: #cbd5ee;
+  color: #fff;
   font:
-    600 10px/1.45 'IBM Plex Mono',
+    600 10px/1.45 ui-monospace,
     monospace;
   letter-spacing: 0.08em;
-  background: #0d1425;
-  border: 1px solid #41496a;
-  border-radius: 4px;
+  background: #152255;
   pointer-events: none;
 }
 .lunar-scene-caption {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 44px;
-  color: #b5bfdc;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  color: #fff;
   font-size: 12px;
+}
+.lunar-scene-caption > span {
+  padding: 5px 8px;
+  background: #131d48;
+  border-radius: 3px;
 }
 .lunar-scene-controls {
   display: flex;
@@ -222,554 +242,151 @@
   width: 44px;
   min-height: 44px;
   padding: 0;
-  color: #ddd9ff;
-  background: transparent;
-  border-color: #424866;
+  color: #fff;
+  background: #131d48;
+  border-color: #90a3f4;
 }
 .lunar-scene-controls button:hover {
-  background: #212945;
+  background: #1c42d3;
 }
 .lunar-scene[data-live='false'] .lunar-scene-controls {
   visibility: hidden;
 }
-.lunar-hero-rail {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  min-height: 61px;
-  padding: 2px clamp(22px, 5vw, 78px);
-  border-top: 1px solid #333d5b;
-  background: #0e1323;
-  color: #c3cce4;
-  font-size: 13px;
-}
-.lunar-hero-rail a,
-.lunar-hero-rail span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.lunar-hero-rail a {
-  min-height: 44px;
-  color: #d8c7ff;
-  font-weight: 650;
-}
-.lunar-rail-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #9be2dd;
-}
-
-.astro-mission,
-.astro-workflow {
-  scroll-margin-top: 88px;
-  margin-top: clamp(42px, 7vw, 96px);
-  border: 1px solid var(--lunar-edge);
-  background: var(--lunar-paper);
-}
-.astro-mission-band {
-  position: relative;
-  display: grid;
-  align-items: center;
-  isolation: isolate;
-  height: clamp(168px, 23vw, 285px);
-  padding-inline: clamp(22px, 5vw, 70px);
-  overflow: clip;
-  background: #0e1222;
-  border-bottom: 1px solid #7d64b8;
-}
-.astro-mission {
-  margin-top: clamp(30px, 4.5vw, 66px);
-}
-.astro-circle-field {
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.astro-mission-band .astro-circle-field {
-  position: absolute;
-  inset: 0;
-  opacity: 0.94;
-  z-index: -2;
-}
-.astro-mission-band::after {
-  content: '';
-  position: absolute;
-  inset: 0 38% 0 0;
-  z-index: -1;
-  background: linear-gradient(90deg, #12122bdb, #12122b8c 58%, transparent);
-}
-.astro-mission-band > span {
-  color: #fff;
-  font-size: clamp(34px, 4.9vw, 68px);
-  line-height: 0.96;
-  font-weight: 760;
-  letter-spacing: -0.044em;
-}
-.astro-mission-band > svg:last-child {
-  position: absolute;
-  right: 24px;
-  bottom: 19px;
-  color: #f4edff;
-}
-.astro-mission-inner,
-.astro-workflow-inner {
-  padding: clamp(18px, 3vw, 40px) clamp(22px, 5vw, 70px) clamp(29px, 5vw, 64px);
-}
-.astro-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 2px 18px;
-  padding-top: 5px;
-  border-top: 1px solid #8d80aa;
-  color: #b9bfd9;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-.astro-meta a {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 44px;
-}
-.astro-mission-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
-  gap: clamp(20px, 5vw, 85px);
-  align-items: start;
-  margin-top: clamp(22px, 3.8vw, 49px);
-}
-.astro-mission h2,
-.astro-workflow h2 {
-  color: #f1edff;
-  font-size: clamp(34px, 4.6vw, 66px);
-  letter-spacing: -0.04em;
-  line-height: 1.015;
-  text-wrap: balance;
-}
-.astro-mission h2 {
-  max-width: 17ch;
-  margin-bottom: 18px;
-}
-.astro-mission p {
-  color: #c0c6dd;
-  font-size: clamp(15px, 1.4vw, 17px);
-  margin-bottom: 12px;
-}
-.astro-mission-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  font-weight: 680;
-}
-.astro-methods {
-  margin-top: 12px;
-  border-top: 1px solid var(--lunar-edge);
-}
-.astro-methods summary {
-  cursor: pointer;
-  min-height: 44px;
-  align-content: center;
-  color: #cbcef0;
-  font-size: 14px;
-}
-.astro-methods p {
-  margin-top: 2px;
-  font-size: 14px;
-}
-.astro-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid #8d80aa;
-  margin: 0;
-}
-.astro-stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  gap: 6px;
-  min-width: 0;
-  border-bottom: 1px solid var(--lunar-edge);
-  padding: clamp(13px, 2vw, 22px) 8px clamp(13px, 2vw, 22px) 0;
-}
-.astro-stats dt {
-  color: #ccd1e6;
-  font-size: 13px;
-}
-.astro-stats dd {
-  color: var(--lunar-violet);
-  font-size: clamp(32px, 4.2vw, 60px);
-  line-height: 0.93;
-  font-weight: 750;
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
-  margin: 0;
-}
-
-.astro-ribbon-stage {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  display: grid;
-  align-items: center;
-  min-height: clamp(190px, 28vw, 360px);
-  padding-inline: clamp(22px, 5vw, 70px);
-  border-bottom: 1px solid var(--lunar-edge);
-  background: #0e1223;
-}
-.astro-stage-type {
-  font-size: clamp(37px, 7.6vw, 110px);
-  letter-spacing: -0.045em;
-  font-weight: 780;
-  line-height: 0.89;
-  z-index: 2;
-  color: #e5d7ff;
-}
-.astro-ribbon {
-  position: absolute;
-  left: 19%;
-  width: 130%;
-  height: clamp(32px, 5.9vw, 86px);
-  border-block: 1px solid #8a7bbb;
-  overflow: clip;
-  mask-image: linear-gradient(to right, transparent, #000 20%);
-}
-.astro-ribbon-dots {
-  top: 26%;
-  transform: rotate(-12deg);
-  background: #302961;
-}
-.astro-ribbon-ink {
-  top: 63%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 25px;
-  transform: rotate(10deg);
-  background: #b3acf0;
-  color: #17142f;
-  white-space: nowrap;
-  font-size: clamp(13px, 2.3vw, 31px);
-  font-weight: 800;
-}
-.astro-ribbon-ink span {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-}
-.astro-workflow h2 {
-  margin: 0 0 clamp(20px, 3vw, 36px);
-}
-.astro-dossiers {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(12px, 1.7vw, 24px);
-  align-items: start;
-}
-.astro-dossier {
-  border: 1px solid var(--lunar-edge);
-  border-radius: 13px;
-  overflow: clip;
-  background: #12182a;
-}
-.astro-dossier-top {
-  position: relative;
-  height: clamp(88px, 10vw, 135px);
-  background: #23264b;
-  border-bottom: 1px solid var(--lunar-edge);
-  overflow: clip;
-}
-.astro-dossier-top .astro-circle-field {
-  position: absolute;
-  inset: 0;
-  clip-path: circle(0 at var(--pointer-x, 50%) var(--pointer-y, 50%));
-  opacity: 0.76;
-}
-.astro-dossier:is(:hover, :focus-within) .astro-dossier-top .astro-circle-field {
-  clip-path: circle(150% at var(--pointer-x, 50%) var(--pointer-y, 50%));
-}
-@media (prefers-reduced-motion: no-preference) {
-  .astro-dossier-top .astro-circle-field {
-    transition: clip-path 640ms cubic-bezier(0.18, 0.85, 0.23, 1);
-  }
-}
-.astro-dossier-number {
-  position: absolute;
-  left: 17px;
-  bottom: 4px;
-  font-size: clamp(44px, 6.5vw, 85px);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.041em;
-  color: #ded1ff;
-}
-.astro-dossier-top > svg:last-child {
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  color: #dccbff;
-}
-.astro-dossier-body {
-  padding: 16px;
-}
-.astro-dossier-body h3 {
-  color: #f2efff;
-  font-size: clamp(18px, 2.1vw, 25px);
-  margin: 0 0 8px;
-  text-wrap: balance;
-}
-.astro-dossier-body p {
-  color: #c5cce4;
-  font-size: 14px;
-  margin: 0 0 9px;
-}
-.astro-dossier-body details {
-  border-top: 1px solid var(--lunar-edge);
-  margin-top: 12px;
-}
-.astro-dossier-body summary,
-.astro-dossier-body a {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  color: #d9c8ff;
-  font-size: 13px;
-  font-weight: 650;
-}
-.astro-dossier-body summary {
-  cursor: pointer;
-  list-style: none;
-}
-.astro-dossier-body summary::-webkit-details-marker {
-  display: none;
-}
-.astro-dossier-body details[open] summary svg {
-  transform: rotate(45deg);
-}
-
+.lunar-hero-rail,
 .lunar-credits {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 2px 24px;
-  border-top: 1px solid #373b59;
-  margin-top: 34px;
-  padding-block: 12px;
-  color: #b7bfd7;
-  font-size: 12px;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 4px clamp(15px, 4vw, 38px);
+  color: var(--muted);
+  font-size: 0.86rem;
 }
+.lunar-hero-rail a,
 .lunar-credits a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  gap: 7px;
 }
-.sky-landing > .page-footer {
-  max-width: 1380px;
-  margin-inline: auto;
+.finkers-section-inner {
+  padding: clamp(38px, 9vw, 106px) clamp(17px, 7vw, 92px);
+}
+.finkers-case {
+  margin-top: clamp(18px, 5vw, 55px);
+  background: #0a0b12;
+  color: #f6f7ff;
+}
+.finkers-case-meta {
   margin-top: 0;
+  color: #b9c9ff;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
 }
-
-.landing-ask {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  margin: clamp(30px, 5vw, 70px) 0;
-  padding: clamp(20px, 5vw, 70px);
-  border: 1px solid var(--lunar-edge);
-  border-radius: 16px;
-  background: #11162a;
+.finkers-case h2,
+.finkers-workflow h2 {
+  max-width: 19ch;
+  margin-bottom: 16px;
+  font: 500 clamp(2.4rem, 5.3vw, 5rem) / 1.02 var(--display);
+  letter-spacing: -0.056em;
+  text-wrap: balance;
 }
-.landing-ask-art {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  background: radial-gradient(ellipse at 85% 55%, #352961, transparent 52%);
+.finkers-case-intro > p:not(.finkers-case-meta),
+.finkers-case-methods p {
+  color: #c6cbda;
 }
-.landing-ask-pixels,
-.landing-ask-pixels::after {
-  --cell: 11px;
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(90deg, #101628 0 2px, transparent 2px var(--cell)),
-    repeating-linear-gradient(0deg, #101628 0 2px, transparent 2px var(--cell)),
-    linear-gradient(145deg, transparent 25%, #372a6a 47%, #816fc4 63%, #59a3b7 91%);
-  mask-image: radial-gradient(ellipse 48% 90% at 81% 55%, #000 22%, transparent 94%);
+.finkers-case .button {
+  color: #fff;
+  background: #233bcb;
+  border-color: #5970ff;
 }
-.landing-ask-pixels::after {
-  content: '';
-  --cell: 29px;
-  mask-image: none;
-  opacity: 0;
+.finkers-case .button:hover {
+  background: #2f4dff;
 }
-.landing-ask-inner {
+.finkers-case-stats,
+.finkers-tool-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.12fr);
-  align-items: center;
-  gap: clamp(16px, 5vw, 70px);
-  max-width: 1100px;
-  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 30px 0 15px;
+  border-top: 1px solid #34374d;
+  border-left: 1px solid #34374d;
 }
-.landing-ask-copy h2 {
-  margin: 0;
-  color: var(--lunar-type);
-  font-size: clamp(2.25rem, 5vw, 4.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
-}
-.landing-ask-copy p {
-  max-width: 35ch;
-  margin: 0.9em 0 0;
-  color: #cad0e5;
-  line-height: 1.6;
-}
-.landing-ask-console {
-  min-width: 0;
-  padding: clamp(12px, 2.2vw, 18px);
-  border: 1px solid #58557d;
-  border-radius: 12px;
-  background: linear-gradient(155deg, #242540, #171b2e 64%);
-  box-shadow: 0 16px 36px #090d1c5e;
-}
-.landing-ask-console-head,
-.landing-question-actions,
-.landing-question-actions span,
-.landing-ask-examples {
+.finkers-case-stats > div {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column-reverse;
+  align-items: start;
+  min-width: 0;
+  gap: 4px;
+  padding: clamp(12px, 3vw, 27px);
+  border-right: 1px solid #34374d;
+  border-bottom: 1px solid #34374d;
 }
-.landing-ask-console-head {
-  margin-bottom: 10px;
-  color: #eee9ff;
-  font-size: 0.9rem;
-  font-weight: 650;
+.finkers-case-stats dd {
+  margin: 0;
+  color: #dce4ff;
+  font: 500 clamp(1.75rem, 4vw, 3.4rem) / 1 var(--display);
+  font-variant-numeric: tabular-nums;
 }
-.landing-ask-console-head svg,
-.landing-question-actions span {
-  color: var(--lunar-cyan);
+.finkers-case-stats dt {
+  color: #b7c3e6;
+  font-size: 0.88rem;
 }
-.landing-question {
-  border: 1px solid #4c506f;
-  border-radius: 8px;
-  background: #101528;
+.finkers-case-methods summary,
+.finkers-tool summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
 }
-.landing-question:focus-within {
-  border-color: var(--lunar-cyan);
+.finkers-tool-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-color: var(--border);
 }
-.landing-question textarea {
-  width: 100%;
-  min-height: 78px;
-  display: block;
-  padding: 12px;
-  resize: vertical;
-  background: transparent;
-  color: var(--lunar-type);
-  border: 0;
-  border-radius: 7px;
-  font-size: max(16px, 1rem);
+.finkers-tool {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(16px, 3vw, 28px);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
-.landing-question textarea::placeholder {
-  color: #a7afc8;
+.finkers-tool-icon {
+  color: var(--accent);
+  margin-bottom: 22px;
 }
-.landing-question-actions {
-  justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 4px 8px 8px 12px;
+.finkers-tool h3 {
+  font-size: 1.12rem;
 }
-.landing-question-actions span {
-  font-size: 0.78rem;
-  font-weight: 650;
+.finkers-tool p {
+  color: var(--muted);
 }
-.landing-ask-examples {
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-top: 4px;
-}
-.landing-ask-examples a {
+.finkers-tool > a {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
   min-height: 44px;
-  color: #e0d2ff;
-  font-size: 0.84rem;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  margin-top: auto;
+}
+.lunar-credits {
+  border-block: 1px solid var(--border);
 }
 
-@media (max-width: 760px) {
-  .landing-ask-inner {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .landing-ask-pixels {
-    mask-image: radial-gradient(ellipse 80% 64% at 100% 0%, #000, transparent 94%);
-  }
+@media (max-width: 720px) {
   .lunar-hero-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 5px;
-    padding: 26px 20px 13px;
+    grid-template-columns: 1fr;
+    padding: 16px;
   }
-  .lunar-hero-copy h1 {
-    font-size: clamp(56px, 13vw, 90px);
-    margin-bottom: 17px;
+  .landing-ask-console {
+    max-width: none;
+    margin-top: 0;
   }
-  .lunar-hero-copy > p {
-    margin-bottom: 15px;
+  .lunar-scene-art {
+    max-width: 325px;
   }
-  .lunar-source {
-    margin-top: 3px;
-    min-height: 44px;
+  .finkers-case-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .lunar-scene {
-    width: min(100%, 460px);
-    margin-inline: auto;
-  }
-  .lunar-scene-caption {
-    justify-content: space-between;
-    gap: 6px;
-    padding-inline: 3px;
-  }
-  .lunar-hero-rail {
-    padding: 10px 20px 3px;
-  }
-  .astro-mission,
-  .astro-workflow {
-    scroll-margin-top: 108px;
-  }
-  .astro-mission-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .astro-dossiers {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .astro-ribbon {
-    left: 11%;
-  }
-  .astro-ribbon-ink {
-    top: 74%;
-  }
-}
-@media (max-width: 390px) {
-  .lunar-hero-grid {
-    padding-inline: 15px;
-  }
-  .lunar-scene-caption {
-    font-size: 11px;
-  }
-  .lunar-object-index {
-    bottom: 3%;
-    right: 0;
-    font-size: 9px;
-  }
-  .astro-meta {
-    justify-content: flex-start;
+  .finkers-tool-grid {
+    grid-template-columns: 1fr;
   }
 }

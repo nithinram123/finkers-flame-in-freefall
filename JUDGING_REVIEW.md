@@ -1,4 +1,4 @@
-# Flame in Freefall · 2026 judging review
+# Finkers · 2026 judging review
 
 This is a project-team self-assessment using the public guidance, not a NASA evaluation or a prediction of the result.
 
@@ -6,7 +6,7 @@ This is a project-team self-assessment using the public guidance, not a NASA eva
 
 The [downloadable Moon Base brief](https://flame-in-freefall-beta.vercel.app/scenario?preset=moon#research-brief) records both cabins’ counts, the matching windows and links to reproducible results. The Sources tab can confirm the PSI accession and CSV filenames against NASA’s live catalogue. These changes strengthen the evidence for the rubric. The scores below were the prototype assessment. Independent researcher testing and official judging are still open.
 
-The [2026 Flame in Freefall challenge](https://www.spaceappschallenge.org/2026/challenges/flame-in-freefall/) calls for an interactive tool to find and interpret microgravity combustion investigations. In Flame in Freefall, the [NASA Physical Sciences Informatics archive](https://psi.nasa.gov/) supplies the evidence itself: 24 investigations catalogued, 22 source tables and 738 nonduplicate test rows with both ambient oxygen and pressure across four investigations. Listed investigations and eligible test rows are different totals.
+The [2026 Flame in Freefall challenge](https://www.spaceappschallenge.org/2026/challenges/flame-in-freefall/) calls for an interactive tool to find and interpret microgravity combustion investigations. In Finkers, the [NASA Physical Sciences Informatics archive](https://psi.nasa.gov/) supplies the evidence itself: 24 investigations catalogued, 22 source tables and 738 nonduplicate test rows with both ambient oxygen and pressure across four investigations. Listed investigations and eligible test rows are different totals.
 
 The [2026 Judging and Awards Guide](https://www.spaceappschallenge.org/resources/judging-awards-guide/) uses five criteria before Executive Judging awards. These indicative scores are out of five, based on what the site can substantiate today. There was no independent evaluation and no demo or project-form score to verify here.
 
@@ -39,7 +39,7 @@ These alignments are based on NASA's [current award definitions](https://www.spa
 
 NASA lists [Resonant Exoplanets as 2025 Best Use of Data](https://www.spaceappschallenge.org/2025/awards/). Its team describes moving from telescope observations through signal processing and physics checks to an inspectable result in its [public explorer](https://resonant-planet.vercel.app/). That is a useful benchmark for a demonstrable pipeline. The winner's claims are the team's account of its method; they are not independently replicated here.
 
-Flame in Freefall's path is **cabin → atmosphere match → PSI source row → downloadable brief**. The Moon Base preset has **zero** close tests and **37** wider-only tests. The station reference has **179** close tests under the same rules. Both counts measure coverage of ambient oxygen and pressure in the snapshot. Material, airflow and gravity need separate evidence.
+Finkers’ path is **cabin → atmosphere match → PSI source row → downloadable brief**. The Moon Base preset has **zero** close tests and **37** wider-only tests. The station reference has **179** close tests under the same rules. Both counts measure coverage of ambient oxygen and pressure in the snapshot. Material, airflow and gravity need separate evidence.
 
 The FLEX audit groups source tests into oxygen/pressure bands, rotating all rows through five held-out folds. The seven-input, six-hidden-unit network gives **4.91 seconds** mean absolute error versus **5.96 seconds** for the fold's training median over **259** PSI-69 tests. This comparison is limited to one study, against a deliberately simple baseline. Adjacent atmospheric groups can be similar and the tests do not constitute an independent external validation. The estimates are computed in the build, not for a judge's cabin, and there is no model or SI API key requirement to inspect the results.
 

@@ -59,7 +59,7 @@ export function briefMarkdown(dataset, primary, reference, origin, page) {
     ],
   );
   return [
-    '# Flame in Freefall · Cabin evidence brief',
+    '# Finkers · Cabin evidence brief',
     '',
     'NASA PSI combustion snapshot prepared ' + dataset.preparedDate + '.',
     'Reproduce this comparison: ' + page,

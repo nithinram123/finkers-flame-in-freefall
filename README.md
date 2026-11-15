@@ -1,4 +1,4 @@
-# Flame in Freefall
+# Finkers
 
 A NASA PSI combustion evidence explorer for the 2026 Space Apps challenge. The first MVP focuses on making source data readable and traceable. Primary award target: Best Use of Data; award saturation is unknown.
 

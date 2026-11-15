@@ -1,14 +1,26 @@
-/* Content is visible by default. Supported browsers add motion on entry. */
 @media (prefers-reduced-motion: no-preference) {
+  [data-reveal-state='waiting']:not(:focus-within) {
+    opacity: 0;
+    transform: translateY(26px) scale(0.975);
+    clip-path: inset(0 0 23% 0);
+  }
+  [data-reveal-state='entered']:not(:focus-within) {
+    animation: evidence-pop 680ms cubic-bezier(0.22, 0.75, 0.25, 1) both;
+  }
+  .finkers-intro h1,
+  .lunar-hero-grid {
+    animation: evidence-pop 710ms cubic-bezier(0.22, 0.75, 0.25, 1) both;
+  }
+  .lunar-hero-grid:focus-within {
+    animation: none;
+  }
+  .finkers-tool:nth-child(2) {
+    animation-delay: 75ms;
+  }
+  .finkers-tool:nth-child(3) {
+    animation-delay: 150ms;
+  }
   @supports (animation-timeline: view()) {
-    [data-reveal] {
-      animation: evidence-enter linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 78%;
-    }
-    [data-reveal]:focus-within {
-      animation: none;
-    }
     .sky-header::after {
       content: '';
       position: absolute;
@@ -16,31 +28,33 @@
       height: 2px;
       pointer-events: none;
       transform-origin: left;
-      background: linear-gradient(90deg, #b7a0fa, #8fdfef);
+      background: repeating-linear-gradient(90deg, #304bde 0 12px, transparent 12px 14px);
       animation: evidence-progress linear both;
       animation-timeline: scroll(root block);
     }
-    .landing-ask-art {
-      animation: evidence-aperture linear both;
+    .finkers-mosaic-coarse {
+      animation: evidence-pixelate linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 92%;
-    }
-    .landing-ask-pixels::after {
-      animation: evidence-resolve linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 96%;
+      animation-range: exit 0% exit 90%;
     }
   }
 }
 
-@keyframes evidence-enter {
+@keyframes evidence-pop {
   from {
-    opacity: 0.72;
-    translate: 0 12px;
+    opacity: 0;
+    transform: translateY(26px) scale(0.975);
+    clip-path: inset(0 0 23% 0);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1);
+    clip-path: inset(0);
   }
   to {
     opacity: 1;
-    translate: 0 0;
+    transform: none;
+    clip-path: inset(0);
   }
 }
 @keyframes evidence-progress {
@@ -51,19 +65,11 @@
     transform: scaleX(1);
   }
 }
-@keyframes evidence-aperture {
+@keyframes evidence-pixelate {
   from {
-    clip-path: inset(14% 0 14% 28%);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-@keyframes evidence-resolve {
-  from {
-    opacity: 0.55;
-  }
-  to {
     opacity: 0;
+  }
+  to {
+    opacity: 0.9;
   }
 }

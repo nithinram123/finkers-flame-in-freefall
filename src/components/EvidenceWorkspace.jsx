@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Reveal from './Reveal.jsx';
 import { ArrowUpRight, ChartScatter, Database, FlaskConical, MessagesSquare } from 'lucide-react';
 import { snapshotSummary } from '../lib/psi-summary.mjs';
 import { analystUrl } from '../lib/routes.mjs';
@@ -69,10 +70,10 @@ export function SnapshotReadout({ dataset, cabin }) {
     return () => controller.abort();
   }, [query, dataset.preparedDate]);
   return (
-    <section
+    <Reveal
+      as="section"
       className="snapshot-readout"
       aria-label="NASA archive feeding this dashboard"
-      data-reveal
     >
       <div className="snapshot-title">
         <Database size={19} aria-hidden="true" />
@@ -97,7 +98,7 @@ export function SnapshotReadout({ dataset, cabin }) {
           </div>
         ))}
       </dl>
-    </section>
+    </Reveal>
   );
 }
 

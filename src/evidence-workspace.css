@@ -4,7 +4,7 @@
   padding: clamp(18px, 4vw, 36px);
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: radial-gradient(ellipse at top left, #2c2544, transparent 65%), #161d2e;
+  background: linear-gradient(135deg, #f0f3ff, #fff 62%);
 }
 .research-brief {
   scroll-margin-top: 90px;
@@ -39,7 +39,7 @@
   padding: clamp(12px, 3vw, 20px);
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #131a2acc;
+  background: #ffffff;
 }
 .brief-comparison article > span,
 .research-brief .eyebrow {
@@ -72,7 +72,7 @@
   margin: 10px 0;
   overflow: hidden;
   border-radius: 4px;
-  background: #34415b;
+  background: #e1e6f3;
 }
 .brief-window-bar span:first-child {
   background: var(--cover-close);
@@ -85,12 +85,12 @@
   overflow-wrap: anywhere;
 }
 .ask-form.evidence-console {
-  border-color: #58557d;
-  background: linear-gradient(155deg, #242540, #171b2e 64%);
-  box-shadow: 0 16px 36px #090d1c5e;
+  border-color: #d7def5;
+  background: var(--surface);
+  box-shadow: 0 16px 36px #28376918;
 }
 .ask-form.evidence-console textarea {
-  background: #101528;
+  background: #f7f8fc;
 }
 .live-psi {
   padding: 16px;
@@ -128,53 +128,9 @@
   }
 }
 :root {
-  --action-face: linear-gradient(164deg, #5a4c7c 0%, #3c3458 35%, #23233a 75%, #181b2c 100%);
-  --action-rim: linear-gradient(
-    145deg,
-    #dfcfff 0%,
-    #79729b 28%,
-    #383b59 51%,
-    #c2abe8 82%,
-    #7796a6 100%
-  );
-  --action-hover: linear-gradient(164deg, #695789 0%, #45375f 37%, #23243c 75%, #1b2032 100%);
-  --cover-close: #85e7ed;
-  --cover-wider: #bea0f9;
-  --cover-outside: #63718e;
-}
-button.primary,
-.button.primary,
-.button.lunar-primary {
-  border: 1px solid transparent;
-  color: #fff9ff;
-  background:
-    var(--action-face) padding-box,
-    var(--action-rim) border-box;
-  box-shadow:
-    inset 0 1px #ffffff26,
-    0 4px 10px #080a1460;
-}
-button.primary:hover,
-.button.primary:hover,
-.button.lunar-primary:hover {
-  border-color: transparent;
-  background:
-    var(--action-hover) padding-box,
-    var(--action-rim) border-box;
-  color: #fff;
-}
-.lunar-scene-controls button {
-  color: #e5dafb;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(165deg, #38334e, #1b2134 68%) padding-box,
-    var(--action-rim) border-box;
-}
-.lunar-scene-controls button:hover {
-  border-color: transparent;
-  background:
-    linear-gradient(165deg, #4d4165, #1f273b 68%) padding-box,
-    var(--action-rim) border-box;
+  --cover-close: #304bde;
+  --cover-wider: #8798f5;
+  --cover-outside: #b7c1d9;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   :is(.sky-research, .lunar-landing) :is(button, .button) {
@@ -199,7 +155,7 @@ button.primary:hover,
   margin: 0 0 22px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #151b2d;
+  background: #f7f8fc;
 }
 .evidence-steps a {
   display: flex;
@@ -207,24 +163,24 @@ button.primary:hover,
   gap: 8px;
   min-height: 44px;
   padding: 5px 10px;
-  color: #d6d8ef;
+  color: #303953;
   font-size: 13px;
   font-weight: 650;
   border: 1px solid transparent;
   border-radius: 7px;
 }
 .evidence-steps a:is([aria-current], :hover) {
-  background: #29263f;
-  border-color: #595071;
+  background: #e9eeff;
+  border-color: #cad5fb;
   text-decoration: none;
 }
 .evidence-steps a span {
-  color: #c4a6fd;
+  color: #304bde;
   font-variant-numeric: tabular-nums;
   font-size: 11px;
 }
 .evidence-steps a svg {
-  color: #9bdfe9;
+  color: #304bde;
 }
 .scenario-start {
   display: grid;
@@ -238,7 +194,7 @@ button.primary:hover,
   margin: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: linear-gradient(128deg, #20243b, #161d2e);
+  background: var(--surface);
   padding: clamp(15px, 3vw, 24px);
 }
 .scenario-start-card h2,
@@ -259,10 +215,10 @@ button.primary:hover,
   text-align: left;
   min-height: 64px;
   justify-content: space-between;
-  background: #1b2338;
+  background: #f6f8ff;
 }
 .scenario-start-card .scenario-presets a:hover {
-  border-color: #9790bc;
+  border-color: #6881e7;
 }
 .scenario-start-card .scenario-form {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -306,7 +262,7 @@ button.primary:hover,
   margin: 14px 0 0;
 }
 .snapshot-readout dl div {
-  border-top: 1px solid #505373;
+  border-top: 1px solid #dce1ef;
   padding-top: 8px;
 }
 .snapshot-readout dt,
@@ -319,14 +275,14 @@ button.primary:hover,
   margin: 2px 0 0;
   font-size: 22px;
   font-weight: 720;
-  color: #e6ddff;
+  color: #293762;
   font-variant-numeric: tabular-nums;
 }
 .coverage-band {
   margin: 0 0 12px;
 }
 .coverage-band figcaption {
-  color: #f0ebff;
+  color: #1e2948;
   font-weight: 690;
 }
 .coverage-band-track {
@@ -335,7 +291,7 @@ button.primary:hover,
   border-radius: 6px;
   height: 11px;
   margin-top: 12px;
-  background: #303c54;
+  background: #e4e9f6;
 }
 [data-band='close'] {
   --band: var(--cover-close);
@@ -376,13 +332,13 @@ button.primary:hover,
 }
 .cabin-cluster {
   fill: none;
-  stroke: #d2cef29e;
+  stroke: #536dda9e;
   stroke-dasharray: 2 2;
   opacity: 0.44;
   pointer-events: none;
 }
 .plot-point:is(:hover, :focus-visible) .cabin-cluster {
-  stroke: #f5f1ff;
+  stroke: #19318c;
   opacity: 1;
   stroke-width: 2px;
 }
@@ -404,8 +360,8 @@ button.primary:hover,
   gap: 3px 12px;
   padding: 8px 12px;
   margin: 0 0 16px;
-  border: 1px solid #514968;
-  background: #25243d;
+  border: 1px solid #d3defb;
+  background: #eff3ff;
   border-radius: 10px;
 }
 .explorer-cabin a {

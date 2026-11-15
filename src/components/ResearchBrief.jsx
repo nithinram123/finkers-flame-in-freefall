@@ -1,4 +1,5 @@
 import { ArrowUpRight, Download, FileText } from 'lucide-react';
+import Reveal from './Reveal.jsx';
 import { briefMarkdown, cabinAir, cabinSummary, moon, station } from '../lib/research-brief.mjs';
 import { explorerUrl } from './EvidenceWorkspace.jsx';
 
@@ -20,17 +21,17 @@ export default function ResearchBrief({ dataset, scenario, coverage, onInspect }
     const url = URL.createObjectURL(new Blob([content], { type: 'text/markdown;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'flame-in-freefall-cabin-brief.md';
+    link.download = 'finkers-cabin-brief.md';
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   return (
-    <section
+    <Reveal
+      as="section"
       className="research-brief"
       id="research-brief"
       aria-labelledby="research-brief-title"
-      data-reveal
     >
       <header>
         <span className="eyebrow">
@@ -95,6 +96,6 @@ export default function ResearchBrief({ dataset, scenario, coverage, onInspect }
           Explore reference tests <ArrowUpRight size={16} aria-hidden="true" />
         </a>
       </div>
-    </section>
+    </Reveal>
   );
 }

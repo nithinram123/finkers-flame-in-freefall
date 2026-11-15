@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useState } from 'react';
-import { ArrowUpRight, Flame } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Catalogue from './components/Catalogue.jsx';
 import Detail from './components/Detail.jsx';
 import Compare from './components/Compare.jsx';
@@ -169,7 +169,7 @@ export default function App() {
   }, [inspect]);
 
   useEffect(() => {
-    document.title = `${titles[active] || 'Flame in Freefall'} · Flame in Freefall`;
+    document.title = `${titles[active] || 'NASA combustion evidence'} · Finkers`;
     if (route !== 'results' || !habitat) return;
     setLastHabitat(habitat.id);
     try {
@@ -190,7 +190,12 @@ export default function App() {
   }
   const props = { dataset, selected, toggleCompare, onInspect: setInspect };
   let page = isHome ? (
-    <Home dataset={dataset} dataError={error} />
+    <Home
+      dataset={dataset}
+      dataError={error}
+      generationProvider={generationProvider}
+      onInspect={setInspect}
+    />
   ) : (
     <div className="empty">
       <h1>Page not found</h1>
@@ -281,8 +286,11 @@ export default function App() {
       <header className="site-header sky-header">
         <div className="site-header-inner">
           <a className="briefing-brand" href="/">
-            <Flame size={25} strokeWidth={1.75} aria-hidden="true" />
-            <span>Flame in Freefall</span>
+            <span className="finkers-mark" aria-hidden="true" />
+            <span className="finkers-wordmark">
+              <strong>Finkers</strong>
+              <small>NASA Space Apps Challenge</small>
+            </span>
           </a>
           <Navigation active={active} openSearch={() => setPalette(true)} key={route} />
         </div>

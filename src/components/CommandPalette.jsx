@@ -7,7 +7,7 @@ export default function CommandPalette({ dataset, onClose }) {
   const ref = useRef(null);
   const [query, setQuery] = useState('');
   const pages = [
-    ['Flame in Freefall home', ''],
+    ['Finkers home', ''],
     ['Habitat Risk and custom scenarios', 'scenario'],
     ['Explore experiments', 'explorer'],
     ['Browse investigations', 'investigations'],

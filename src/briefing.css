@@ -42,7 +42,7 @@ button:hover,
 }
 button.primary:hover,
 .button.primary:hover {
-  background: #7a2c11;
+  background: #233bb5;
 }
 :focus-visible {
   outline: 3px solid var(--accent);
@@ -182,7 +182,7 @@ kbd {
 }
 .habitat-card:hover {
   background: var(--accent-soft);
-  border-color: #c9927a;
+  border-color: #7c91e8;
   text-decoration: none;
 }
 .habitat-icon {
@@ -392,7 +392,7 @@ summary {
   width: 26px;
   height: 26px;
   border-color: var(--accent);
-  background: #f6d7c7;
+  background: #dfe7ff;
   border-radius: 67% 40% 65% 0;
   transform: rotate(133deg);
   animation: none;
@@ -420,7 +420,7 @@ summary {
 .flame-controls button[aria-pressed='true'] {
   background: var(--accent-soft);
   color: var(--accent);
-  border-color: #e0b6a4;
+  border-color: #ccd8fc;
 }
 .flame-demo a {
   font-size: 12px;
@@ -487,7 +487,7 @@ summary {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 0 8px 24px #231f1c1a;
+  box-shadow: 0 8px 24px #1b28551a;
 }
 .filter-options button {
   width: 100%;
@@ -545,12 +545,12 @@ progress {
   border: 0;
   border-radius: 999px;
   overflow: hidden;
-  background: #ebe7e3;
+  background: #e9edf6;
   color: var(--accent);
   appearance: none;
 }
 progress::-webkit-progress-bar {
-  background: #ebe7e3;
+  background: #e9edf6;
 }
 progress::-webkit-progress-value {
   background: var(--accent);
@@ -589,10 +589,10 @@ progress::-moz-progress-bar {
 }
 .plot-axis {
   fill: none;
-  stroke: #bbb3ac;
+  stroke: #cfdaef;
 }
 .plot-reference path {
-  stroke: #8f8379;
+  stroke: #8090b0;
   stroke-dasharray: 4 4;
   opacity: 0.85;
 }
@@ -602,8 +602,8 @@ progress::-moz-progress-bar {
   stroke-width: 3px;
 }
 .plot-box {
-  fill: #b949191c;
-  stroke: #a4431e;
+  fill: #304bde18;
+  stroke: #304bde;
   stroke-width: 1.25;
   stroke-dasharray: 4 3;
 }
@@ -615,26 +615,26 @@ progress::-moz-progress-bar {
 }
 .plot-point:focus-visible .point-mark,
 .plot-point:hover .point-mark {
-  stroke: #241b16;
+  stroke: #1a2850;
   stroke-width: 2.5;
 }
 .fuel-tone-0 {
-  --fuel-color: #ad4822;
+  --fuel-color: #4563e6;
 }
 .fuel-tone-1 {
-  --fuel-color: #49433e;
+  --fuel-color: #405578;
 }
 .fuel-tone-2 {
-  --fuel-color: #a38d80;
+  --fuel-color: #8094b8;
 }
 .fuel-tone-3 {
-  --fuel-color: #cb805e;
+  --fuel-color: #9b759a;
 }
 .fuel-tone-4 {
-  --fuel-color: #756c65;
+  --fuel-color: #566f97;
 }
 .fuel-tone-5 {
-  --fuel-color: #5c5651;
+  --fuel-color: #434d70;
 }
 .point-mark {
   fill: var(--fuel-color);
@@ -646,7 +646,7 @@ progress::-moz-progress-bar {
   pointer-events: none;
 }
 .fuel-tone-5 .point-mark {
-  stroke: #25201d;
+  stroke: #2b385a;
   stroke-dasharray: 2 2;
 }
 .condition-chart svg .point-count {

@@ -1,28 +1,25 @@
 :root {
-  color-scheme: dark;
-  --sky-navy: #111827;
-  --sky-night: #080b12;
-  --sky-panel: #191f31;
-  --sky-violet: #c38bf4;
-  --sky-cyan: #22d3ee;
-  --sky-green: #5de49a;
-  --sky-seam: #35394f;
-  --text: #f7f7ff;
+  color-scheme: light;
+  --text: #13151c;
   --ink: var(--text);
-  --muted: #b3b8cb;
-  --surface: #171d2d;
-  --ground: var(--sky-navy);
-  --border: var(--sky-seam);
-  --accent: #d1a7fb;
-  --accent-soft: #24213e;
-  --neutral: #1c2335;
-  --neutral-dark: #cad2e5;
-  background: var(--sky-night);
+  --muted: #545967;
+  --surface: #fff;
+  --ground: #f6f7fb;
+  --border: #dce0ea;
+  --accent: #304bde;
+  --accent-soft: #eef1ff;
+  --neutral: #f4f5f9;
+  --neutral-dark: #454b5b;
+  --sky-violet: var(--accent);
+  --sky-cyan: #3855e9;
+  --sky-green: #207258;
+  --display: Georgia, 'Times New Roman', serif;
+  background: var(--surface);
 }
 
 body {
   min-width: 0;
-  background: linear-gradient(180deg, #151d2e 0, #101624 470px, #080b12 100%);
+  background: var(--surface);
 }
 a {
   text-underline-offset: 3px;
@@ -31,47 +28,86 @@ a {
   outline-color: var(--sky-cyan);
 }
 ::selection {
-  background: #7551ad;
+  background: #304bde;
   color: #fff;
 }
 button.primary,
 .button.primary {
-  background: #6e3dbb;
+  background: #101218;
   color: #fff;
-  border-color: #a070df;
+  border-color: #101218;
   font-weight: 650;
 }
 button.primary:hover,
 .button.primary:hover {
-  background: #8150c7;
-  border-color: #c38bf4;
+  background: #304bde;
+  border-color: #304bde;
 }
 input::placeholder,
 textarea::placeholder {
-  color: #a8acc2;
+  color: #686f81;
 }
 
 .site-header.sky-header {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #101626;
-  border-color: #262f43;
+  background: #ffffff;
+  border-color: #dce0ea;
 }
 .sky-header .site-header-inner {
   position: relative;
   justify-content: space-between;
-  max-width: 1176px;
+  max-width: 1240px;
+  border-inline: 1px solid var(--border);
   min-height: 64px;
   gap: 16px;
 }
 .sky-header .briefing-brand {
   color: var(--text);
+  gap: 9px;
   letter-spacing: -0.02em;
   font-size: 15px;
 }
 .sky-header .briefing-brand svg {
   color: var(--sky-violet);
+}
+.finkers-mark {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  background: url('/finkers-logo.png') -32px -4.4px / 91px auto no-repeat;
+  clip-path: polygon(
+    33% 0,
+    100% 0,
+    86% 25%,
+    74% 32%,
+    45% 34%,
+    34% 47%,
+    71% 47%,
+    68% 59%,
+    59% 71%,
+    45% 80%,
+    28% 80%,
+    16% 84%,
+    0 100%,
+    0 32%,
+    4% 18%,
+    15% 7%
+  );
+}
+.finkers-wordmark {
+  display: grid;
+  gap: 1px;
+  line-height: 1.08;
+}
+.finkers-wordmark strong {
+  font-size: 1.26rem;
+  letter-spacing: -0.035em;
+}
+.finkers-wordmark small {
+  font-size: 0.71rem;
+  font-weight: 560;
 }
 .sky-nav {
   display: flex;
@@ -90,7 +126,7 @@ textarea::placeholder {
   border: 1px solid transparent;
   border-radius: 7px;
   background: transparent;
-  color: #d5d9e7;
+  color: #353b4b;
   white-space: nowrap;
   font-size: 13px;
   font-weight: 600;
@@ -100,12 +136,12 @@ textarea::placeholder {
 .sky-nav .sky-tab[aria-current],
 .sky-nav .sky-tab[aria-expanded='true'],
 .sky-nav .sky-tab:focus-visible {
-  background: #222941;
-  color: #f5edff;
+  background: #eef1ff;
+  color: #243bb5;
   text-decoration: none;
 }
 .sky-tab svg {
-  color: #aaa5c7;
+  color: #65708b;
 }
 .sky-nav .sky-search {
   min-width: 44px;
@@ -121,9 +157,9 @@ textarea::placeholder {
   padding: 5px;
   color: var(--text);
   border-radius: 10px;
-  background: #181f34;
-  border: 1px solid #414661;
-  box-shadow: 0 14px 30px #05071099;
+  background: #ffffff;
+  border: 1px solid #d5dcf0;
+  box-shadow: 0 14px 30px #27325526;
 }
 .sky-dropdown a {
   display: flex;
@@ -131,13 +167,13 @@ textarea::placeholder {
   min-height: 44px;
   padding: 8px 11px;
   border-radius: 5px;
-  color: #e2e3f1;
+  color: #303649;
   font-size: 14px;
   overflow-wrap: anywhere;
 }
 .sky-dropdown a:is(:hover, :focus-visible, [aria-current]) {
-  color: #f3e4ff;
-  background: #292b49;
+  color: #243bb5;
+  background: #eef1ff;
   text-decoration: none;
 }
 
@@ -152,9 +188,9 @@ textarea::placeholder {
   min-height: 166px;
   margin-bottom: 30px;
   padding: clamp(20px, 4vw, 38px);
-  background: linear-gradient(115deg, #24223f, #1b2337 59%, #141e30);
-  border: 1px solid #3b405d;
-  border-radius: 13px;
+  background: linear-gradient(125deg, #fff 36%, #edf1ff);
+  border: 1px solid #dce2f5;
+  border-radius: 6px;
   overflow: clip;
 }
 .sky-research .page-heading::after {
@@ -165,7 +201,7 @@ textarea::placeholder {
   width: min(48%, 440px);
   height: 265px;
   border-radius: 50%;
-  background: radial-gradient(circle, #998ac8 1px, transparent 1.4px) 0 0 / 13px 13px;
+  background: radial-gradient(circle, #536bf0 1px, transparent 1.4px) 0 0 / 13px 13px;
   mask-image: radial-gradient(ellipse at 58% 55%, #000, transparent 70%);
   opacity: 0.32;
   pointer-events: none;
@@ -173,13 +209,13 @@ textarea::placeholder {
 }
 .sky-research .page-heading h1 {
   letter-spacing: -0.038em;
-  font-size: clamp(32px, 4vw, 54px);
+  font: 500 clamp(32px, 4.6vw, 59px) / 1.05 var(--display);
 }
 .sky-research .page-heading .eyebrow {
   display: none;
 }
 .sky-research .page-heading p {
-  color: #bcc3d9;
+  color: #545967;
   margin-bottom: 0;
 }
 .sky-research .page-heading p:empty {
@@ -197,19 +233,19 @@ textarea::placeholder {
   ) {
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: linear-gradient(135deg, #1e2237, #171e2d);
+  background: var(--surface);
 }
 .sky-research .scenario-verdict {
-  border-color: #63448f;
-  background: linear-gradient(135deg, #281d3d, #1b2233);
+  border-color: #cdd6fa;
+  background: #f4f6ff;
 }
 .sky-research .scenario-risk {
-  background: #181f31;
+  background: #f8f9fc;
 }
 .sky-research .notice {
-  color: #d6d8e9;
-  background: #252440;
-  border: 1px solid #494267;
+  color: #303b5d;
+  background: #eff2ff;
+  border: 1px solid #d8e0fc;
 }
 .sky-research .scenario-adjust {
   background: var(--surface);
@@ -219,44 +255,44 @@ textarea::placeholder {
   background: var(--neutral);
 }
 .sky-research .scenario-evidence-switch button[aria-pressed='true'] {
-  background: #3b2d56;
+  background: #e4eaff;
 }
 .sky-research .compare-tray {
   color: var(--text);
-  background: #23283f;
-  border-color: #525878;
+  background: #f2f5ff;
+  border-color: #ccd6f9;
 }
 .sky-research .plain-summary {
   color: var(--text);
 }
 .badge {
-  background: #2c334b;
-  color: #e1e5f9;
+  background: #edf0f8;
+  color: #303a54;
 }
 .badge.prevention {
-  background: #1c3c3a;
-  color: #a6eddf;
+  background: #e7f5ee;
+  color: #155c4a;
 }
 .badge.detection {
-  background: #30264e;
-  color: #e0c3ff;
+  background: #eaf0ff;
+  color: #2843bb;
 }
 .badge.suppression {
-  background: #432c35;
-  color: #ffd4d4;
+  background: #f8eee9;
+  color: #844024;
 }
 thead th {
-  background: #242b43;
+  background: #f0f3fa;
 }
 th,
 td {
   border-color: var(--border);
 }
 tbody tr:hover {
-  background: #232a40;
+  background: #f0f3ff;
 }
 .skeleton {
-  background: #2a3248;
+  background: #e5e9f3;
 }
 .field input,
 .field select,
@@ -265,54 +301,54 @@ tbody tr:hover {
 }
 .condition-chart .plot-reference text,
 .condition-chart svg .plot-annotation {
-  stroke: #1a2133;
+  stroke: #ffffff;
 }
 .condition-chart svg text {
-  fill: #c4cce0;
+  fill: #41495e;
 }
 .condition-chart .plot-reference path {
-  stroke: #8da0bf;
+  stroke: #74829f;
 }
 .condition-chart .plot-box {
-  stroke: #ca9afa;
-  fill: #b87af229;
+  stroke: #304bde;
+  fill: #304bde1a;
 }
 .condition-chart .plot-axis {
-  stroke: #747f9d;
+  stroke: #8591aa;
 }
 .condition-chart .plot-point:is(:focus-visible, :hover) .point-mark {
-  stroke: #f4efff;
+  stroke: #101b52;
 }
 .condition-chart .point-mark {
-  stroke: #1a2030;
+  stroke: #ffffff;
 }
 .condition-chart svg .point-count {
-  fill: #0d1020;
+  fill: #0f1936;
 }
 .condition-chart .plot-point:focus-visible > circle:first-child {
-  stroke: #35dbee;
+  stroke: #304bde;
 }
 .sky-research .fuel-tone-0 {
-  --fuel-color: #ac88ee;
+  --fuel-color: #4563e6;
 }
 .sky-research .fuel-tone-1 {
-  --fuel-color: #75c8ed;
+  --fuel-color: #3a87b4;
 }
 .sky-research .fuel-tone-2 {
-  --fuel-color: #b9adc9;
+  --fuel-color: #8c94b4;
 }
 .sky-research .fuel-tone-3 {
-  --fuel-color: #dca0b9;
+  --fuel-color: #be7694;
 }
 .sky-research .fuel-tone-4 {
-  --fuel-color: #a7b7d6;
+  --fuel-color: #52687d;
 }
 .sky-research .fuel-tone-5 {
-  --fuel-color: #c5c0ea;
+  --fuel-color: #8591ef;
 }
 .range-earth,
 .range-marker {
-  border-color: #bdc8e1;
+  border-color: #576685;
 }
 .method-api-list {
   margin: 0 0 24px;
@@ -339,7 +375,7 @@ tbody tr:hover {
 }
 .sky-research progress,
 .sky-research progress::-webkit-progress-bar {
-  background: #323a51;
+  background: #e5eaf6;
 }
 .method-api-list > div {
   border-top: 1px solid var(--border);
@@ -370,7 +406,7 @@ tbody tr:hover {
 }
 .record-drawer::backdrop,
 .command-palette::backdrop {
-  background: #050710a8;
+  background: #1119328c;
 }
 .record-drawer .drawer-header {
   background: var(--surface);

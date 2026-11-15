@@ -150,7 +150,7 @@ export async function handleAsk(request, response, env = process.env, lookup = l
     if (!provider) return fallback('not-configured');
     const context = {
       question,
-      snapshot: 'NASA PSI combustion tables bundled by Flame in Freefall',
+      snapshot: 'NASA PSI combustion tables bundled by Finkers',
       snapshotPrepared: dataset.preparedDate,
       selectedFilters: readout.filters,
       scopedTotals: tally,

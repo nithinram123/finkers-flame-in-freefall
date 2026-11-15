@@ -1,10 +1,10 @@
 .neural-lab {
-  --lab-ink: #142c31;
-  --lab-muted: #426067;
-  --lab-accent: #155f63;
-  --lab-border: #d2e2e1;
-  --lab-wash: #f0f7f6;
-  --lab-signal: #d9ece9;
+  --lab-ink: #151b2c;
+  --lab-muted: #545d74;
+  --lab-accent: #304bde;
+  --lab-border: #dce3f3;
+  --lab-wash: #f3f5ff;
+  --lab-signal: #e4eaff;
   display: grid;
   gap: 1.25rem;
   max-width: 900px;
@@ -36,8 +36,8 @@
 .neural-heading {
   padding: clamp(1.25rem, 4vw, 2.5rem);
   border-radius: 1rem;
-  color: #eef6f4;
-  background: #101b20;
+  color: #f5f6ff;
+  background: #111321;
 }
 .neural-heading h1 {
   margin: 0.55rem 0;
@@ -47,15 +47,15 @@
 }
 .neural-heading > p {
   max-width: 55ch;
-  color: #b6cbcc;
+  color: #c2cce8;
   font-size: 1.07rem;
 }
 .neural-heading > a {
   margin-top: 0.4rem;
-  color: #99e8e4;
+  color: #b5c5ff;
 }
 .neural-heading > a:focus-visible {
-  outline-color: #99e8e4;
+  outline-color: #b5c5ff;
 }
 .neural-pipeline {
   display: grid;
@@ -182,24 +182,24 @@
     sans-serif;
 }
 .neural-gridline {
-  stroke: #cddbdc;
+  stroke: #d2daef;
   fill: none;
 }
 .neural-window {
   stroke: var(--lab-accent);
   stroke-dasharray: 5 3;
-  fill: #c4e6df;
+  fill: #d6e0ff;
   fill-opacity: 0.45;
 }
 .neural-dot {
-  fill: #4d6f75;
+  fill: #526291;
   fill-opacity: 0.68;
 }
 .neural-dot.exact {
   fill: var(--lab-accent);
 }
 .neural-target {
-  stroke: #142c31;
+  stroke: #151b2c;
   stroke-width: 2;
 }
 .neural-records {
@@ -351,10 +351,10 @@
 .neural-diagram {
   min-width: 0;
   border-radius: 12px;
-  background: #101b20;
-  color: #eef6f4;
+  background: #111321;
+  color: #f5f6ff;
   overflow: clip;
-  border: 1px solid #334a51;
+  border: 1px solid #343e68;
 }
 .flex-diagram-tools {
   display: flex;
@@ -363,7 +363,7 @@
   gap: 6px;
   flex-wrap: wrap;
   padding: 0.7rem;
-  border-bottom: 1px solid #334a51;
+  border-bottom: 1px solid #343e68;
 }
 .flex-layer-controls {
   display: flex;
@@ -371,17 +371,17 @@
   gap: 4px;
 }
 .neural-lab .flex-diagram-tools button {
-  background: #14252c;
-  color: #c7d9d9;
-  border-color: #3d595e;
+  background: #172141;
+  color: #c6d1f0;
+  border-color: #4b5b96;
   font-size: 0.82rem;
   font-weight: 650;
 }
 .neural-lab .flex-diagram-tools button:hover,
 .neural-lab .flex-diagram-tools button[aria-pressed='true'] {
-  background: #204047;
-  border-color: #99e8e4;
-  color: #c5fff8;
+  background: #223471;
+  border-color: #b5c5ff;
+  color: #e6edff;
 }
 .flex-trace {
   display: inline-flex;
@@ -392,14 +392,14 @@
   position: relative;
   min-height: 350px;
   isolation: isolate;
-  background: #0b1317;
+  background: #0d1327;
 }
 @media (pointer: fine) {
   .flex-canvas:hover {
     background: radial-gradient(
       ellipse 200px 140px at var(--spot-x, 50%) var(--spot-y, 50%),
-      #1b383d,
-      #0b1317 86%
+      #233777,
+      #0d1327 86%
     );
   }
 }
@@ -412,7 +412,7 @@
 }
 .flex-wire {
   fill: none;
-  stroke: #76c6c4;
+  stroke: #8fa9ff;
   opacity: 0.28;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -434,7 +434,7 @@
   min-width: 44px;
   min-height: 44px;
   padding: 0;
-  color: #d8efee;
+  color: #e0e8ff;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -442,9 +442,9 @@
 .neural-lab .flex-node-dot {
   display: grid;
   place-items: center;
-  background: #19343a;
-  color: #bdeeee;
-  border: 1px solid #81c1c0;
+  background: #213267;
+  color: #dbe6ff;
+  border: 1px solid #8fa9ff;
   border-radius: 5px;
   width: 23px;
   height: 23px;
@@ -458,15 +458,15 @@
 }
 .neural-lab .flex-node[aria-pressed='true'],
 .neural-lab .flex-node:hover {
-  border-color: #a2eeeb;
-  background: #173238;
+  border-color: #b2c5ff;
+  background: #1a2a57;
   z-index: 1;
 }
 .neural-diagram :is(a, button):focus-visible {
-  outline-color: #99e8e4;
+  outline-color: #b5c5ff;
 }
 .flex-node-label {
-  color: #d2e9e9;
+  color: #dbe5ff;
   position: absolute;
   top: 100%;
   left: 50%;
@@ -477,9 +477,9 @@
 }
 .neural-diagram .flex-diagram-key {
   margin: 0;
-  border-block: 1px solid #334a51;
+  border-block: 1px solid #343e68;
   padding: 0.65rem 0.75rem;
-  color: #bfd4d5;
+  color: #c4d2f5;
   font-size: 0.83rem;
 }
 .flex-inspector {
@@ -489,7 +489,7 @@
   min-height: 140px;
 }
 .flex-inspector > p {
-  color: #bfd4d5;
+  color: #c4d2f5;
   font-size: 0.88rem;
 }
 .flex-inspector dl > div {
@@ -501,7 +501,7 @@
 }
 .flex-inspector dd,
 .flex-weights td {
-  color: #b9f2ee;
+  color: #cddcff;
   font-variant-numeric: tabular-nums;
 }
 .flex-weights {
@@ -513,7 +513,7 @@
 }
 .flex-weights :is(td, th) {
   padding: 0.35rem 0.2rem;
-  border-top: 1px solid #334a51;
+  border-top: 1px solid #343e68;
   text-align: right;
 }
 .flex-weights th:first-child {
@@ -545,12 +545,12 @@
   flex: none;
 }
 .flex-prediction-diagonal {
-  stroke: #426067;
+  stroke: #545d74;
   stroke-dasharray: 3 3;
   fill: none;
 }
 .flex-prediction-dot {
-  fill: #216b73;
+  fill: #3156b5;
   fill-opacity: 0.34;
   cursor: pointer;
 }
