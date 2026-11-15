@@ -1,152 +1,116 @@
-import { ArrowRight, ArrowUpRight, CheckCircle2, CircleHelp, Moon, Sparkles } from 'lucide-react';
+import { useRef } from 'react';
+import { ArrowDown, ArrowRight, ArrowUpRight, Database } from 'lucide-react';
+import AstroSections from './AstroSections.jsx';
+import MoonScene from './MoonScene.jsx';
 import { readScenario, scenarioCoverage } from '../lib/scenario.mjs';
 import { presetLinks } from './missionDestinations.mjs';
+import './landing.css';
 
 const moon = readScenario(new URLSearchParams({ preset: 'moon' }));
-const count = new Intl.NumberFormat('en');
-const format = (value) => (value == null ? '—' : count.format(value));
-const method = [
-  [
-    'Cabin matching',
-    'Choose a habitat or enter your own conditions.',
-    'Compare ambient oxygen and air pressure.',
-    'Count tests in close and wider windows.',
-    'Open the original NASA measurements.',
-  ],
-  [
-    'Evidence checks',
-    'Use tests that report both measurements.',
-    'Keep burner oxygen separate from cabin air.',
-    'Exclude summaries and duplicate rows.',
-    'Flag gaps in gravity, fuel, and test coverage.',
-  ],
-];
+
+const stars = Array.from({ length: 92 }, (_, index) => ({
+  x: ((index * 0.61803398875) % 1) * 1200,
+  y: ((index * 0.754877666) % 1) * 660,
+  r: index % 13 === 0 ? 1.35 : 0.45 + (index % 4) * 0.15,
+  opacity: 0.16 + (index % 7) * 0.075,
+}));
 
 export default function Home({ dataset, dataError }) {
+  const controller = useRef(null);
   const coverage = dataset ? scenarioCoverage(dataset.records, moon) : null;
-  const close = coverage?.exact.length;
-  const wider = coverage ? coverage.nearby.length - close : null;
+
+  function moveLight(event) {
+    if (event.pointerType === 'touch' && !event.buttons) return;
+    const hero = event.currentTarget;
+    const bounds = hero.getBoundingClientRect();
+    const x = event.clientX - bounds.left;
+    const y = event.clientY - bounds.top;
+    hero.style.setProperty('--light-x', x + 'px');
+    hero.style.setProperty('--light-y', y + 'px');
+    hero.dataset.relighting = 'true';
+    const globe = hero.querySelector('.lunar-globe').getBoundingClientRect();
+    if (globe.width) {
+      controller.current?.light(
+        2.2 * ((event.clientX - globe.left) / globe.width - 0.5),
+        2.2 * (0.5 - (event.clientY - globe.top) / globe.height),
+      );
+    }
+  }
+
   return (
-    <div className="sky-home">
-      <section className="sky-method" aria-labelledby="sky-headline">
-        <h1 id="sky-headline">Method Overview</h1>
-        <p className="sky-intro">
-          Compare your crew cabin’s atmosphere with NASA combustion tests. See what was measured,
-          what applies, and where evidence is missing.
-        </p>
-        <div className="sky-method-grid">
-          {method.map(([title, ...steps]) => (
-            <article className="sky-method-card" key={title}>
-              <h2>{title}</h2>
-              <ol>
-                {steps.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ol>
-            </article>
+    <div className="lunar-landing">
+      <section
+        className="lunar-hero"
+        aria-labelledby="lunar-title"
+        onPointerMove={moveLight}
+        onPointerLeave={(event) => {
+          delete event.currentTarget.dataset.relighting;
+          event.currentTarget.style.removeProperty('--light-x');
+          event.currentTarget.style.removeProperty('--light-y');
+          controller.current?.light(-0.48, 0.42);
+        }}
+      >
+        <svg
+          className="lunar-stars"
+          viewBox="0 0 1200 660"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+        >
+          {stars.map(({ x, y, r, opacity }) => (
+            <circle key={x} cx={x} cy={y} r={r} opacity={opacity} />
           ))}
+        </svg>
+        <div className="lunar-hero-spot" aria-hidden="true" />
+        <div className="lunar-hero-grid">
+          <div className="lunar-hero-copy">
+            <h1 id="lunar-title">
+              <span>Fire in</span>
+              <span>freefall.</span>
+            </h1>
+            <p>
+              Compare the air in your crew cabin with NASA combustion tests. Find the closest
+              experiments, inspect the evidence, and see where the data runs out.
+            </p>
+            <div className="lunar-actions">
+              <a className="button lunar-primary" href="/scenario">
+                Compare cabin conditions <ArrowRight size={18} aria-hidden="true" />
+              </a>
+              <a className="lunar-hero-link" href={presetLinks.moon}>
+                Try Moon Base <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+            </div>
+            <a className="lunar-source" href="/data-sources">
+              <Database size={15} aria-hidden="true" /> NASA Physical Sciences Informatics
+            </a>
+          </div>
+          <MoonScene controller={controller} />
+        </div>
+        <div className="lunar-hero-rail">
+          <span>
+            <span className="lunar-rail-dot" /> Moon Base preset · {moon.oxygen}% O₂ · {moon.atm}{' '}
+            atm
+          </span>
+          <a href="#lunar-evidence">
+            See the Moon Base evidence <ArrowDown size={16} aria-hidden="true" />
+          </a>
         </div>
       </section>
-      <article className="sky-case" aria-labelledby="sky-case-title">
-        <div className="sky-case-meta">
-          <span className="sky-status">
-            <Moon size={13} aria-hidden="true" /> Cabin study
-          </span>
-          <span className="sky-label">NASA PSI</span>
-        </div>
-        <Sparkles className="sky-case-icon" size={29} aria-hidden="true" />
-        <h2 id="sky-case-title">Moon Base Atmosphere Analysis</h2>
-        <p className="sky-case-intro">
-          How closely do published NASA experiments match a proposed lunar cabin?
-        </p>
-        <div className="sky-case-grid">
-          <section>
-            <h3>Cabin Conditions</h3>
-            <dl className="sky-reading">
-              <div>
-                <dt>Ambient oxygen</dt>
-                <dd>{moon.oxygen}%</dd>
-              </div>
-              <div>
-                <dt>Air pressure</dt>
-                <dd>{moon.atm} atm</dd>
-              </div>
-              <div>
-                <dt>Surface gravity</dt>
-                <dd>{moon.gravityG} g</dd>
-              </div>
-              <div>
-                <dt>Scenario</dt>
-                <dd>Illustrative preset</dd>
-              </div>
-            </dl>
-          </section>
-          <section>
-            <h3>NASA Test Coverage</h3>
-            <dl className="sky-reading sky-coverage" aria-live="polite">
-              <div>
-                <dt>
-                  <CheckCircle2 size={15} aria-hidden="true" />
-                  Close matches
-                </dt>
-                <dd>{format(close)}</dd>
-              </div>
-              <div>
-                <dt>
-                  <CheckCircle2 size={15} aria-hidden="true" />
-                  Additional wider matches
-                </dt>
-                <dd>{format(wider)}</dd>
-              </div>
-              <div>
-                <dt>
-                  <CheckCircle2 size={15} aria-hidden="true" />
-                  Tests with both measurements
-                </dt>
-                <dd>{format(coverage?.paired.length)}</dd>
-              </div>
-              <div>
-                <dt>
-                  <CheckCircle2 size={15} aria-hidden="true" />
-                  Investigations in the archive
-                </dt>
-                <dd>{format(dataset?.stats.investigations)}</dd>
-              </div>
-            </dl>
-          </section>
-        </div>
-        <div className="sky-finding">
-          <span className="sky-finding-icon">
-            <CircleHelp size={20} aria-hidden="true" />
-          </span>
-          <div>
-            <h3>
-              {coverage
-                ? close
-                  ? 'NASA has tested similar air'
-                  : 'The exact cabin conditions remain untested'
-                : 'Check the cabin against NASA’s archive'}
-            </h3>
-            <p>
-              {coverage
-                ? close
-                  ? 'Air matches help identify relevant tests. Fuel, airflow and gravity still matter.'
-                  : 'Nearby experiments help plan follow-up tests. The archive leaves fire risk at this combination uncertain.'
-                : dataError
-                  ? 'The NASA snapshot could not load. Refresh the page to try again.'
-                  : 'Loading NASA test coverage…'}
-            </p>
-          </div>
-        </div>
-        <div className="sky-case-actions">
-          <a className="button sky-primary" href={presetLinks.moon}>
-            Open Moon Base analysis <ArrowRight size={17} aria-hidden="true" />
-          </a>
-          <a className="sky-secondary" href="/scenario">
-            Compare another cabin <ArrowUpRight size={16} aria-hidden="true" />
-          </a>
-        </div>
-      </article>
+      <AstroSections
+        coverage={coverage}
+        scenario={moon}
+        count={dataset?.stats.investigations}
+        dataError={dataError}
+      />
+      <div className="lunar-credits">
+        <span>
+          Moon imagery{' '}
+          <a href="https://svs.gsfc.nasa.gov/4720/">NASA’s Scientific Visualization Studio</a>
+        </span>
+        <span>
+          Poster layout adapted from{' '}
+          <a href="https://21st.dev/@kedhareswer/library/astro-association">Astro Association</a>
+        </span>
+      </div>
     </div>
   );
 }

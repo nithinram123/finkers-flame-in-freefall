@@ -21,7 +21,7 @@ const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const Neural = lazy(() => import('./components/Neural.jsx'));
 const titles = {
   ...routeTitles,
-  habitats: 'Method Overview',
+  habitats: 'NASA combustion evidence',
   neural: 'Neural Evidence Lab',
 };
 

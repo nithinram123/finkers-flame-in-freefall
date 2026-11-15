@@ -1,8 +1,8 @@
 # Flame in Freefall design
 
-The homepage follows the supplied Method Overview reference: a centered heading, two method cards, and a Moon Base case study in an 896-pixel column. Show the measured coverage and the method that produced it alongside a direct link to the habitat analysis.
+The homepage opens on a WebGL Moon set next to the cabin comparison actions. The pointer moves the soft spotlight and changes the rendered surface light. Dragging or the labelled controls turns the globe. A self-hosted still appears immediately and remains available without WebGL.
 
-Use Inter, navy backgrounds, violet and cyan section titles, and a single row of disclosure navigation above the content. The dark interiors borrow the poster-like headings and circular graphic motif from [Astro Association](https://21st.dev/@kedhareswer/library/astro-association). Keep controls and measurements legible over the panel surfaces. Use line icons and 44 px primary controls.
+Use Inter, navy backgrounds, violet and cyan accents, and a single row of disclosure navigation above the content. Below the scene, adapt the supplied [Astro Association](https://21st.dev/@kedhareswer/library/astro-association) bubble bands, split mission layout, crossing ribbons and numbered dossiers to the NASA evidence and research tools. Keep controls and measurements legible over the panel surfaces. Use line icons and 44 px primary controls.
 
 The Neural Lab remains available by its existing direct URL for archived references. It is outside the current homepage and navigation.
 

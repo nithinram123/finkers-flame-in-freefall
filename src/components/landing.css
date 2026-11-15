@@ -1,0 +1,633 @@
+.sky-landing {
+  padding: 0 clamp(12px, 3vw, 44px) 0;
+  background: #0c101d;
+}
+
+.lunar-landing {
+  --lunar-edge: #3e3a62;
+  --lunar-paper: #13182b;
+  --lunar-type: #f2efff;
+  --lunar-cyan: #9de5ee;
+  --lunar-violet: #c6b0ff;
+  width: min(100%, 1380px);
+  margin: 0 auto;
+  padding-top: clamp(12px, 2vw, 26px);
+}
+
+.lunar-hero {
+  --light-x: 74%;
+  --light-y: 43%;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  color: var(--lunar-type);
+  border: 1px solid #343c57;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 74% 48%, #182039 0, #0a0e1c 48%, #070910 78%);
+}
+
+.lunar-stars,
+.lunar-hero-spot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+.lunar-stars {
+  fill: #b9c8f5;
+}
+.lunar-hero-spot {
+  opacity: 0.9;
+  background: radial-gradient(
+    ellipse clamp(180px, 28vw, 460px) clamp(175px, 24vw, 380px) at var(--light-x) var(--light-y),
+    #c6befc34 0,
+    #9b8ce825 28%,
+    #6c69c916 53%,
+    transparent 100%
+  );
+}
+.lunar-hero[data-relighting='true'] .lunar-hero-spot {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lunar-hero-spot {
+    transition: opacity 180ms ease-out;
+  }
+}
+
+.lunar-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.14fr);
+  gap: clamp(4px, 1vw, 18px);
+  align-items: center;
+  min-height: min(650px, 68vw);
+  padding: clamp(22px, 4.3vw, 68px) clamp(22px, 5vw, 78px) clamp(20px, 3.8vw, 54px);
+}
+
+.lunar-hero-copy {
+  position: relative;
+  z-index: 1;
+}
+.lunar-hero-copy h1 {
+  margin: 0 0 23px;
+  font-size: clamp(62px, 8.15vw, 119px);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 0.87;
+}
+.lunar-hero-copy h1 span {
+  display: block;
+}
+.lunar-hero-copy h1 span:last-child {
+  color: #ded3fb;
+}
+.lunar-hero-copy > p {
+  max-width: 41ch;
+  color: #c0c6dd;
+  font-size: clamp(15px, 1.36vw, 18px);
+  line-height: 1.65;
+  margin: 0 0 24px;
+  text-wrap: pretty;
+}
+.lunar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+.button.lunar-primary {
+  min-height: 50px;
+  padding: 10px 16px;
+  gap: 12px;
+  color: #141126;
+  background: #c9b5ff;
+  border-color: #d2c1ff;
+  font-weight: 730;
+}
+.button.lunar-primary:hover {
+  color: #110f24;
+  background: #e3d7ff;
+  border-color: #efe8ff;
+}
+.lunar-hero-link,
+.lunar-source {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 7px;
+  font-weight: 640;
+}
+.lunar-hero-link {
+  color: #e9e3fb;
+}
+.lunar-source {
+  margin-top: 12px;
+  color: #b3bddf;
+  font-size: 12px;
+}
+
+.lunar-scene {
+  min-width: 0;
+  margin: 0;
+}
+.lunar-scene-art {
+  position: relative;
+  width: min(100%, 575px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+.lunar-orbits {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #969dc46e;
+  stroke-width: 1;
+  pointer-events: none;
+}
+.lunar-orbit-mark {
+  fill: var(--lunar-cyan);
+  stroke: #101429;
+  stroke-width: 2;
+}
+.lunar-globe,
+.lunar-still {
+  position: absolute;
+  display: block;
+  width: 87%;
+  height: 87%;
+  top: 6.5%;
+  left: 6.5%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.lunar-still {
+  object-fit: contain;
+  pointer-events: none;
+}
+.lunar-globe {
+  visibility: hidden;
+  opacity: 0;
+  touch-action: pan-y;
+}
+.lunar-scene[data-live='true'] .lunar-globe {
+  visibility: visible;
+  opacity: 1;
+  cursor: grab;
+}
+.lunar-scene[data-live='true'] .lunar-globe[data-dragging='true'] {
+  cursor: grabbing;
+}
+.lunar-scene[data-live='true'] .lunar-still {
+  visibility: hidden;
+}
+.lunar-object-index {
+  position: absolute;
+  right: -1%;
+  bottom: 5%;
+  padding: 4px 8px;
+  color: #cbd5ee;
+  font:
+    600 10px/1.45 'IBM Plex Mono',
+    monospace;
+  letter-spacing: 0.08em;
+  background: #0d1425;
+  border: 1px solid #41496a;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.lunar-scene-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 44px;
+  color: #b5bfdc;
+  font-size: 12px;
+}
+.lunar-scene-controls {
+  display: flex;
+  gap: 4px;
+}
+.lunar-scene-controls button {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: #ddd9ff;
+  background: transparent;
+  border-color: #424866;
+}
+.lunar-scene-controls button:hover {
+  background: #212945;
+}
+.lunar-scene[data-live='false'] .lunar-scene-controls {
+  visibility: hidden;
+}
+.lunar-hero-rail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  min-height: 61px;
+  padding: 2px clamp(22px, 5vw, 78px);
+  border-top: 1px solid #333d5b;
+  background: #0e1323;
+  color: #c3cce4;
+  font-size: 13px;
+}
+.lunar-hero-rail a,
+.lunar-hero-rail span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.lunar-hero-rail a {
+  min-height: 44px;
+  color: #d8c7ff;
+  font-weight: 650;
+}
+.lunar-rail-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9be2dd;
+}
+
+.astro-mission,
+.astro-workflow {
+  scroll-margin-top: 88px;
+  margin-top: clamp(42px, 7vw, 96px);
+  border: 1px solid var(--lunar-edge);
+  background: var(--lunar-paper);
+}
+.astro-mission-band {
+  position: relative;
+  display: grid;
+  align-items: center;
+  isolation: isolate;
+  height: clamp(168px, 23vw, 285px);
+  padding-inline: clamp(22px, 5vw, 70px);
+  overflow: clip;
+  background: #0e1222;
+  border-bottom: 1px solid #7d64b8;
+}
+.astro-mission {
+  margin-top: clamp(30px, 4.5vw, 66px);
+}
+.astro-circle-field {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.astro-mission-band .astro-circle-field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.94;
+  z-index: -2;
+}
+.astro-mission-band::after {
+  content: '';
+  position: absolute;
+  inset: 0 38% 0 0;
+  z-index: -1;
+  background: linear-gradient(90deg, #12122bdb, #12122b8c 58%, transparent);
+}
+.astro-mission-band > span {
+  color: #fff;
+  font-size: clamp(34px, 4.9vw, 68px);
+  line-height: 0.96;
+  font-weight: 760;
+  letter-spacing: -0.044em;
+}
+.astro-mission-band > svg:last-child {
+  position: absolute;
+  right: 24px;
+  bottom: 19px;
+  color: #f4edff;
+}
+.astro-mission-inner,
+.astro-workflow-inner {
+  padding: clamp(18px, 3vw, 40px) clamp(22px, 5vw, 70px) clamp(29px, 5vw, 64px);
+}
+.astro-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  padding-top: 5px;
+  border-top: 1px solid #8d80aa;
+  color: #b9bfd9;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.astro-meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+}
+.astro-mission-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: clamp(20px, 5vw, 85px);
+  align-items: start;
+  margin-top: clamp(22px, 3.8vw, 49px);
+}
+.astro-mission h2,
+.astro-workflow h2 {
+  color: #f1edff;
+  font-size: clamp(34px, 4.6vw, 66px);
+  letter-spacing: -0.04em;
+  line-height: 1.015;
+  text-wrap: balance;
+}
+.astro-mission h2 {
+  max-width: 17ch;
+  margin-bottom: 18px;
+}
+.astro-mission p {
+  color: #c0c6dd;
+  font-size: clamp(15px, 1.4vw, 17px);
+  margin-bottom: 12px;
+}
+.astro-mission-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 680;
+}
+.astro-methods {
+  margin-top: 12px;
+  border-top: 1px solid var(--lunar-edge);
+}
+.astro-methods summary {
+  cursor: pointer;
+  min-height: 44px;
+  align-content: center;
+  color: #cbcef0;
+  font-size: 14px;
+}
+.astro-methods p {
+  margin-top: 2px;
+  font-size: 14px;
+}
+.astro-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #8d80aa;
+  margin: 0;
+}
+.astro-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+  border-bottom: 1px solid var(--lunar-edge);
+  padding: clamp(13px, 2vw, 22px) 8px clamp(13px, 2vw, 22px) 0;
+}
+.astro-stats dt {
+  color: #ccd1e6;
+  font-size: 13px;
+}
+.astro-stats dd {
+  color: var(--lunar-violet);
+  font-size: clamp(32px, 4.2vw, 60px);
+  line-height: 0.93;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.astro-ribbon-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: grid;
+  align-items: center;
+  min-height: clamp(190px, 28vw, 360px);
+  padding-inline: clamp(22px, 5vw, 70px);
+  border-bottom: 1px solid var(--lunar-edge);
+  background: #0e1223;
+}
+.astro-stage-type {
+  font-size: clamp(37px, 7.6vw, 110px);
+  letter-spacing: -0.045em;
+  font-weight: 780;
+  line-height: 0.89;
+  z-index: 2;
+  color: #e5d7ff;
+}
+.astro-ribbon {
+  position: absolute;
+  left: 19%;
+  width: 130%;
+  height: clamp(32px, 5.9vw, 86px);
+  border-block: 1px solid #8a7bbb;
+  overflow: clip;
+  mask-image: linear-gradient(to right, transparent, #000 20%);
+}
+.astro-ribbon-dots {
+  top: 26%;
+  transform: rotate(-12deg);
+  background: #302961;
+}
+.astro-ribbon-ink {
+  top: 63%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 25px;
+  transform: rotate(10deg);
+  background: #b3acf0;
+  color: #17142f;
+  white-space: nowrap;
+  font-size: clamp(13px, 2.3vw, 31px);
+  font-weight: 800;
+}
+.astro-ribbon-ink span {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+.astro-workflow h2 {
+  margin: 0 0 clamp(20px, 3vw, 36px);
+}
+.astro-dossiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.7vw, 24px);
+  align-items: start;
+}
+.astro-dossier {
+  border: 1px solid var(--lunar-edge);
+  border-radius: 13px;
+  overflow: clip;
+  background: #12182a;
+}
+.astro-dossier-top {
+  position: relative;
+  height: clamp(88px, 10vw, 135px);
+  background: #23264b;
+  border-bottom: 1px solid var(--lunar-edge);
+  overflow: clip;
+}
+.astro-dossier-top .astro-circle-field {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(0 at var(--pointer-x, 50%) var(--pointer-y, 50%));
+  opacity: 0.76;
+}
+.astro-dossier:is(:hover, :focus-within) .astro-dossier-top .astro-circle-field {
+  clip-path: circle(150% at var(--pointer-x, 50%) var(--pointer-y, 50%));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .astro-dossier-top .astro-circle-field {
+    transition: clip-path 640ms cubic-bezier(0.18, 0.85, 0.23, 1);
+  }
+}
+.astro-dossier-number {
+  position: absolute;
+  left: 17px;
+  bottom: 4px;
+  font-size: clamp(44px, 6.5vw, 85px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.041em;
+  color: #ded1ff;
+}
+.astro-dossier-top > svg:last-child {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  color: #dccbff;
+}
+.astro-dossier-body {
+  padding: 16px;
+}
+.astro-dossier-body h3 {
+  color: #f2efff;
+  font-size: clamp(18px, 2.1vw, 25px);
+  margin: 0 0 8px;
+  text-wrap: balance;
+}
+.astro-dossier-body p {
+  color: #c5cce4;
+  font-size: 14px;
+  margin: 0 0 9px;
+}
+.astro-dossier-body details {
+  border-top: 1px solid var(--lunar-edge);
+  margin-top: 12px;
+}
+.astro-dossier-body summary,
+.astro-dossier-body a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: #d9c8ff;
+  font-size: 13px;
+  font-weight: 650;
+}
+.astro-dossier-body summary {
+  cursor: pointer;
+  list-style: none;
+}
+.astro-dossier-body summary::-webkit-details-marker {
+  display: none;
+}
+.astro-dossier-body details[open] summary svg {
+  transform: rotate(45deg);
+}
+
+.lunar-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 24px;
+  border-top: 1px solid #373b59;
+  margin-top: 34px;
+  padding-block: 12px;
+  color: #b7bfd7;
+  font-size: 12px;
+}
+.lunar-credits a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.sky-landing > :is(.page-footer, .demo-steps) {
+  max-width: 1380px;
+  margin-inline: auto;
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .lunar-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    padding: 26px 20px 13px;
+  }
+  .lunar-hero-copy h1 {
+    font-size: clamp(56px, 13vw, 90px);
+    margin-bottom: 17px;
+  }
+  .lunar-hero-copy > p {
+    margin-bottom: 15px;
+  }
+  .lunar-source {
+    margin-top: 3px;
+    min-height: 44px;
+  }
+  .lunar-scene {
+    width: min(100%, 460px);
+    margin-inline: auto;
+  }
+  .lunar-scene-caption {
+    justify-content: space-between;
+    gap: 6px;
+    padding-inline: 3px;
+  }
+  .lunar-hero-rail {
+    padding: 10px 20px 3px;
+  }
+  .astro-mission,
+  .astro-workflow {
+    scroll-margin-top: 108px;
+  }
+  .astro-mission-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .astro-dossiers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .astro-ribbon {
+    left: 11%;
+  }
+  .astro-ribbon-ink {
+    top: 74%;
+  }
+}
+@media (max-width: 390px) {
+  .lunar-hero-grid {
+    padding-inline: 15px;
+  }
+  .lunar-scene-caption {
+    font-size: 11px;
+  }
+  .lunar-object-index {
+    bottom: 3%;
+    right: 0;
+    font-size: 9px;
+  }
+  .astro-meta {
+    justify-content: flex-start;
+  }
+}
