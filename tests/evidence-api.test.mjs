@@ -140,6 +140,14 @@ test('Groq rate limits retain the evidence without switching providers', async (
   assert.equal(answer.evidence.matches, 126);
 });
 
+test('the project-specific secret selects Groq only when it has a Groq key prefix', async () => {
+  const status = response();
+  await handleAsk({ method: 'GET' }, status, { nasaspaceapps: 'gsk_mock' });
+  assert.deepEqual(status.body, { enabled: true, provider: 'GroqCloud' });
+  await handleAsk({ method: 'GET' }, status, { nasaspaceapps: 'other-provider-mock' });
+  assert.deepEqual(status.body, { enabled: false, provider: null });
+});
+
 test('a rejected Claude key keeps the NASA results and reports why generation failed', async (t) => {
   t.mock.method(globalThis, 'fetch', async (_url, options) => {
     assert.equal(options.headers['x-api-key'], 'legacy-mock');

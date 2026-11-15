@@ -2,7 +2,8 @@ const groqDefault = 'openai/gpt-oss-20b';
 const claudeDefault = 'claude-haiku-5-5';
 
 export function askProvider(env) {
-  const groqKey = env.GROQ_API_KEY?.trim();
+  const projectKey = env.nasaspaceapps?.trim();
+  const groqKey = env.GROQ_API_KEY?.trim() || (projectKey?.startsWith('gsk_') ? projectKey : null);
   if (groqKey) {
     return { name: 'GroqCloud', key: groqKey, model: env.GROQ_MODEL?.trim() || groqDefault };
   }
