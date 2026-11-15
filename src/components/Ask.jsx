@@ -12,7 +12,13 @@ const examples = [
   'How many investigations are in the NASA snapshot?',
 ];
 
-export default function Ask({ dataset, habitat, onInspect, initialQuestion = '', claudeStatus }) {
+export default function Ask({
+  dataset,
+  habitat,
+  onInspect,
+  initialQuestion = '',
+  generationProvider,
+}) {
   const [question, setQuestion] = useState(initialQuestion.slice(0, 500));
   const [result, setResult] = useState(null);
   const [pending, setPending] = useState(false);
@@ -63,6 +69,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         matches,
         claims: answer.claims,
         model: answer.model,
+        provider: answer.provider ?? generationProvider,
         readout: answer.evidence,
         note: answer.message,
         offline: answer.offline ? answer.answer : undefined,
@@ -95,8 +102,8 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
       />
       <EvidenceSteps cabin={habitat} current="analyst" />
       <Notice>
-        {claudeStatus
-          ? 'Questions first run against the NASA snapshot. Claude receives the selected cabin conditions, computed totals and up to 12 source rows.'
+        {generationProvider
+          ? 'Questions first run against the NASA snapshot. The model receives the selected cabin conditions, computed totals and up to 12 source rows.'
           : 'Questions run against the NASA snapshot through our evidence API. Generated answers are currently unavailable.'}{' '}
         <a href="/data-sources#apis">See the data and APIs</a>
       </Notice>
@@ -134,7 +141,8 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
           {result.claims?.length > 0 && (
             <article className="answer-card">
               <p className="answer-origin">
-                Answer by Claude{result.model ? ' · ' + result.model : ''}
+                Answer via {result.provider || 'the model'}
+                {result.model ? ' · ' + result.model : ''}
               </p>
               <h2>{result.text}</h2>
               {Number.isFinite(result.readout?.matches) && (

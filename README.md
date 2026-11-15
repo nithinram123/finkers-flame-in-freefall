@@ -30,7 +30,7 @@ npm run preview
 - Clustered plots of oxygen, log pressure, airflow and burn duration, grouped by fuel or material. Coverage indicators track reported outcomes and measurements.
 - Original-column inspector and original CSV downloads for every nonempty record.
 - CSV export with source filenames and CSV row references.
-- Claude answers with citations to specific PSI source rows when configured, with local evidence search available as a fallback.
+- GroqCloud answers with citations to specific PSI source rows when configured, with local evidence search available as a fallback.
 - [Neural Evidence Lab](/neural) compares cabin conditions to actual NASA records and audits a small, build-time neural model on held-out FLEX burn durations.
 - Sources, methods, limitations and SI disclosure in the application.
 
@@ -67,16 +67,16 @@ The chart groups nearby points by screen position without discarding any rows. M
 
 The Fire Evidence Dashboard is the main entry to this workflow. Its explorer and Ask links carry the cabin selection. `GET /api/evidence` reads archive totals from the build’s NASA PSI snapshot. Add `?preset=moon` or pass the custom cabin query to get close, wider-only, and outside-window counts. The snapshot is bundled and its original retrieval date was not supplied.
 
-## Enable Claude on Vercel
+## Enable generated answers on Vercel
 
 1. Import the GitHub repository into your Vercel team.
-2. In **Project Settings → Environment Variables**, add a sensitive Anthropic key for the environments that should use Claude. The server checks `NASASpaceAppAPIKey` first and then `ANTHROPIC_API_KEY`. Set `ANTHROPIC_MODEL` to override the default Haiku model.
-3. Redeploy and check `GET /api/ask`. Its `enabled` field indicates that a key is configured. Ask “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row. The POST response includes `generationStatus` to distinguish a generated answer from source search and provider errors.
-4. Set an Anthropic workspace spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
+2. In **Project Settings → Environment Variables**, add `GROQ_API_KEY` as a secret for Production. GroqCloud uses `openai/gpt-oss-20b` by default. Set `GROQ_MODEL` to select a different supported model. Deployments without a Groq key can still use `NASASpaceAppAPIKey` or `ANTHROPIC_API_KEY` for Anthropic.
+3. Redeploy and check `GET /api/ask`. Its `enabled` and `provider` fields identify which service is configured. Ask “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row. The POST response includes `generationStatus` to distinguish a generated answer from source search and provider errors.
+4. Set a provider spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
 
 For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.
 
-`POST /api/ask` searches the bundled NASA PSI records even without a Claude key. Named investigations, fuels and outcomes constrain retrieval and matching totals are computed from the snapshot. With a key configured, the request sends the question, selected scenario, computed totals and up to 12 original NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
+`POST /api/ask` searches the bundled NASA PSI records even without a model API key. Named investigations, fuels and outcomes constrain retrieval and matching totals are computed from the snapshot. With a key configured, the request sends the question, selected scenario, computed totals and up to 12 original NASA records to the configured model. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
 
 ## SI use and originality
 

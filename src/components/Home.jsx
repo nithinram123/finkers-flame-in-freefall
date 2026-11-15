@@ -66,6 +66,7 @@ export default function Home({ dataset, dataError }) {
             <h1 id="lunar-title">
               <span>Fire in</span> <span>freefall.</span>
             </h1>
+            <p className="lunar-challenge">NASA Space Apps Challenge</p>
             <p>
               Compare the air in your crew cabin with NASA combustion tests. Find the closest
               experiments, inspect the evidence, and see where the data runs out.

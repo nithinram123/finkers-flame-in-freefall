@@ -75,13 +75,17 @@ test('the cabin API and Ask use the same mutually exclusive Moon coverage', asyn
   assert.deepEqual(answer.evidence.coverage, reply.body.coverage);
 });
 
-test('the Claude request includes original NASA values, and invented citation IDs are filtered', async (t) => {
+test('Groq receives original NASA values and invented citation IDs are filtered', async (t) => {
   t.mock.method(globalThis, 'fetch', async (url, options) => {
-    assert.equal(url, 'https://api.anthropic.com/v1/messages');
-    assert.equal(options.headers['x-api-key'], 'new-mock-key');
+    assert.equal(url, 'https://api.groq.com/openai/v1/chat/completions');
+    assert.equal(options.headers.Authorization, 'Bearer new-groq-key');
+    assert.equal(options.headers['x-api-key'], undefined);
     const request = JSON.parse(options.body);
-    assert.equal(request.output_config.format.type, 'json_schema');
-    const context = JSON.parse(request.messages[0].content);
+    assert.equal(request.model, 'openai/gpt-oss-20b');
+    assert.equal(request.response_format.type, 'json_schema');
+    assert.equal(request.response_format.json_schema.strict, true);
+    assert.equal(request.reasoning_effort, 'low');
+    const context = JSON.parse(request.messages[1].content);
     assert.ok(context.scopedTotals.count > 0);
     assert.ok(context.evidence.length > 0 && context.evidence.length <= 12);
     for (const row of context.evidence) {
@@ -94,27 +98,46 @@ test('the Claude request includes original NASA values, and invented citation ID
     }
     const id = context.evidence[0].id;
     return Response.json({
-      content: [
+      choices: [
         {
-          type: 'text',
-          text: JSON.stringify({
-            claims: [
-              { text: 'This FLEX record reports methanol extinction.', rowIds: [id] },
-              { text: 'Invented test result.', rowIds: ['not-a-nasa-record'] },
-            ],
-          }),
+          finish_reason: 'stop',
+          message: {
+            content: JSON.stringify({
+              claims: [
+                { text: 'This FLEX record reports methanol extinction.', rowIds: [id] },
+                { text: 'Invented test result.', rowIds: ['not-a-nasa-record'] },
+              ],
+            }),
+          },
         },
       ],
     });
   });
   const answer = await ask(prompt, {
-    NASASpaceAppAPIKey: ' new-mock-key ',
+    GROQ_API_KEY: ' new-groq-key ',
     ANTHROPIC_API_KEY: 'old-mock-key',
   });
+  assert.equal(answer.provider, 'GroqCloud');
   assert.equal(answer.offline, false);
   assert.equal(answer.generationStatus, 'generated');
   assert.equal(answer.claims.length, 1);
   assert.equal(answer.sources[0].accession, 'PSI-69');
+});
+
+test('Groq rate limits retain the evidence without switching providers', async (t) => {
+  const call = t.mock.method(globalThis, 'fetch', async (url) => {
+    assert.equal(new URL(url).hostname, 'api.groq.com');
+    return new Response(null, { status: 429 });
+  });
+  const env = { GROQ_API_KEY: 'mock-groq', NASASpaceAppAPIKey: 'mock-claude' };
+  const status = response();
+  await handleAsk({ method: 'GET' }, status, env);
+  assert.deepEqual(status.body, { enabled: true, provider: 'GroqCloud' });
+  const answer = await ask(prompt, env);
+  assert.equal(call.mock.callCount(), 1);
+  assert.equal(answer.offline, true);
+  assert.equal(answer.generationStatus, 'rate-limited');
+  assert.equal(answer.evidence.matches, 126);
 });
 
 test('a rejected Claude key keeps the NASA results and reports why generation failed', async (t) => {

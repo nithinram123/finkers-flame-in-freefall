@@ -102,7 +102,7 @@ export default function App() {
   });
   const [inspect, setInspect] = useState(null);
   const [palette, setPalette] = useState(false);
-  const [claude, setClaude] = useState(null);
+  const [generationProvider, setGenerationProvider] = useState(undefined);
   useEffect(() => {
     try {
       sessionStorage.setItem('flame-comparison', JSON.stringify(selected));
@@ -114,9 +114,9 @@ export default function App() {
     const controller = new AbortController();
     fetch('/api/ask', { signal: controller.signal })
       .then((response) => response.json())
-      .then((status) => setClaude(status.enabled === true))
+      .then((status) => setGenerationProvider(status.enabled ? status.provider : null))
       .catch(() => {
-        if (!controller.signal.aborted) setClaude(false);
+        if (!controller.signal.aborted) setGenerationProvider(null);
       });
     return () => controller.abort();
   }, []);
@@ -211,7 +211,7 @@ export default function App() {
           <Ask
             key={query.toString()}
             {...props}
-            claudeStatus={claude}
+            generationProvider={generationProvider}
             habitat={query.has('preset') ? readScenario(query) : null}
             initialQuestion={query.get('question') || ''}
           />
@@ -247,7 +247,12 @@ export default function App() {
         break;
       case 'ask':
         page = (
-          <Ask key={habitat?.id || 'general'} {...props} habitat={habitat} claudeStatus={claude} />
+          <Ask
+            key={habitat?.id || 'general'}
+            {...props}
+            habitat={habitat}
+            generationProvider={generationProvider}
+          />
         );
         break;
       case 'insights':
@@ -261,7 +266,7 @@ export default function App() {
         break;
       case 'data-sources':
       case 'methods':
-        page = <Methods dataset={dataset} claudeStatus={claude} />;
+        page = <Methods dataset={dataset} generationProvider={generationProvider} />;
         break;
     }
 

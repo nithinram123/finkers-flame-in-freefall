@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import PsiSources from './PsiSources.jsx';
 import { Notice, PageTitle } from './ui.jsx';
 
-export default function Methods({ dataset, claudeStatus }) {
+export default function Methods({ dataset, generationProvider }) {
   useEffect(() => {
     if (window.location.hash === '#apis') document.getElementById('apis')?.scrollIntoView();
   }, []);
@@ -76,17 +76,17 @@ export default function Methods({ dataset, claudeStatus }) {
             <div>
               <dt>Ask the Evidence</dt>
               <dd>
-                <code>GET /api/ask</code> reports whether Claude is configured.
+                <code>GET /api/ask</code> reports the configured answer provider.
                 <code> POST /api/ask</code> searches the NASA snapshot and returns original row
-                citations. When Claude is configured, the service also passes the question,
-                scenario, computed totals and retrieved rows to Anthropic’s{' '}
-                <a href="https://platform.claude.com/docs/en/api/messages">Messages API</a>.
-                Citation IDs are checked against retrieved rows. The browser can use its copy of the
-                NASA snapshot if the search API is unavailable.
+                citations. When generation is configured, the service passes the question, scenario,
+                computed totals and retrieved rows to the model. GroqCloud uses its{' '}
+                <a href="https://console.groq.com/docs/text-chat">Chat Completions API</a>. Citation
+                IDs are checked against retrieved rows. The browser can use its copy of the NASA
+                snapshot if the search API is unavailable.
                 <strong className="method-api-status">
-                  {claudeStatus === true
-                    ? 'This deployment: Claude configured'
-                    : claudeStatus === false
+                  {generationProvider
+                    ? 'This deployment: ' + generationProvider + ' configured'
+                    : generationProvider === null
                       ? 'This deployment: Server evidence search'
                       : 'This deployment: Checking connection'}
                 </strong>
@@ -148,8 +148,8 @@ export default function Methods({ dataset, claudeStatus }) {
         <p>
           {dataset.siDisclosure} OpenAI Codex assisted implementation, normalization, documentation
           and plain-English descriptions. Source measurements and outcomes come from NASA. Ask sends
-          retrieved source rows to Claude when the server is configured. A citation identifies the
-          records Claude referenced. Check the raw rows when a claim matters.
+          retrieved source rows to the configured model. A citation identifies the records the model
+          referenced. Check the raw rows when a claim matters.
         </p>
         <h2>Tools & attribution</h2>
         <p>
