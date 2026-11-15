@@ -93,8 +93,13 @@ test('Groq receives original NASA values and invented citation IDs are filtered'
       assert.equal(source.fuel, 'Methanol');
       assert.equal(row.outcome, 'Extinction');
       assert.equal(row.oxygenPercent, source.oxygen.value);
-      assert.equal(row.source.row, source.row);
-      assert.ok(Object.keys(row.values).length > 0);
+      assert.equal(row.csvRow, source.row);
+      assert.deepEqual(row.values, source.values);
+      const table = context.tables.find(({ id }) => id === row.tableId);
+      assert.deepEqual(
+        table.columns,
+        dataset.tables.find(({ id }) => id === source.tableId).headers,
+      );
     }
     const id = context.evidence[0].id;
     return Response.json({
