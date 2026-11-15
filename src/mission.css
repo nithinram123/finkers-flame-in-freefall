@@ -168,18 +168,6 @@
 .site-header .palette-trigger {
   margin-left: auto;
 }
-.demo-steps {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 24px;
-  font-size: 13px;
-}
-.demo-steps a {
-  min-height: 44px;
-  align-content: center;
-}
 .insight-chart {
   border: 1px solid var(--border);
   padding: 17px;

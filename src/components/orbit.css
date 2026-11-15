@@ -67,7 +67,6 @@
 .orbit-page a {
   color: var(--teal);
 }
-.orbit-page .demo-steps,
 .orbit-page > .page-footer {
   max-width: 1480px;
   margin-inline: auto;

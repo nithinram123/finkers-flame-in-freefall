@@ -6,6 +6,8 @@ Use Inter, navy backgrounds, violet and cyan accents, and a single row of disclo
 
 The Neural Lab remains available by its existing direct URL for archived references. It is outside the current homepage and navigation.
 
+The landing question panel uses a pixel field and an aperture reveal inspired by the supplied Tessel landing reference. The form opens Ask with the visitor’s question filled in. The research workspace shares the composer’s panel styling. Scroll effects are limited to the landing sections, selected evidence panels and the reading progress line. Reduced-motion preferences disable those effects.
+
 Lead with a short finding. Place measurements, sample counts and source references beneath it. Put experimental detail behind a disclosure or in the source drawer. Format missing values explicitly. Keep initial chamber oxygen separate from burner-stream oxygen.
 
 The current cabin coverage uses ±2 oxygen percentage points and ±0.05 atm for close matches. The wider window uses ±6 points and ±0.15 atm. Display wider-only counts when shown alongside close counts. The legacy investigation ranking has its own comparison rules. Use NASA PSI accession, source filename and CSV row for original observations. Cabin scenarios and gravity illustrations are labelled separately.

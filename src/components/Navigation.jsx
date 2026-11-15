@@ -25,13 +25,12 @@ const tabs = [
   },
   {
     name: 'Research',
-    routes: ['analyst', 'insights', 'research-gaps', 'data-sources', 'briefing'],
+    routes: ['analyst', 'insights', 'research-gaps', 'data-sources'],
     links: [
       ['Ask the evidence', '/analyst', 'analyst'],
       ['Insights', '/insights', 'insights'],
       ['Research gaps', '/research-gaps', 'research-gaps'],
       ['Data sources & APIs', '/data-sources', 'data-sources'],
-      ['Project walkthrough', '/briefing', 'briefing'],
     ],
   },
 ];

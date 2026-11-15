@@ -19,7 +19,6 @@ import Insights, { ResearchGaps } from './components/Insights.jsx';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const Neural = lazy(() => import('./components/Neural.jsx'));
-const JudgeBriefing = lazy(() => import('./components/JudgeBriefing.jsx'));
 const titles = {
   ...routeTitles,
   habitats: 'NASA combustion evidence',
@@ -261,9 +260,6 @@ export default function App() {
       case 'research-gaps':
         page = <ResearchGaps dataset={dataset} />;
         break;
-      case 'briefing':
-        page = <JudgeBriefing dataset={dataset} query={query} />;
-        break;
       case 'data-sources':
       case 'methods':
         page = <Methods dataset={dataset} generationProvider={generationProvider} />;
@@ -296,14 +292,6 @@ export default function App() {
         id="main-content"
         tabIndex={-1}
       >
-        {query.get('demo') === '1' && (
-          <nav className="demo-steps" aria-label="Five-minute demo">
-            <strong>5-MIN DEMO</strong>
-            <a href="/?demo=1">1. Pick a habitat</a>
-            <a href="/scenario?preset=moon&demo=1">2. See the risks</a>
-            <a href="/analyst?demo=1">3. Ask the AI</a>
-          </nav>
-        )}
         {error && !isHome ? (
           <div className="empty" role="alert">
             <h1>Research data could not load</h1>

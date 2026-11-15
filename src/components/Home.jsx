@@ -102,9 +102,6 @@ export default function Home({ dataset, dataError }) {
         dataError={dataError}
       />
       <div className="lunar-credits">
-        <a href="/briefing">
-          Project walkthrough <ArrowUpRight size={14} aria-hidden="true" />
-        </a>
         <span>
           Moon imagery{' '}
           <a href="https://svs.gsfc.nasa.gov/4720/">NASA’s Scientific Visualization Studio</a>

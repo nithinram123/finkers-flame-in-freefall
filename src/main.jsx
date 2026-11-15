@@ -6,6 +6,7 @@ import './briefing.css';
 import './mission.css';
 import './sky.css';
 import './evidence-workspace.css';
+import './scroll-motion.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

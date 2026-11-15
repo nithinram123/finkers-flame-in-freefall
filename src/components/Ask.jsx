@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import { analystEvidence, evidenceReadout, offlineAssessment } from '../lib/analyst.mjs';
+import { evidenceQuestions } from '../lib/evidence-questions.mjs';
 import { nasaReportSearch } from '../lib/nasa-reports.mjs';
 import { HabitatContext } from './Habitat.jsx';
 import { EvidenceSteps } from './EvidenceWorkspace.jsx';
 import { Badge, Empty, Field, Measurement, Notice, PageTitle } from './ui.jsx';
-
-const examples = [
-  'Which FLEX tests report methanol extinction?',
-  'What did NASA test near Moon Base?',
-  'Show heptane test records from PSI-69.',
-  'How many investigations are in the NASA snapshot?',
-];
 
 export default function Ask({
   dataset,
@@ -111,7 +105,7 @@ export default function Ask({
           : 'Questions run against the NASA snapshot through our evidence API. Generated answers are currently unavailable.'}{' '}
         <a href="/data-sources#apis">See the data and APIs</a>
       </Notice>
-      <form className="ask-form" onSubmit={ask}>
+      <form className="ask-form evidence-console" onSubmit={ask}>
         <Field label="Your question">
           <textarea
             name="question"
@@ -129,7 +123,7 @@ export default function Ask({
         </button>
       </form>
       <div className="suggestions">
-        {examples.map((example) => (
+        {evidenceQuestions.map((example) => (
           <button type="button" key={example} disabled={pending} onClick={() => ask(null, example)}>
             {example} <ArrowRight size={14} aria-hidden="true" />
           </button>

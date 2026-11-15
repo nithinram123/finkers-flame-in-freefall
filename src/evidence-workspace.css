@@ -1,6 +1,5 @@
 /* The same navy / violet materials used by the lunar landing. */
-.research-brief,
-.judge-slide {
+.research-brief {
   margin: 24px 0;
   padding: clamp(18px, 4vw, 36px);
   border: 1px solid var(--border);
@@ -17,17 +16,13 @@
 .research-brief header p,
 .brief-comparison p,
 .brief-comparison small,
-.brief-source span,
-.judge-slide p {
+.brief-source span {
   color: var(--muted);
 }
 .research-brief .eyebrow,
-.judge-slide header,
 .live-psi h3,
 .brief-actions,
-.brief-source,
-.brief-pagination,
-.brief-pagination ol {
+.brief-source {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -47,7 +42,6 @@
   background: #131a2acc;
 }
 .brief-comparison article > span,
-.judge-slide header,
 .research-brief .eyebrow {
   color: var(--sky-violet);
   font-weight: 650;
@@ -90,49 +84,13 @@
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
-.judge-slide {
-  display: grid;
-  align-content: center;
-  justify-items: start;
-  min-block-size: 340px;
+.ask-form.evidence-console {
+  border-color: #58557d;
+  background: linear-gradient(155deg, #242540, #171b2e 64%);
+  box-shadow: 0 16px 36px #090d1c5e;
 }
-.judge-slide header {
-  width: 100%;
-}
-.judge-slide header span {
-  margin-left: auto;
-}
-.judge-slide h2 {
-  max-width: 24ch;
-  margin: 24px 0 0;
-  font-size: clamp(1.8rem, 4.4vw, 3.4rem);
-}
-.judge-slide p {
-  max-width: 65ch;
-  line-height: 1.6;
-}
-.brief-pagination {
-  justify-content: center;
-  gap: 12px;
-}
-.brief-pagination ol {
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.brief-pagination ol a {
-  display: grid;
-  place-items: center;
-  min-width: 44px;
-  min-height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-.brief-pagination ol a[aria-current] {
-  background: #393151;
-  border-color: var(--sky-violet);
-  color: white;
+.ask-form.evidence-console textarea {
+  background: #101528;
 }
 .live-psi {
   padding: 16px;

@@ -9,6 +9,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { presetLinks } from './missionDestinations.mjs';
+import LandingAsk from './LandingAsk.jsx';
 
 // Confetti distribution and card reveal adapted from Kedhareswer Naidu's
 // Astro Association template, distributed under the MIT license.
@@ -109,7 +110,7 @@ const dossiers = [
 function Dossier({ item, index }) {
   const { code, title, Icon, summary, detail, to, action } = item;
   return (
-    <article className="astro-dossier">
+    <article className="astro-dossier" data-reveal>
       <div
         className="astro-dossier-top"
         onPointerMove={(event) => {
@@ -174,7 +175,7 @@ export default function AstroSections({ coverage, scenario, count, dataError }) 
               NASA PSI snapshot <ArrowUpRight size={13} aria-hidden="true" />
             </a>
           </div>
-          <div className="astro-mission-grid">
+          <div className="astro-mission-grid" data-reveal>
             <div>
               <h2 id="astro-mission-title">Has NASA tested fire in lunar cabin air?</h2>
               <p>
@@ -209,6 +210,7 @@ export default function AstroSections({ coverage, scenario, count, dataError }) 
           </div>
         </div>
       </section>
+      <LandingAsk />
       <section className="astro-workflow" id="research-tools" aria-labelledby="astro-tools-title">
         <div className="astro-ribbon-stage" aria-hidden="true">
           <span className="astro-stage-type">

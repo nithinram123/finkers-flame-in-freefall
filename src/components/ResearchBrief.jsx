@@ -26,7 +26,12 @@ export default function ResearchBrief({ dataset, scenario, coverage, onInspect }
   }
 
   return (
-    <section className="research-brief" id="research-brief" aria-labelledby="research-brief-title">
+    <section
+      className="research-brief"
+      id="research-brief"
+      aria-labelledby="research-brief-title"
+      data-reveal
+    >
       <header>
         <span className="eyebrow">
           <FileText size={16} aria-hidden="true" /> Cabin evidence brief

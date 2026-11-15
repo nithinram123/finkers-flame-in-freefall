@@ -34,7 +34,7 @@ npm run preview
 - [Neural Evidence Lab](/neural) compares cabin conditions to actual NASA records and audits a small, build-time neural model on held-out FLEX burn durations.
 - Sources, methods, limitations and SI disclosure in the application.
 
-The [judging review and demo checklist](JUDGING_REVIEW.md) map the project to all five 2026 criteria and ten global awards.
+The [judging review](JUDGING_REVIEW.md) maps the project to all five 2026 criteria and ten global awards.
 
 ## Data and scientific boundaries
 
