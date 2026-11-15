@@ -143,6 +143,27 @@
 .live-psi h3 {
   margin-top: 0;
 }
+.psi-csv-check {
+  margin-top: 14px;
+}
+.psi-csv-check summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-block: 10px;
+}
+.psi-csv-check ul {
+  list-style: none;
+  padding: 0;
+}
+.psi-csv-check li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-block: 8px;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 520px) {
   .brief-comparison {
     grid-template-columns: 1fr;

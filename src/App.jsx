@@ -224,7 +224,7 @@ export default function App() {
         page = <Catalogue {...props} />;
         break;
       case 'investigation':
-        page = <Detail {...props} accession={id} key={id} />;
+        page = <Detail {...props} accession={id} query={query} key={id + query.toString()} />;
         break;
       case 'record':
         page = <RecordDetail dataset={dataset} id={id} />;

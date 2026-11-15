@@ -48,6 +48,9 @@ export default function RecordDetail({ dataset, id }) {
         <a className="button" href={`/data/${encodeURIComponent(table.file)}`} download>
           Download original CSV
         </a>
+        <a className="button" href={`/investigation/${record.accession}?tab=sources`}>
+          Verify against NASA
+        </a>
       </PageTitle>
       <p className="source-filename">{table.file}</p>
       <RecordFields record={record} table={table} />

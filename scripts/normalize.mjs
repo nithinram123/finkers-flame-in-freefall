@@ -3,7 +3,7 @@ import { buildPsi } from '../src/lib/psi.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { parse } from 'csv-parse/sync';
+import { csvCells, csvDigest } from '../server/psi-csv.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -172,7 +172,8 @@ function main() {
     .filter((x) => x.endsWith('.csv'))
     .sort()) {
     const bytes = fs.readFileSync(path.join(root, 'data/tables', file));
-    const parsed = parse(bytes, { bom: true, skip_empty_lines: false, relax_column_count: false });
+    const parsed = csvCells(bytes);
+    const cellDigest = csvDigest(parsed);
     const originalHeaders = parsed.shift();
     const headers = originalHeaders.map((x) => x.trim());
     const accession = file.match(/^PSI-\d+/)[0];
@@ -180,7 +181,14 @@ function main() {
     const counts = {};
     const seen = new Map();
     let duplicates = 0;
-    tables.push({ id: tableId, accession, file, headers: originalHeaders });
+    tables.push({
+      id: tableId,
+      accession,
+      file,
+      headers: originalHeaders,
+      sourceRows: parsed.length,
+      cellDigest,
+    });
     parsed.forEach((values, index) => {
       sourceRows++;
       const r = Object.fromEntries(headers.map((h, i) => [h, (values[i] || '').trim()]));

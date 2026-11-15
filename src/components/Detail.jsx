@@ -5,8 +5,8 @@ import { Badge, Empty, Notice, PageTitle, SourceLink } from './ui.jsx';
 import Records from './Records.jsx';
 import LivePsiCheck from './LivePsiCheck.jsx';
 
-export default function Detail({ dataset, accession, selected, toggleCompare, onInspect }) {
-  const [tab, setTab] = useState('Overview');
+export default function Detail({ dataset, accession, selected, toggleCompare, onInspect, query }) {
+  const [tab, setTab] = useState(query?.get('tab') === 'sources' ? 'Sources' : 'Overview');
   const investigation = dataset.investigations.find((item) => item.accession === accession);
   if (!investigation)
     return (
@@ -160,7 +160,7 @@ export default function Detail({ dataset, accession, selected, toggleCompare, on
               </a>
             </p>
           )}
-          <LivePsiCheck accession={accession} />
+          <LivePsiCheck accession={accession} tables={tables} />
           <h2>Original experimental tables</h2>
           {tables.length ? (
             <ul>

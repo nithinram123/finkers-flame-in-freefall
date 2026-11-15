@@ -174,3 +174,38 @@ test('the portable brief keeps the same coverage and source coordinates as the d
   assert.ok(brief.includes('https://example.test/record/' + lunar.example.id));
   assert.ok(brief.includes(dataset.preparedDate));
 });
+
+test('live CSV verification compares original cells and restricts the download to NASA PSI storage', async (t) => {
+  const source = dataset.tables.find(({ accession }) => accession === 'PSI-69');
+  const original = await readFile(
+    new URL('../data/tables/' + source.file, import.meta.url),
+    'utf8',
+  );
+  const signed = 'https://psi-repo-prod.s3.amazonaws.com/file.csv?signature=mock-only';
+  let link = signed;
+  let csv = original.replace(/\r\n/g, '\n');
+  const request = t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(options.redirect, 'error');
+    if (String(url) === signed) return new Response(csv);
+    const download = new URL(url);
+    assert.equal(download.origin, 'https://psi.nasa.gov');
+    assert.equal(download.pathname, '/geode-py/ws/studies/PSI-69/download');
+    assert.equal(download.searchParams.get('file'), source.file);
+    assert.equal(download.searchParams.get('redirect'), 'false');
+    return new Response(link);
+  });
+  const reply = response();
+  const path =
+    '/api/evidence?' + new URLSearchParams({ accession: source.accession, file: source.file });
+  await evidenceApi({ method: 'GET', url: path }, reply);
+  assert.equal(reply.body.status, 'match');
+  assert.equal(reply.body.liveRows, 274);
+  csv = csv.replace('Methanol', 'Changed fuel');
+  await evidenceApi({ method: 'GET', url: path }, reply);
+  assert.equal(reply.body.status, 'changed');
+  assert.equal(reply.body.liveRows, reply.body.archivedRows);
+  link = 'https://other.example/redirect';
+  await evidenceApi({ method: 'GET', url: path }, reply);
+  assert.equal(reply.body.status, 'unavailable');
+  assert.equal(request.mock.callCount(), 5);
+});
