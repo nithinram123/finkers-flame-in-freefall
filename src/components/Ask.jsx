@@ -35,7 +35,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
     const matches = evidence.rows;
     const fallback = offlineAssessment(evidence);
     if (claudeStatus !== true) {
-      setResult({ text, matches, claims: [], offline: fallback });
+      setResult({ text, matches, claims: [], offline: fallback, coverage: evidence.coverage });
       setPending(false);
       return;
     }
@@ -64,8 +64,11 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         text,
         matches,
         claims: response.ok ? answer.claims : [],
+        model: answer.model,
+        coverage: evidence.coverage,
         note: answer.message,
-        offline: !response.ok || answer.offline ? fallback : undefined,
+        offline:
+          !response.ok || answer.offline ? (response.ok && answer.answer) || fallback : undefined,
       });
     } catch {
       if (!controller.signal.aborted)
@@ -74,6 +77,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
           matches,
           claims: [],
           offline: fallback,
+          coverage: evidence.coverage,
           note: 'The answer service is unavailable. Browse the matching source records below.',
         });
     } finally {
@@ -86,17 +90,18 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
       <PageTitle
         eyebrow="Ask the evidence"
         title="What would you like to know?"
-        description="Find NASA experiments and inspect their source rows. Questions opened from a habitat use that cabin’s selected conditions."
+        description="Ask about a fuel, a test result, or a cabin. Every result starts with records from NASA Physical Sciences Informatics."
       />
       <Notice>
         {claudeStatus
-          ? 'Claude can receive your question, selected cabin conditions and matching public NASA records.'
-          : 'Local evidence search uses the NASA snapshot in your browser.'}{' '}
-        <a href="/data-sources#apis">How this works</a>
+          ? 'Claude receives your question, selected cabin conditions and up to 12 retrieved NASA records.'
+          : 'Local evidence search reads the NASA snapshot in your browser. It calculates coverage and retrieves matching rows.'}{' '}
+        <a href="/data-sources#apis">See the data and APIs</a>
       </Notice>
       <form className="ask-form" onSubmit={ask}>
         <Field label="Your question">
           <textarea
+            name="question"
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="How did changing oxygen affect the FLEX tests?"
@@ -107,7 +112,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         </Field>
         <button className="primary" type="submit" disabled={pending || !question.trim()}>
           <Search size={17} aria-hidden="true" />{' '}
-          {pending ? 'Reading the evidence…' : claudeStatus ? 'Ask the evidence' : 'Find evidence'}
+          {pending ? 'Reading the evidence…' : claudeStatus ? 'Ask Claude' : 'Find evidence'}
         </button>
       </form>
       <div className="suggestions">
@@ -126,7 +131,9 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         <section className="search-results" aria-live="polite">
           {result.claims?.length > 0 && (
             <article className="answer-card">
-              <span className="eyebrow">Claude · SI-generated</span>
+              <p className="answer-origin">
+                Answer by Claude{result.model ? ' · ' + result.model : ''}
+              </p>
               <h2>{result.text}</h2>
               {result.claims.map((claim, index) => (
                 <div className="answer-claim" key={index}>
@@ -152,13 +159,30 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
           )}
           {result.offline && (
             <article className="answer-card">
-              <span className="eyebrow">Local evidence search</span>
+              <p className="answer-origin">Local evidence search</p>
               <h2>{result.text}</h2>
               <p>{result.offline}</p>
             </article>
           )}
           {result.note && <Notice>{result.note}</Notice>}
+          {result.coverage && (
+            <dl className="ask-coverage" aria-label="Cabin test coverage">
+              <div>
+                <dt>Close matches</dt>
+                <dd>{result.coverage.exact.length}</dd>
+              </div>
+              <div>
+                <dt>Wider matches</dt>
+                <dd>{result.coverage.nearby.length - result.coverage.exact.length}</dd>
+              </div>
+              <div>
+                <dt>Tests with both measurements</dt>
+                <dd>{result.coverage.paired.length}</dd>
+              </div>
+            </dl>
+          )}
           <h2>Source matches</h2>
+          <p className="muted">Use a PSI citation to open the original NASA CSV row.</p>
           {result.matches.length ? (
             result.matches.map((row) => (
               <article className="evidence-match" key={row.id}>

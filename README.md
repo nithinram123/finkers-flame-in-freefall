@@ -74,7 +74,7 @@ The chart groups nearby points by screen position without discarding any rows. M
 
 For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.
 
-The request sends the question, selected scenario and up to ten relevant public NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
+The request sends the question, selected scenario and up to 12 relevant public NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
 
 ## SI use and originality
 

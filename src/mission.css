@@ -473,6 +473,29 @@
 #atmosphere-evidence {
   scroll-margin-top: 1.4rem;
 }
+.answer-origin {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.ask-coverage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.7rem;
+  border-block: 1px solid var(--border);
+  padding: 0.8rem 0;
+}
+.ask-coverage dt {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.ask-coverage dd {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 .scenario-jump {
   display: inline-flex;
   align-items: center;
