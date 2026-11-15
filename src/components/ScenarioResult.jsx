@@ -1,4 +1,4 @@
-import { Eye, Flame, FireExtinguisher } from 'lucide-react';
+import { ArrowDown, Eye, Flame, FireExtinguisher } from 'lucide-react';
 import { HabitatResults } from './Habitat.jsx';
 import { AtmosphereEvidence, OxygenRanges } from './ScenarioCharts.jsx';
 import { PsiTag } from './PsiSources.jsx';
@@ -34,7 +34,8 @@ const safety = [
 
 export default function ScenarioResult({ dataset, scenario, onInspect, controls }) {
   const psi = buildPsi(dataset);
-  const { exact, nearby } = scenarioCoverage(dataset.records, scenario);
+  const coverage = scenarioCoverage(dataset.records, scenario);
+  const { exact, nearby } = coverage;
   const ranking = rankInvestigations(dataset, scenario);
   const position = new Map(
     ranking.map(({ investigation }, index) => [investigation.accession, index]),
@@ -89,6 +90,11 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
         </div>
       </section>
       {controls}
+      <a className="button scenario-jump" href="#atmosphere-evidence">
+        See matching NASA tests <ArrowDown size={16} aria-hidden="true" />
+      </a>
+      <AtmosphereEvidence coverage={coverage} scenario={scenario} psi={psi} onInspect={onInspect} />
+      <OxygenRanges psi={psi} oxygen={scenario.oxygen} />
       <section className="scenario-risks" aria-label="Fire safety considerations">
         {safety.map(([area, label, Icon, line, informs]) => (
           <article key={area} className="scenario-risk">
@@ -114,8 +120,6 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
           </article>
         ))}
       </section>
-      <AtmosphereEvidence dataset={dataset} scenario={scenario} psi={psi} onInspect={onInspect} />
-      <OxygenRanges psi={psi} oxygen={scenario.oxygen} />
       <section className="scenario-evidence">
         <h2>What the evidence says</h2>
         <p>

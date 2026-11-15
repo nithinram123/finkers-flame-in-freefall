@@ -68,7 +68,10 @@ export default function Scenario({ dataset, scenario, run, onInspect }) {
     />
   ) : (
     <>
-      <PageTitle title="Mission Scenarios" description="Set the conditions in your crew cabin." />
+      <PageTitle
+        title="Compare cabin conditions"
+        description="Choose a habitat or set your own oxygen, pressure and gravity. See which NASA tests have similar air and open the original measurements."
+      />
       <nav aria-label="Habitat presets" className="scenario-presets">
         {scenarioProfiles
           .filter(({ id }) => id !== 'custom')

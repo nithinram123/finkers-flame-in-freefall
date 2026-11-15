@@ -23,6 +23,7 @@ export default function ConditionChart({
   x = 'oxygen',
   y = 'pressure',
   box,
+  bounds,
   references,
   onInspect,
   mode,
@@ -55,7 +56,8 @@ export default function ConditionChart({
   const transform = (value, key) =>
     key === 'pressure' && !scenarioMode ? Math.log10(value) : value;
   const invert = (value, key) => (key === 'pressure' && !scenarioMode ? 10 ** value : value);
-  function domain(key, lowerBox, upperBox) {
+  function domain(key, lowerBox, upperBox, lowerBound, upperBound) {
+    if (bounds) return [transform(lowerBound, key), transform(upperBound, key)];
     const values = records.map((row) => row[key].value);
     if (showReference) values.push(cabinPoint[key]);
     if (box) values.push(lowerBox, upperBox);
@@ -67,8 +69,8 @@ export default function ConditionChart({
     const pad = Math.max((high - low) * 0.1, minSpan / 2);
     return [key === 'pressure' ? low - pad : Math.max(0, low - pad), high + pad];
   }
-  const xDomain = domain(x, box?.x1, box?.x2);
-  const yDomain = domain(y, box?.y1, box?.y2);
+  const xDomain = domain(x, box?.x1, box?.x2, bounds?.x1, bounds?.x2);
+  const yDomain = domain(y, box?.y1, box?.y2, bounds?.y1, bounds?.y2);
   const scaleX = (value) =>
     plot.left +
     ((transform(value, x) - xDomain[0]) / (xDomain[1] - xDomain[0])) * (plot.right - plot.left);
