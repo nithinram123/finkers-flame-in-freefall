@@ -1,13 +1,8 @@
 .sky-landing {
   background: var(--surface);
 }
-.finkers-landing,
 .sky-landing > .page-footer {
-  max-width: 1240px;
-  margin-inline: auto;
-}
-.finkers-landing {
-  border-inline: 1px solid var(--border);
+  padding-inline: clamp(16px, 4vw, 64px);
 }
 .finkers-intro {
   padding: clamp(42px, 7vw, 83px) clamp(16px, 4vw, 44px) clamp(26px, 4vw, 45px);
@@ -82,6 +77,8 @@
   grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
   align-items: start;
   gap: clamp(14px, 3vw, 48px);
+  max-width: 1640px;
+  margin-inline: auto;
   padding: clamp(17px, 4vw, 48px);
 }
 .landing-ask-console {
@@ -271,6 +268,8 @@
   gap: 7px;
 }
 .finkers-section-inner {
+  max-width: 1640px;
+  margin-inline: auto;
   padding: clamp(38px, 9vw, 106px) clamp(17px, 7vw, 92px);
 }
 .finkers-case {
@@ -369,6 +368,12 @@
 }
 .lunar-credits {
   border-block: 1px solid var(--border);
+}
+
+@media (min-width: 721px) {
+  .lunar-hero {
+    margin-inline: 0;
+  }
 }
 
 @media (max-width: 720px) {
