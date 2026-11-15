@@ -64,8 +64,7 @@ export default function Home({ dataset, dataError }) {
         <div className="lunar-hero-grid">
           <div className="lunar-hero-copy">
             <h1 id="lunar-title">
-              <span>Fire in</span>
-              <span>freefall.</span>
+              <span>Fire in</span> <span>freefall.</span>
             </h1>
             <p>
               Compare the air in your crew cabin with NASA combustion tests. Find the closest
