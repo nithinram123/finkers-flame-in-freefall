@@ -89,13 +89,16 @@ function fit(train, seed) {
       for (let i = 0; i < w[j].length; i++) w[j][i] = decay * w[j][i] - step * dw[j][i];
     }
   }
-  return (raw) => {
-    const activations = hidden(scale(raw));
+  const predict = (raw) => {
+    const normalized = scale(raw);
+    const activations = hidden(normalized);
     return {
       predicted: Math.exp(logCenter + intercept + dot(head, activations)),
       activations,
+      normalized,
     };
   };
+  return { predict, model: { weights: w, bias: b, head, logCenter, intercept } };
 }
 
 export function auditModel(dataset) {
@@ -112,10 +115,12 @@ export function auditModel(dataset) {
     fold.groups.push(group);
     fold.size += count;
   }
-  const predictions = folds.flatMap(({ groups }, index) => {
+  const predictions = folds.flatMap((fold, index) => {
+    const { groups } = fold;
     const train = samples.filter(({ group }) => !groups.includes(group));
     const test = samples.filter(({ group }) => groups.includes(group));
-    const predict = fit(train, 6901 + index);
+    const { predict, model } = fit(train, 6901 + index);
+    fold.model = model;
     const baseline = median(train.map(({ observed }) => observed));
     return test.map(({ id, x, observed, group }) => ({
       id,
@@ -123,6 +128,7 @@ export function auditModel(dataset) {
       fold: index + 1,
       observed,
       baseline,
+      inputs: x,
       ...predict(x),
     }));
   });
@@ -133,7 +139,7 @@ export function auditModel(dataset) {
       'SI-assisted code; model trained on NASA PSI-69 FLEX measurements. No generated training data.',
     features: ['Oxygen', 'Pressure', 'Nitrogen', 'CO₂', 'Helium', 'Droplet diameter', 'Fuel'],
     hiddenUnits: width,
-    folds: folds.map(({ groups, size }) => ({ groups, size })),
+    folds,
     mae: error('predicted'),
     baselineMae: error('baseline'),
     predictions,

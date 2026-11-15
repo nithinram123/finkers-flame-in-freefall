@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { kPaPerAtm, readScenario, scenarioCoverage, scenarioProfiles } from '../lib/scenario.mjs';
 import { analystUrl } from '../lib/routes.mjs';
+import FlexNetwork, { PredictionPlot } from './FlexNetwork.jsx';
 import './neural.css';
 
 const format = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
@@ -85,62 +86,6 @@ function CoveragePlot({ scenario, coverage }) {
   );
 }
 
-function NetworkPlot({ audit, example }) {
-  const inputY = (i) => 25 + i * 28;
-  const hiddenY = (i) => 32 + i * 32;
-  return (
-    <figure className="neural-network">
-      <svg viewBox="0 0 410 218" aria-hidden="true" focusable="false">
-        {audit.features.map((_, i) =>
-          example.activations.map((_, j) => (
-            <path
-              key={i + ':' + j}
-              className="neural-wire"
-              d={`M135 ${inputY(i)}C188 ${inputY(i)} 190 ${hiddenY(j)} 236 ${hiddenY(j)}`}
-            />
-          )),
-        )}
-        {example.activations.map((_, j) => (
-          <path
-            key={j}
-            className="neural-wire output"
-            d={`M236 ${hiddenY(j)}C280 ${hiddenY(j)} 276 112 319 112`}
-          />
-        ))}
-        {audit.features.map((name, i) => (
-          <g key={name}>
-            <text x="12" y={inputY(i) + 4}>
-              {name}
-            </text>
-            <circle className="neural-node" cx="135" cy={inputY(i)} r="5" />
-          </g>
-        ))}
-        {example.activations.map((value, i) => (
-          <g key={i}>
-            <circle
-              className={value >= 0 ? 'neural-node positive' : 'neural-node negative'}
-              cx="236"
-              cy={hiddenY(i)}
-              r={6 + Math.abs(value) * 3.5}
-            />
-            <text x="236" y={hiddenY(i) + 3} textAnchor="middle" className="neural-node-sign">
-              {value >= 0 ? '+' : '−'}
-            </text>
-          </g>
-        ))}
-        <circle className="neural-node positive" cx="319" cy="112" r="8" />
-        <text x="335" y="116">
-          Burn time
-        </text>
-      </svg>
-      <figcaption>
-        Seven inputs, six hidden units, one output. Each hidden node shows the sign and relative
-        size of its activation for the selected test.
-      </figcaption>
-    </figure>
-  );
-}
-
 function ModelAudit({ records, onInspect }) {
   const [audit, setAudit] = useState(null);
   const [error, setError] = useState(false);
@@ -153,7 +98,11 @@ function ModelAudit({ records, onInspect }) {
         return response.json();
       })
       .then((data) => {
-        if (data.schemaVersion !== 1 || !data.predictions?.length)
+        if (
+          data.schemaVersion !== 1 ||
+          !data.predictions?.length ||
+          !data.folds?.every(({ model }) => model)
+        )
           throw new Error('Invalid model check');
         setAudit(data);
       })
@@ -166,14 +115,11 @@ function ModelAudit({ records, onInspect }) {
     return (
       <p role="status">
         {error
-          ? 'The model check is unavailable. You can still browse and verify the NASA evidence above.'
+          ? 'The model check is unavailable. You can still browse the cabin evidence below.'
           : 'Loading the FLEX model check…'}
       </p>
     );
-  // One representative row per fold, selected without looking at prediction error.
-  const examples = audit.folds
-    .map((_, index) => audit.predictions.find(({ fold }) => fold === index + 1))
-    .filter((item) => item && records.has(item.id));
+  const examples = audit.predictions.filter(({ id }) => records.has(id));
   const example = examples.find(({ id }) => id === selection) || examples[0];
   const row = example && records.get(example.id);
   const groups = audit.folds.reduce((sum, fold) => sum + fold.groups.length, 0);
@@ -201,40 +147,43 @@ function ModelAudit({ records, onInspect }) {
         a habitat.
       </p>
       {row && (
-        <div className="neural-model-grid">
-          <NetworkPlot audit={audit} example={example} />
-          <div className="neural-example">
-            <label htmlFor="neural-example-select">Inspect a held-out FLEX test</label>
-            <select
-              id="neural-example-select"
-              value={example.id}
-              onChange={(event) => setSelection(event.target.value)}
-            >
-              {examples.map((item) => (
-                <option key={item.id} value={item.id}>
-                  Fold {item.fold} · {records.get(item.id).label}
-                </option>
-              ))}
-            </select>
-            <dl>
-              <div>
-                <dt>NASA measurement</dt>
-                <dd>{seconds(example.observed)}</dd>
-              </div>
-              <div>
-                <dt>Neural estimate</dt>
-                <dd>{seconds(example.predicted)}</dd>
-              </div>
-              <div>
-                <dt>Median estimate</dt>
-                <dd>{seconds(example.baseline)}</dd>
-              </div>
-            </dl>
-            <button className="neural-text-button" type="button" onClick={() => onInspect([row])}>
-              Inspect original row <ArrowUpRight size={15} aria-hidden="true" />
-            </button>
+        <>
+          <div className="neural-model-grid">
+            <div className="neural-example">
+              <label htmlFor="neural-example-select">Inspect a held-out FLEX test</label>
+              <select
+                id="neural-example-select"
+                value={example.id}
+                onChange={(event) => setSelection(event.target.value)}
+              >
+                {examples.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    Fold {item.fold} · {records.get(item.id).label}
+                  </option>
+                ))}
+              </select>
+              <dl>
+                <div>
+                  <dt>NASA measurement</dt>
+                  <dd>{seconds(example.observed)}</dd>
+                </div>
+                <div>
+                  <dt>Neural estimate</dt>
+                  <dd>{seconds(example.predicted)}</dd>
+                </div>
+                <div>
+                  <dt>Median estimate</dt>
+                  <dd>{seconds(example.baseline)}</dd>
+                </div>
+              </dl>
+              <button className="neural-text-button" type="button" onClick={() => onInspect([row])}>
+                Inspect original row <ArrowUpRight size={15} aria-hidden="true" />
+              </button>
+            </div>
+            <FlexNetwork audit={audit} example={example} key={example.id} />
           </div>
-        </div>
+          <PredictionPlot predictions={examples} selected={example} onSelect={setSelection} />
+        </>
       )}
       <details className="neural-methods">
         <summary>How the experiment was checked</summary>
@@ -304,14 +253,13 @@ export default function Neural({ dataset, onInspect, query }) {
       <header className="neural-heading">
         <h1>Neural Evidence Lab</h1>
         <p>
-          Find out what NASA actually tested near your cabin conditions, then see how well a neural
-          model explains one set of measured burns.
+          Follow a FLEX burn-duration prediction through every layer, compare it with NASA’s
+          measurement, and trace the original record.
         </p>
         <a
           href="#neural-audit"
-          onClick={(event) => {
-            event.preventDefault();
-            document.getElementById('neural-audit')?.focus();
+          onClick={() => {
+            document.getElementById('neural-audit')?.focus({ preventScroll: true });
           }}
         >
           Jump to the model check <ArrowDownRight size={16} aria-hidden="true" />
@@ -329,6 +277,24 @@ export default function Neural({ dataset, onInspect, query }) {
           </li>
         ))}
       </ol>
+      <section
+        className="neural-panel"
+        id="neural-audit"
+        tabIndex={-1}
+        aria-labelledby="neural-audit-title"
+      >
+        <div className="neural-panel-head">
+          <div>
+            <h2 id="neural-audit-title">Can the network estimate burn time?</h2>
+          </div>
+        </div>
+        <p className="neural-model-intro">
+          We held back whole sets of atmospheric conditions, then compared the model’s estimates
+          with the burn times NASA measured.
+        </p>
+        <ModelAudit records={records} onInspect={onInspect} />
+      </section>
+
       <section className="neural-panel" aria-labelledby="neural-coverage">
         <div className="neural-panel-head">
           <div>
@@ -440,23 +406,6 @@ export default function Neural({ dataset, onInspect, query }) {
             </ul>
           )}
         </div>
-      </section>
-      <section
-        className="neural-panel"
-        id="neural-audit"
-        tabIndex={-1}
-        aria-labelledby="neural-audit-title"
-      >
-        <div className="neural-panel-head">
-          <div>
-            <h2 id="neural-audit-title">Can the network estimate burn time?</h2>
-          </div>
-        </div>
-        <p className="neural-model-intro">
-          We held back whole sets of atmospheric conditions, then compared the model’s estimates
-          with the burn times NASA measured.
-        </p>
-        <ModelAudit records={records} onInspect={onInspect} />
       </section>
       <footer className="neural-footer">
         <a

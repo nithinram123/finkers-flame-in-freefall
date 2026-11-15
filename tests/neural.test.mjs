@@ -54,3 +54,16 @@ test('NASA data distinguish a cabin evidence gap from a closer station match', (
   assert.ok(station.exact.length > 0);
   assert.ok(station.exact.every((row) => station.nearby.includes(row)));
 });
+
+test('the exported node trace reconstructs each held-out estimate', () => {
+  const dot = (a, b) => a.reduce((sum, value, i) => sum + value * b[i], 0);
+  for (const row of audit.predictions) {
+    const model = audit.folds[row.fold - 1].model;
+    const activation = model.weights.map((weights, i) =>
+      Math.tanh(dot(weights, row.normalized) + model.bias[i]),
+    );
+    assert.deepEqual(activation, row.activations);
+    const estimated = Math.exp(model.logCenter + model.intercept + dot(model.head, activation));
+    assert.ok(Math.abs(estimated - row.predicted) < 1e-9);
+  }
+});
