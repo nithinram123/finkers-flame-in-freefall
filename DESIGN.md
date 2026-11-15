@@ -1,8 +1,10 @@
 # Flame in Freefall design
 
-The homepage is a mission map with selectable stations, drag and zoom, and direct links to the research tools. The map uses decorative orbital linework with real destinations. The scroll path leads from habitat selection through evidence coverage to the FLEX model check.
+The homepage follows the supplied Method Overview reference: a centered heading, two method cards, and a Moon Base case study in an 896-pixel column. Show the measured coverage and the method that produced it alongside a direct link to the habitat analysis.
 
-Use Inter across the app. Deep charcoal and pale teal carry the map and Neural Lab. Flame orange marks the brand and remains the accent for the white research briefings. Use line icons and 44 px primary controls. Keep every map destination reachable without dragging and remove camera transitions for reduced motion.
+Use Inter, navy backgrounds, violet and cyan section titles, and a single row of disclosure navigation above the content. The dark interiors borrow the poster-like headings and circular graphic motif from [Astro Association](https://21st.dev/@kedhareswer/library/astro-association). Keep controls and measurements legible over the panel surfaces. Use line icons and 44 px primary controls.
+
+The Neural Lab remains available by its existing direct URL for archived references. It is outside the current homepage and navigation.
 
 Lead with a short finding. Place measurements, sample counts and source references beneath it. Put experimental detail behind a disclosure or in the source drawer. Format missing values explicitly. Keep initial chamber oxygen separate from burner-stream oxygen.
 

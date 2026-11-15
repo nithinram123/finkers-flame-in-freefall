@@ -136,20 +136,6 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
         </p>
         <a className="button primary" href={analystUrl(question, scenario)}>
           Ask the AI about this habitat
-        </a>{' '}
-        <a
-          className="button"
-          href={
-            '/neural?' +
-            new URLSearchParams({
-              preset: scenario.id,
-              oxygen: scenario.oxygen,
-              pressure: scenario.atm,
-              gravity: scenario.gravityG,
-            })
-          }
-        >
-          Inspect matches in the Neural Lab
         </a>
       </section>
       <details className="legacy-evidence">

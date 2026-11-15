@@ -1,75 +1,123 @@
-import { useState } from 'react';
-import {
-  BookOpen,
-  ChartScatter,
-  ChevronDown,
-  FlaskConical,
-  Home,
-  Menu,
-  MessageCircle,
-  X,
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, Search } from 'lucide-react';
+import { presetLinks } from './missionDestinations.mjs';
 
-const primary = [
-  ['Mission map', '/', 'habitats', Home],
-  ['Habitat Risk', '/scenario', 'scenario', FlaskConical],
-  ['Ask the AI', '/analyst', 'analyst', MessageCircle],
-  ['Explore Experiments', '/explorer', 'explorer', ChartScatter],
+const tabs = [
+  {
+    name: 'Habitats',
+    routes: ['scenario'],
+    links: [
+      ['Compare cabin conditions', '/scenario', 'scenario'],
+      ['Moon Base', presetLinks.moon],
+      ['Space Station', presetLinks.station],
+      ['Pressurized Rover', presetLinks.rover],
+      ['Mars Base', presetLinks.mars],
+    ],
+  },
+  {
+    name: 'Experiments',
+    routes: ['explorer', 'investigations', 'compare'],
+    links: [
+      ['Explore test records', '/explorer', 'explorer'],
+      ['Browse investigations', '/investigations', 'investigations'],
+      ['Compare investigations', '/compare', 'compare'],
+    ],
+  },
+  {
+    name: 'Research',
+    routes: ['analyst', 'insights', 'research-gaps', 'data-sources'],
+    links: [
+      ['Ask the evidence', '/analyst', 'analyst'],
+      ['Insights', '/insights', 'insights'],
+      ['Research gaps', '/research-gaps', 'research-gaps'],
+      ['Data sources & APIs', '/data-sources', 'data-sources'],
+    ],
+  },
 ];
-export const morePages = [
-  ['Neural Evidence Lab', '/neural', 'neural'],
-  ['Experiment Analysis', '/investigations', 'investigations'],
-  ['Compare', '/compare', 'compare'],
-  ['Insights', '/insights', 'insights'],
-  ['Research Gaps', '/research-gaps', 'research-gaps'],
-  ['Data Sources', '/data-sources', 'data-sources'],
-];
+export const routeTitles = Object.fromEntries(
+  tabs.flatMap(({ links }) =>
+    links.filter(([, , route]) => route).map(([title, , route]) => [route, title]),
+  ),
+);
 
-export default function Navigation({ active, claude }) {
-  const [mobile, setMobile] = useState(false);
-  const Icon = mobile ? X : Menu;
-  const moreActive = morePages.some(([, , key]) => key === active);
+export default function Navigation({ active, openSearch }) {
+  const [open, setOpen] = useState(null);
+  const nav = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event) => {
+      if (!nav.current?.contains(event.target)) setOpen(null);
+    };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('focusin', close);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('focusin', close);
+    };
+  }, [open]);
   return (
-    <div
-      className="mission-navigation"
+    <nav
+      className="sky-nav"
+      aria-label="Main navigation"
+      ref={nav}
       onKeyDown={(event) => {
-        if (event.key === 'Escape' && mobile) {
-          setMobile(false);
-          event.currentTarget.querySelector('.mobile-nav-toggle')?.focus();
-        }
+        if (event.key !== 'Escape' || !open) return;
+        event.preventDefault();
+        nav.current.querySelector('[aria-expanded="true"]')?.focus();
+        setOpen(null);
       }}
     >
-      <button
-        className="mobile-nav-toggle"
-        type="button"
-        aria-expanded={mobile}
-        aria-controls="mission-nav"
-        onClick={() => setMobile(!mobile)}
+      <a
+        className="sky-tab sky-home-tab"
+        href="/"
+        aria-current={active === 'habitats' ? 'page' : undefined}
       >
-        <Icon size={18} aria-hidden="true" />
-        {mobile ? 'Close menu' : 'Menu'}
+        Home
+      </a>
+      {tabs.map(({ name, links, routes }) => {
+        const id = 'nav-' + name.toLowerCase();
+        return (
+          <div className="sky-tab-group" key={name}>
+            <button
+              type="button"
+              className="sky-tab"
+              aria-expanded={open === name}
+              aria-controls={id}
+              data-active={routes.includes(active) || undefined}
+              onClick={() => setOpen(open === name ? null : name)}
+              onKeyDown={(event) => {
+                if (event.key !== 'ArrowDown') return;
+                event.preventDefault();
+                setOpen(name);
+                requestAnimationFrame(() =>
+                  document.getElementById(id)?.querySelector('a')?.focus(),
+                );
+              }}
+            >
+              {name} <ChevronDown size={14} aria-hidden="true" />
+            </button>
+            <div className="sky-dropdown" id={id} hidden={open !== name}>
+              {links.map(([label, href, route]) => (
+                <a key={href} href={href} aria-current={route === active ? 'page' : undefined}>
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      <button
+        className="sky-tab sky-search"
+        type="button"
+        aria-label="Open quick navigation"
+        aria-keyshortcuts="Control+K Meta+K"
+        onClick={() => {
+          setOpen(null);
+          openSearch();
+        }}
+      >
+        <Search size={19} aria-hidden="true" />
       </button>
-      <nav aria-label="Main navigation" id="mission-nav" className={mobile ? 'is-open' : ''}>
-        {primary.map(([label, href, key, Symbol]) => (
-          <a key={key} href={href} aria-current={key === active ? 'page' : undefined}>
-            <Symbol size={17} aria-hidden="true" />
-            {label}
-          </a>
-        ))}
-        <details open={moreActive || undefined}>
-          <summary>
-            <BookOpen size={17} aria-hidden="true" />
-            More
-            <ChevronDown size={14} aria-hidden="true" />
-          </summary>
-          {morePages.map(([label, href, key]) => (
-            <a key={key} href={href} aria-current={key === active ? 'page' : undefined}>
-              {label}
-            </a>
-          ))}
-        </details>
-        {claude && <small className="nav-ai">Claude configured</small>}
-      </nav>
-    </div>
+    </nav>
   );
 }

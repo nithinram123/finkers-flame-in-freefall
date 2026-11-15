@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useState } from 'react';
-import { ArrowUpRight, Flame, Search } from 'lucide-react';
+import { ArrowUpRight, Flame } from 'lucide-react';
 import Catalogue from './components/Catalogue.jsx';
 import Detail from './components/Detail.jsx';
 import Compare from './components/Compare.jsx';
@@ -14,17 +14,15 @@ import Home from './components/Home.jsx';
 import Scenario from './components/Scenario.jsx';
 import { locationRoute } from './lib/routes.mjs';
 import { readScenario } from './lib/scenario.mjs';
-import Navigation, { morePages } from './components/Navigation.jsx';
+import Navigation, { routeTitles } from './components/Navigation.jsx';
 import Insights, { ResearchGaps } from './components/Insights.jsx';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const Neural = lazy(() => import('./components/Neural.jsx'));
 const titles = {
-  habitats: 'Home',
-  explorer: 'Explore Experiments',
-  scenario: 'Habitat Risk',
-  analyst: 'Ask the AI',
-  ...Object.fromEntries(morePages.map(([label, , route]) => [route, label])),
+  ...routeTitles,
+  habitats: 'Method Overview',
+  neural: 'Neural Evidence Lab',
 };
 
 function Loading() {
@@ -196,7 +194,7 @@ export default function App() {
   ) : (
     <div className="empty">
       <h1>Page not found</h1>
-      <a href="/">Return to the mission map</a>
+      <a href="/">Return home</a>
     </div>
   );
   if (dataset)
@@ -268,45 +266,20 @@ export default function App() {
       >
         Skip to content
       </a>
-      <header className="site-header orbit-header">
+      <header className="site-header sky-header">
         <div className="site-header-inner">
           <a className="briefing-brand" href="/">
             <Flame size={25} strokeWidth={1.75} aria-hidden="true" />
             <span>Flame in Freefall</span>
           </a>
-          <nav aria-label="Research tools" className="orbit-header-links">
-            <a href="/scenario" aria-current={active === 'scenario' ? 'page' : undefined}>
-              Habitats
-            </a>
-            <a href="/explorer" aria-current={active === 'explorer' ? 'page' : undefined}>
-              Experiments
-            </a>
-            <a href="/neural" aria-current={active === 'neural' ? 'page' : undefined}>
-              Neural Lab
-            </a>
-            <a href="/data-sources" aria-current={active === 'data-sources' ? 'page' : undefined}>
-              Sources
-            </a>
-          </nav>
-          <button
-            className="palette-trigger"
-            aria-label="Open quick navigation"
-            aria-keyshortcuts="Control+K Meta+K"
-            type="button"
-            onClick={() => setPalette(true)}
-          >
-            <Search size={19} aria-hidden="true" />
-            <span>Jump to</span>
-            <kbd>
-              {typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
-                ? '⌘ K'
-                : 'Ctrl K'}
-            </kbd>
-          </button>
+          <Navigation active={active} openSearch={() => setPalette(true)} key={route} />
         </div>
       </header>
-      {!isHome && <Navigation active={active} claude={claude} key={route} />}
-      <main className={isHome ? 'orbit-page' : 'briefing-page'} id="main-content" tabIndex={-1}>
+      <main
+        className={isHome ? 'sky-landing' : 'briefing-page sky-research'}
+        id="main-content"
+        tabIndex={-1}
+      >
         {query.get('demo') === '1' && (
           <nav className="demo-steps" aria-label="Five-minute demo">
             <strong>5-MIN DEMO</strong>

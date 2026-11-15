@@ -73,15 +73,6 @@ export default function Methods({ dataset, claudeStatus }) {
                 </strong>
               </dd>
             </div>
-            <div>
-              <dt>FLEX neural model</dt>
-              <dd>
-                The build trains and evaluates a small network on PSI-69 droplet burn times. The{' '}
-                <a href="/neural#neural-audit">model check</a> reads the held-out estimates from
-                <a href="/data/neural.json"> /data/neural.json</a>. Its scope is burn duration
-                within the FLEX study.
-              </dd>
-            </div>
           </dl>
         </section>
         <h2>What is included</h2>

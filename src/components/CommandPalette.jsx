@@ -7,10 +7,9 @@ export default function CommandPalette({ dataset, onClose }) {
   const ref = useRef(null);
   const [query, setQuery] = useState('');
   const pages = [
-    ['Mission map', ''],
+    ['Method Overview', ''],
     ['Habitat Risk and custom scenarios', 'scenario'],
     ['Explore experiments', 'explorer'],
-    ['Neural Evidence Lab', 'neural'],
     ['Browse investigations', 'investigations'],
     ['Ask the evidence', 'analyst'],
     ['Compare investigations', 'compare'],
