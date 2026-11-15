@@ -153,6 +153,75 @@ test('the project-specific secret selects Groq only when it has a Groq key prefi
   assert.deepEqual(status.body, { enabled: false, provider: null });
 });
 
+test('Gemini takes over a failed Groq request using the same NASA data and citation validation', async (t) => {
+  let primaryEvidence;
+  const fetchMock = t.mock.method(globalThis, 'fetch', async (url, options) => {
+    const request = JSON.parse(options.body);
+    if (new URL(url).hostname === 'api.groq.com') {
+      primaryEvidence = request.messages[1].content;
+      assert.equal(options.headers.Authorization, 'Bearer mock-groq');
+      assert.equal(options.headers['x-goog-api-key'], undefined);
+      return new Response(null, { status: 429 });
+    }
+    assert.equal(
+      url,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent',
+    );
+    assert.equal(options.headers['x-goog-api-key'], 'mock-gemini');
+    assert.equal(options.headers.Authorization, undefined);
+    const context = request.contents[0].parts[0].text;
+    assert.equal(context, primaryEvidence);
+    assert.equal(request.generationConfig.responseMimeType, 'application/json');
+    const id = JSON.parse(context).evidence[0].id;
+    return Response.json({
+      candidates: [
+        {
+          finishReason: 'STOP',
+          content: {
+            parts: [
+              {
+                text: JSON.stringify({
+                  claims: [
+                    { text: 'The FLEX record reports methanol extinction.', rowIds: [id] },
+                    { text: 'Invented observation.', rowIds: ['fake-id'] },
+                  ],
+                }),
+              },
+            ],
+          },
+        },
+      ],
+    });
+  });
+  const env = { GROQ_API_KEY: 'mock-groq', GEMINI_API_KEY: 'mock-gemini' };
+  const status = response();
+  await handleAsk({ method: 'GET' }, status, env);
+  assert.deepEqual(status.body, {
+    enabled: true,
+    provider: 'GroqCloud',
+    backupProvider: 'Google Gemini',
+  });
+  const answer = await ask(prompt, env);
+  assert.equal(fetchMock.mock.callCount(), 2);
+  assert.equal(answer.provider, 'Google Gemini');
+  assert.equal(answer.generationStatus, 'generated');
+  assert.equal(answer.evidence.matches, 126);
+  assert.equal(answer.claims.length, 1);
+  assert.equal(answer.sources[0].accession, 'PSI-69');
+});
+
+test('a network failure and a failed backup still return the NASA matches', async (t) => {
+  const fetchMock = t.mock.method(globalThis, 'fetch', async (url) => {
+    if (new URL(url).hostname === 'api.groq.com') throw new Error('request timed out');
+    return new Response(null, { status: 503 });
+  });
+  const answer = await ask(prompt, { GROQ_API_KEY: 'mock-groq', GEMINI_API_KEY: 'mock-gemini' });
+  assert.equal(fetchMock.mock.callCount(), 2);
+  assert.equal(answer.offline, true);
+  assert.equal(answer.generationStatus, 'provider-unavailable');
+  assert.equal(answer.evidence.matches, 126);
+});
+
 test('a rejected Claude key keeps the NASA results and reports why generation failed', async (t) => {
   t.mock.method(globalThis, 'fetch', async (_url, options) => {
     assert.equal(options.headers['x-api-key'], 'legacy-mock');

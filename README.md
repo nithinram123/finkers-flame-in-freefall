@@ -71,8 +71,9 @@ The Fire Evidence Dashboard is the main entry to this workflow. Its explorer and
 
 1. Import the GitHub repository into your Vercel team.
 2. In **Project Settings → Environment Variables**, add `GROQ_API_KEY` as a secret for Production. The project also recognizes a Groq key saved as `nasaspaceapps`. GroqCloud uses `openai/gpt-oss-20b` by default. Set `GROQ_MODEL` to select a different supported model. Deployments without a Groq key can still use `NASASpaceAppAPIKey` or `ANTHROPIC_API_KEY` for Anthropic.
-3. Redeploy and check `GET /api/ask`. Its `enabled` and `provider` fields identify which service is configured. Ask “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row. The POST response includes `generationStatus` to distinguish a generated answer from source search and provider errors.
-4. Set a provider spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
+3. Optionally add `GEMINI_API_KEY` as a Production secret from Google AI Studio. The server sends the same question and NASA evidence to Gemini Flash-Lite if the primary provider times out, hits a rate limit, rejects its credentials, or has a server outage. Both services use the same citation validation.
+4. Redeploy and check `GET /api/ask`. Its `enabled` and `provider` fields identify which service is configured. A configured secondary service appears as `backupProvider`. Ask “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row. The POST response includes `generationStatus` to distinguish a generated answer from source search and provider errors.
+5. Set a provider spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
 
 For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.
 
