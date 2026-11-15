@@ -320,6 +320,9 @@ export default function App() {
             and the published sources on the <a href="/data-sources">Data Sources</a> page.
           </span>
           <div>
+            <a href="https://flame-in-freefall-beta.vercel.app/" target="_blank" rel="noreferrer">
+              Live project <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
             <a
               href="https://github.com/nithinram123/flame-in-freefall"
               target="_blank"
