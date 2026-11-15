@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { handleAsk } from '../api/ask.js';
+import { lookupNasaReports } from '../server/nasa-reports.mjs';
 import evidenceApi from '../api/evidence.js';
 import { briefMarkdown, cabinSummary, moon, station } from '../src/lib/research-brief.mjs';
 
@@ -21,7 +22,7 @@ function response() {
   };
 }
 
-async function ask(question, config = {}, scenario) {
+async function ask(question, config = {}, scenario, lookup = async () => undefined) {
   const reply = response();
   await handleAsk(
     {
@@ -31,6 +32,7 @@ async function ask(question, config = {}, scenario) {
     },
     reply,
     config,
+    lookup,
   );
   assert.equal(reply.statusCode, 200);
   return reply.body;
@@ -137,7 +139,11 @@ test('Groq rate limits retain the evidence without switching providers', async (
   const env = { GROQ_API_KEY: 'mock-groq', NASASpaceAppAPIKey: 'mock-claude' };
   const status = response();
   await handleAsk({ method: 'GET' }, status, env);
-  assert.deepEqual(status.body, { enabled: true, provider: 'GroqCloud' });
+  assert.deepEqual(status.body, {
+    enabled: true,
+    provider: 'GroqCloud',
+    backupProvider: 'NASA Technical Reports Server',
+  });
   const answer = await ask(prompt, env);
   assert.equal(call.mock.callCount(), 1);
   assert.equal(answer.offline, true);
@@ -148,78 +154,17 @@ test('Groq rate limits retain the evidence without switching providers', async (
 test('the project-specific secret selects Groq only when it has a Groq key prefix', async () => {
   const status = response();
   await handleAsk({ method: 'GET' }, status, { nasaspaceapps: 'gsk_mock' });
-  assert.deepEqual(status.body, { enabled: true, provider: 'GroqCloud' });
-  await handleAsk({ method: 'GET' }, status, { nasaspaceapps: 'other-provider-mock' });
-  assert.deepEqual(status.body, { enabled: false, provider: null });
-});
-
-test('Gemini takes over a failed Groq request using the same NASA data and citation validation', async (t) => {
-  let primaryEvidence;
-  const fetchMock = t.mock.method(globalThis, 'fetch', async (url, options) => {
-    const request = JSON.parse(options.body);
-    if (new URL(url).hostname === 'api.groq.com') {
-      primaryEvidence = request.messages[1].content;
-      assert.equal(options.headers.Authorization, 'Bearer mock-groq');
-      assert.equal(options.headers['x-goog-api-key'], undefined);
-      return new Response(null, { status: 429 });
-    }
-    assert.equal(
-      url,
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent',
-    );
-    assert.equal(options.headers['x-goog-api-key'], 'mock-gemini');
-    assert.equal(options.headers.Authorization, undefined);
-    const context = request.contents[0].parts[0].text;
-    assert.equal(context, primaryEvidence);
-    assert.equal(request.generationConfig.responseMimeType, 'application/json');
-    const id = JSON.parse(context).evidence[0].id;
-    return Response.json({
-      candidates: [
-        {
-          finishReason: 'STOP',
-          content: {
-            parts: [
-              {
-                text: JSON.stringify({
-                  claims: [
-                    { text: 'The FLEX record reports methanol extinction.', rowIds: [id] },
-                    { text: 'Invented observation.', rowIds: ['fake-id'] },
-                  ],
-                }),
-              },
-            ],
-          },
-        },
-      ],
-    });
-  });
-  const env = { GROQ_API_KEY: 'mock-groq', GEMINI_API_KEY: 'mock-gemini' };
-  const status = response();
-  await handleAsk({ method: 'GET' }, status, env);
   assert.deepEqual(status.body, {
     enabled: true,
     provider: 'GroqCloud',
-    backupProvider: 'Google Gemini',
+    backupProvider: 'NASA Technical Reports Server',
   });
-  const answer = await ask(prompt, env);
-  assert.equal(fetchMock.mock.callCount(), 2);
-  assert.equal(answer.provider, 'Google Gemini');
-  assert.equal(answer.generationStatus, 'generated');
-  assert.equal(answer.evidence.matches, 126);
-  assert.equal(answer.claims.length, 1);
-  assert.equal(answer.sources[0].accession, 'PSI-69');
-});
-
-test('a network failure and a failed backup still return the NASA matches', async (t) => {
-  const fetchMock = t.mock.method(globalThis, 'fetch', async (url) => {
-    if (new URL(url).hostname === 'api.groq.com') throw new Error('request timed out');
-    return new Response(null, { status: 503 });
+  await handleAsk({ method: 'GET' }, status, { nasaspaceapps: 'other-provider-mock' });
+  assert.deepEqual(status.body, {
+    enabled: false,
+    provider: null,
+    backupProvider: 'NASA Technical Reports Server',
   });
-  const answer = await ask(prompt, { GROQ_API_KEY: 'mock-groq', GEMINI_API_KEY: 'mock-gemini' });
-  assert.equal(fetchMock.mock.callCount(), 2);
-  assert.equal(answer.offline, true);
-  assert.equal(answer.generationStatus, 'provider-unavailable');
-  assert.equal(answer.evidence.matches, 126);
 });
 
 test('a rejected Claude key keeps the NASA results and reports why generation failed', async (t) => {
@@ -229,12 +174,54 @@ test('a rejected Claude key keeps the NASA results and reports why generation fa
   });
   const status = response();
   await handleAsk({ method: 'GET' }, status, { NASASpaceAppAPIKey: 'mock' });
-  assert.deepEqual(status.body, { enabled: true, provider: 'Anthropic' });
+  assert.deepEqual(status.body, {
+    enabled: true,
+    provider: 'Anthropic',
+    backupProvider: 'NASA Technical Reports Server',
+  });
   const answer = await ask(prompt, { ANTHROPIC_API_KEY: 'legacy-mock' });
   assert.equal(answer.offline, true);
   assert.equal(answer.generationStatus, 'credentials-rejected');
   assert.equal(answer.evidence.matches, 126);
   assert.ok(answer.sources.every((source) => source.accession === 'PSI-69'));
+});
+
+test('Groq rate limiting keeps PSI rows and fetches public NASA reports without a credential', async (t) => {
+  const requests = t.mock.method(globalThis, 'fetch', async (url, options) => {
+    const link = new URL(url);
+    if (link.hostname === 'api.groq.com') return new Response(null, { status: 429 });
+    assert.equal(link.origin, 'https://ntrs.nasa.gov');
+    assert.equal(link.pathname, '/api/citations/search');
+    assert.equal(link.searchParams.get('q'), 'flex methanol extinction');
+    assert.equal(options.headers.Authorization, undefined);
+    return Response.json({
+      results: [
+        {
+          id: 20130014061,
+          title: 'Methanol Droplet Combustion in Oxygen-Inert Environments in Microgravity',
+        },
+        { id: 'untrusted', title: 'Invalid citation' },
+      ],
+    });
+  });
+  const answer = await ask(prompt, { GROQ_API_KEY: 'mock-groq' }, undefined, lookupNasaReports);
+  assert.equal(requests.mock.callCount(), 2);
+  assert.equal(answer.generationStatus, 'rate-limited');
+  assert.equal(answer.evidence.matches, 126);
+  assert.equal(answer.nasaSearch.status, 'results');
+  assert.equal(answer.nasaSearch.reports.length, 1);
+  assert.equal(answer.nasaSearch.reports[0].url, 'https://ntrs.nasa.gov/citations/20130014061');
+});
+
+test('when NASA is unreachable, Ask gives direct NASA search links and keeps the local readout', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => {
+    throw new Error('unavailable');
+  });
+  const answer = await ask('What did PSI-99999 report?', {}, undefined, lookupNasaReports);
+  assert.equal(answer.evidence.matches, 0);
+  assert.equal(answer.nasaSearch.status, 'unavailable');
+  assert.match(answer.nasaSearch.searchUrl, /^https:\/\/ntrs\.nasa\.gov\/search\?/);
+  assert.match(answer.nasaSearch.siteSearchUrl, /^https:\/\/www\.nasa\.gov\/\?/);
 });
 
 test('live PSI lookup confirms bundled filenames and retains provenance if NASA is unavailable', async (t) => {

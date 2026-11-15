@@ -1,11 +1,6 @@
 const groqDefault = 'openai/gpt-oss-20b';
 const claudeDefault = 'claude-haiku-5-5';
 
-export function geminiProvider(env) {
-  const key = env.GEMINI_API_KEY?.trim();
-  return key ? { name: 'Google Gemini', key, model: 'gemini-3.1-flash-lite' } : null;
-}
-
 export function askProvider(env) {
   const projectKey = env.nasaspaceapps?.trim();
   const groqKey = env.GROQ_API_KEY?.trim() || (projectKey?.startsWith('gsk_') ? projectKey : null);
@@ -13,35 +8,17 @@ export function askProvider(env) {
     return { name: 'GroqCloud', key: groqKey, model: env.GROQ_MODEL?.trim() || groqDefault };
   }
   const claudeKey = env.NASASpaceAppAPIKey?.trim() || env.ANTHROPIC_API_KEY?.trim();
-  if (!claudeKey) return geminiProvider(env);
+  if (!claudeKey) return null;
   return { name: 'Anthropic', key: claudeKey, model: env.ANTHROPIC_MODEL?.trim() || claudeDefault };
 }
 
-export function requestAnswer({ name, key, model }, system, content, schema, timeout = 17000) {
+export function requestAnswer({ name, key, model }, system, content, schema) {
   const request = {
     method: 'POST',
-    signal: AbortSignal.timeout(timeout),
+    signal: AbortSignal.timeout(17000),
     headers: { 'Content-Type': 'application/json' },
   };
   const user = { role: 'user', content };
-  if (name === 'Google Gemini') {
-    return fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent',
-      {
-        ...request,
-        headers: { ...request.headers, 'x-goog-api-key': key },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
-          contents: [{ role: 'user', parts: [{ text: content }] }],
-          generationConfig: {
-            maxOutputTokens: 1200,
-            responseMimeType: 'application/json',
-            responseJsonSchema: schema,
-          },
-        }),
-      },
-    );
-  }
   if (name === 'GroqCloud') {
     const isGptOss = model === groqDefault || model === 'openai/gpt-oss-120b';
     return fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -74,16 +51,6 @@ export function requestAnswer({ name, key, model }, system, content, schema, tim
 }
 
 export function readProviderAnswer(name, result) {
-  if (name === 'Google Gemini') {
-    const candidate = result.candidates?.[0];
-    return {
-      incomplete: candidate?.finishReason !== 'STOP',
-      content: candidate?.content?.parts
-        ?.filter((part) => !part.thought)
-        .map((part) => part.text)
-        .join(''),
-    };
-  }
   if (name === 'GroqCloud') {
     const choice = result.choices?.[0];
     return {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import { analystEvidence, evidenceReadout, offlineAssessment } from '../lib/analyst.mjs';
+import { nasaReportSearch } from '../lib/nasa-reports.mjs';
 import { HabitatContext } from './Habitat.jsx';
 import { EvidenceSteps } from './EvidenceWorkspace.jsx';
 import { Badge, Empty, Field, Measurement, Notice, PageTitle } from './ui.jsx';
@@ -72,6 +73,7 @@ export default function Ask({
         provider: answer.provider ?? generationProvider,
         readout: answer.evidence,
         note: answer.message,
+        nasaSearch: answer.nasaSearch,
         offline: answer.offline ? answer.answer : undefined,
         origin: 'NASA evidence search',
       });
@@ -85,6 +87,7 @@ export default function Ask({
           offline: offlineAssessment(evidence),
           readout: evidenceReadout(evidence),
           origin: 'NASA evidence search · browser copy',
+          nasaSearch: { ...nasaReportSearch(text), status: 'unavailable', reports: [] },
           note: 'The API was unavailable. These results came from the NASA snapshot already loaded in your browser.',
         });
       }
@@ -180,6 +183,58 @@ export default function Ask({
             </article>
           )}
           {result.note && <Notice>{result.note}</Notice>}
+          {result.nasaSearch && (
+            <section className="answer-card" aria-labelledby="nasa-report-heading">
+              <p className="answer-origin">NASA Technical Reports Server</p>
+              <h2 id="nasa-report-heading">Related NASA research</h2>
+              {result.nasaSearch.status === 'results' ? (
+                <ul>
+                  {result.nasaSearch.reports.map(({ id, url, title, year }) => (
+                    <li key={id}>
+                      <a href={url} target="_blank" rel="noreferrer">
+                        {title}
+                      </a>
+                      {year && ' · ' + year}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  {result.nasaSearch.status === 'unavailable'
+                    ? 'NASA’s report search is temporarily unavailable here. You can search the NASA archive directly.'
+                    : 'NASA’s report search returned no matches for these terms. Try a shorter search or browse the PSI catalogue.'}
+                </p>
+              )}
+              <div className="brief-actions">
+                <a
+                  className="button"
+                  href={result.nasaSearch.searchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Search NASA reports
+                </a>
+                <a
+                  className="button"
+                  href="https://psi.nasa.gov/physci/repo/search?data_source=psi&data_type=investigation"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Browse NASA PSI
+                </a>
+                {result.nasaSearch.status !== 'results' && (
+                  <a
+                    className="button"
+                    href={result.nasaSearch.siteSearchUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Search NASA.gov
+                  </a>
+                )}
+              </div>
+            </section>
+          )}
           {result.readout?.coverage && (
             <dl className="ask-coverage" aria-label="Cabin test coverage">
               <div>

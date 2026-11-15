@@ -82,7 +82,10 @@ export default function Methods({ dataset, generationProvider }) {
                 computed totals and retrieved rows to the model. GroqCloud uses its{' '}
                 <a href="https://console.groq.com/docs/text-chat">Chat Completions API</a>. Citation
                 IDs are checked against retrieved rows. The browser can use its copy of the NASA
-                snapshot if the search API is unavailable.
+                snapshot if the search API is unavailable. When no cited answer is available, Ask
+                searches the{' '}
+                <a href="https://ntrs.nasa.gov/api/openapi/">NASA Technical Reports Server API</a>{' '}
+                with terms from the question and links to relevant reports.
                 <strong className="method-api-status">
                   {generationProvider
                     ? 'This deployment: ' + generationProvider + ' configured'
