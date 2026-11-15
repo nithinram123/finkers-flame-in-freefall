@@ -56,19 +56,29 @@ export default function Methods({ dataset, claudeStatus }) {
               </dd>
             </div>
             <div>
+              <dt>Dashboard coverage</dt>
+              <dd>
+                <a href="/api/evidence">GET /api/evidence</a> reports investigations, test records,
+                and records with measured ambient oxygen and pressure. A cabin query such as{' '}
+                <a href="/api/evidence?preset=moon">preset=moon</a> also returns the close,
+                wider-only and outside-window counts from the same NASA snapshot.
+              </dd>
+            </div>
+            <div>
               <dt>Ask the Evidence</dt>
               <dd>
-                <code>GET /api/ask</code> reports whether Claude is configured. When enabled,
-                <code> POST /api/ask</code> can send your question, scenario and retrieved public
-                NASA rows to Anthropic’s{' '}
+                <code>GET /api/ask</code> reports whether Claude is configured.
+                <code> POST /api/ask</code> searches the NASA snapshot and returns original row
+                citations. When Claude is configured, the service also passes the question,
+                scenario, computed totals and retrieved rows to Anthropic’s{' '}
                 <a href="https://platform.claude.com/docs/en/api/messages">Messages API</a>.
-                Citation IDs are checked against retrieved rows. Local source search is the
-                fallback.
+                Citation IDs are checked against retrieved rows. The browser can use its copy of the
+                NASA snapshot if the search API is unavailable.
                 <strong className="method-api-status">
                   {claudeStatus === true
                     ? 'This deployment: Claude configured'
                     : claudeStatus === false
-                      ? 'This deployment: Local evidence search'
+                      ? 'This deployment: Server evidence search'
                       : 'This deployment: Checking connection'}
                 </strong>
               </dd>

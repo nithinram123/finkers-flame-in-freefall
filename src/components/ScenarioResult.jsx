@@ -3,6 +3,7 @@ import { HabitatResults } from './Habitat.jsx';
 import { AtmosphereEvidence, OxygenRanges } from './ScenarioCharts.jsx';
 import { PsiTag } from './PsiSources.jsx';
 import { PageTitle } from './ui.jsx';
+import { CoverageBand, EvidenceSteps, SnapshotReadout } from './EvidenceWorkspace.jsx';
 import { buildPsi } from '../lib/psi.mjs';
 import { scenarioCoverage } from '../lib/scenario.mjs';
 import { analystUrl } from '../lib/routes.mjs';
@@ -64,6 +65,7 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
           (scenario.note ? ' · ' + scenario.note : '')
         }
       />
+      <EvidenceSteps cabin={scenario} current="dashboard" />
       <section className="scenario-verdict" aria-label="Habitat risk and evidence">
         <div>
           <span>Fire safety verdict</span>
@@ -89,6 +91,7 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
           <small>Estimating risk needs a validated model.</small>
         </div>
       </section>
+      <CoverageBand coverage={coverage} />
       {controls}
       <a className="button scenario-jump" href="#atmosphere-evidence">
         See matching NASA tests <ArrowDown size={16} aria-hidden="true" />
@@ -142,6 +145,7 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
         <summary>Open the investigation ranking, exports and full methods</summary>
         <HabitatResults dataset={dataset} habitat={scenario} onInspect={onInspect} />
       </details>
+      <SnapshotReadout dataset={dataset} cabin={scenario} />
     </>
   );
 }

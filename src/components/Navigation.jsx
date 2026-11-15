@@ -4,10 +4,10 @@ import { presetLinks } from './missionDestinations.mjs';
 
 const tabs = [
   {
-    name: 'Habitats',
+    name: 'Dashboard',
     routes: ['scenario'],
     links: [
-      ['Compare cabin conditions', '/scenario', 'scenario'],
+      ['Fire Evidence Dashboard', '/scenario', 'scenario'],
       ['Moon Base', presetLinks.moon],
       ['Space Station', presetLinks.station],
       ['Pressurized Rover', presetLinks.rover],

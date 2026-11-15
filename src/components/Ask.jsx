@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
-import { analystEvidence, offlineAssessment } from '../lib/analyst.mjs';
+import { analystEvidence, evidenceReadout, offlineAssessment } from '../lib/analyst.mjs';
 import { HabitatContext } from './Habitat.jsx';
+import { EvidenceSteps } from './EvidenceWorkspace.jsx';
 import { Badge, Empty, Field, Measurement, Notice, PageTitle } from './ui.jsx';
 
 const examples = [
-  'Is a Moon base more dangerous for fire than the Space Station?',
-  'What should a Mars base use to put out fires?',
-  'Why does fire behave differently in space?',
-  'Which materials are safest for a crew cabin?',
-  'What has NASA never tested that a Moon base needs?',
+  'Which FLEX tests report methanol extinction?',
+  'What did NASA test near Moon Base?',
+  'Show heptane test records from PSI-69.',
+  'How many investigations are in the NASA snapshot?',
 ];
 
 export default function Ask({ dataset, habitat, onInspect, initialQuestion = '', claudeStatus }) {
@@ -18,6 +18,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
   const [pending, setPending] = useState(false);
   const request = useRef(null);
   const rowIndex = new Map(dataset.records.map((row) => [row.id, row]));
+  const names = new Map(dataset.investigations.map(({ accession, name }) => [accession, name]));
   useEffect(() => {
     return () => {
       request.current?.abort();
@@ -31,14 +32,6 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
     setQuestion(value);
     setPending(true);
     setResult(null);
-    const evidence = analystEvidence(dataset, text, habitat);
-    const matches = evidence.rows;
-    const fallback = offlineAssessment(evidence);
-    if (claudeStatus !== true) {
-      setResult({ text, matches, claims: [], offline: fallback, coverage: evidence.coverage });
-      setPending(false);
-      return;
-    }
     const controller = new AbortController();
     request.current = controller;
     try {
@@ -59,27 +52,35 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
             : undefined,
         }),
       });
+      if (!response.ok) throw new Error('Evidence service unavailable');
       const answer = await response.json();
+      if (typeof answer.answer !== 'string') throw new Error('Evidence response invalid');
+      const matches = (answer.retrieved ?? answer.sources ?? [])
+        .map(({ id }) => rowIndex.get(id))
+        .filter(Boolean);
       setResult({
         text,
         matches,
-        claims: response.ok ? answer.claims : [],
+        claims: answer.claims,
         model: answer.model,
-        coverage: evidence.coverage,
+        readout: answer.evidence,
         note: answer.message,
-        offline:
-          !response.ok || answer.offline ? (response.ok && answer.answer) || fallback : undefined,
+        offline: answer.offline ? answer.answer : undefined,
+        origin: 'NASA evidence search',
       });
     } catch {
-      if (!controller.signal.aborted)
+      if (!controller.signal.aborted) {
+        const evidence = analystEvidence(dataset, text, habitat);
         setResult({
           text,
-          matches,
+          matches: evidence.rows,
           claims: [],
-          offline: fallback,
-          coverage: evidence.coverage,
-          note: 'The answer service is unavailable. Browse the matching source records below.',
+          offline: offlineAssessment(evidence),
+          readout: evidenceReadout(evidence),
+          origin: 'NASA evidence search · browser copy',
+          note: 'The API was unavailable. These results came from the NASA snapshot already loaded in your browser.',
         });
+      }
     } finally {
       if (!controller.signal.aborted) setPending(false);
     }
@@ -92,10 +93,11 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         title="What would you like to know?"
         description="Ask about a fuel, a test result, or a cabin. Every result starts with records from NASA Physical Sciences Informatics."
       />
+      <EvidenceSteps cabin={habitat} current="analyst" />
       <Notice>
         {claudeStatus
-          ? 'Claude receives your question, selected cabin conditions and up to 12 retrieved NASA records.'
-          : 'Local evidence search reads the NASA snapshot in your browser. It calculates coverage and retrieves matching rows.'}{' '}
+          ? 'Questions first run against the NASA snapshot. Claude receives the selected cabin conditions, computed totals and up to 12 source rows.'
+          : 'Questions run against the NASA snapshot through our evidence API. Generated answers are currently unavailable.'}{' '}
         <a href="/data-sources#apis">See the data and APIs</a>
       </Notice>
       <form className="ask-form" onSubmit={ask}>
@@ -159,37 +161,47 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
           )}
           {result.offline && (
             <article className="answer-card">
-              <p className="answer-origin">Local evidence search</p>
+              <p className="answer-origin">{result.origin}</p>
               <h2>{result.text}</h2>
               <p>{result.offline}</p>
             </article>
           )}
           {result.note && <Notice>{result.note}</Notice>}
-          {result.coverage && (
+          {result.readout?.coverage && (
             <dl className="ask-coverage" aria-label="Cabin test coverage">
               <div>
                 <dt>Close matches</dt>
-                <dd>{result.coverage.exact.length}</dd>
+                <dd>{result.readout.coverage.close}</dd>
               </div>
               <div>
                 <dt>Wider matches</dt>
-                <dd>{result.coverage.nearby.length - result.coverage.exact.length}</dd>
+                <dd>{result.readout.coverage.wider}</dd>
               </div>
               <div>
                 <dt>Tests with both measurements</dt>
-                <dd>{result.coverage.paired.length}</dd>
+                <dd>{result.readout.coverage.paired}</dd>
               </div>
             </dl>
           )}
+          {result.readout?.filters?.length > 0 && (
+            <p>Matched filters: {result.readout.filters.join(' · ')}</p>
+          )}
           <h2>Source matches</h2>
-          <p className="muted">Use a PSI citation to open the original NASA CSV row.</p>
+          <p className="muted">
+            {Number.isFinite(result.readout?.matches) && (
+              <>
+                Showing {result.matches.length} of {result.readout.matches} matching tests.{' '}
+              </>
+            )}
+            Use a PSI citation to open the original NASA CSV row.
+          </p>
           {result.matches.length ? (
             result.matches.map((row) => (
               <article className="evidence-match" key={row.id}>
                 <div>
                   <button type="button" className="text-button" onClick={() => onInspect([row])}>
                     <strong>
-                      {row.investigation} · {row.label}
+                      {names.get(row.accession) ?? row.accession} · {row.label}
                     </strong>
                   </button>
                   <Badge>{row.kind}</Badge>
@@ -210,6 +222,8 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
                 </button>
               </article>
             ))
+          ) : result.readout?.archive ? (
+            <a href="/data-sources">Open the NASA archive and source inventory</a>
           ) : (
             <Empty>Try an investigation name, fuel, material or measured outcome.</Empty>
           )}

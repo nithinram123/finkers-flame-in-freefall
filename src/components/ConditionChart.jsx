@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { cabinPoint, fuelGroups, fuelLabel } from '../lib/habitat.mjs';
+import { cabinPoint, fuelGroups, fuelLabel, inWindow } from '../lib/habitat.mjs';
 
 export const metrics = {
   oxygen: ['Initial oxygen', '%'],
@@ -24,6 +24,7 @@ export default function ConditionChart({
   y = 'pressure',
   box,
   bounds,
+  nearbyBox,
   references,
   onInspect,
   mode,
@@ -67,7 +68,7 @@ export default function ConditionChart({
     const high = Math.max(...transformed);
     const minSpan = key === 'oxygen' ? 3 : key === 'pressure' ? (scenarioMode ? 6 : 0.06) : 2;
     const pad = Math.max((high - low) * 0.1, minSpan / 2);
-    return [key === 'pressure' ? low - pad : Math.max(0, low - pad), high + pad];
+    return [key === 'pressure' && !scenarioMode ? low - pad : Math.max(0, low - pad), high + pad];
   }
   const xDomain = domain(x, box?.x1, box?.x2, bounds?.x1, bounds?.x2);
   const yDomain = domain(y, box?.y1, box?.y2, bounds?.y1, bounds?.y2);
@@ -177,16 +178,24 @@ export default function ConditionChart({
             )}
             {scenarioMode && (
               <g aria-hidden="true">
-                {records.map((row) => (
-                  <circle
-                    key={row.id}
-                    cx={scaleX(row.oxygen.value)}
-                    cy={scaleY(row.pressure.value)}
-                    r="2.6"
-                    fill="#687078"
-                    fillOpacity=".42"
-                  />
-                ))}
+                {records.map((row) => {
+                  const band =
+                    box && inWindow(row, box)
+                      ? 'close'
+                      : nearbyBox && inWindow(row, nearbyBox)
+                        ? 'wider'
+                        : 'outside';
+                  return (
+                    <circle
+                      key={row.id}
+                      cx={scaleX(row.oxygen.value)}
+                      cy={scaleY(row.pressure.value)}
+                      r={band === 'outside' ? 2.8 : 3.75}
+                      className="cabin-point"
+                      data-band={band}
+                    />
+                  );
+                })}
               </g>
             )}
             {[...points].reverse().map((point) => {
@@ -217,6 +226,14 @@ export default function ConditionChart({
                   }}
                 >
                   <circle cx={point.px} cy={point.py} r={Math.max(radius, 12)} fill="transparent" />
+                  {scenarioMode && (
+                    <circle
+                      className="cabin-cluster"
+                      cx={point.px}
+                      cy={point.py}
+                      r={Math.min(13, radius)}
+                    />
+                  )}
                   {!scenarioMode && (
                     <circle className="point-mark" cx={point.px} cy={point.py} r={radius} />
                   )}
@@ -267,6 +284,21 @@ export default function ConditionChart({
                 ? `${hovered.rows.length} source ${hovered.rows.length === 1 ? 'row' : 'rows'} · ${[...new Set(hovered.rows.map(fuelLabel))].slice(0, 2).join(', ')}`
                 : `${yLabel}. Select a marker to open its source.`}
           </p>
+          {scenarioMode && nearbyBox && (
+            <ul className="cabin-plot-legend" aria-label="Cabin match legend">
+              <li data-band="close">
+                <i /> Close
+              </li>
+              <li data-band="wider">
+                <i /> Wider only
+              </li>
+              {!bounds && (
+                <li data-band="outside">
+                  <i /> Outside wider window
+                </li>
+              )}
+            </ul>
+          )}
           {!scenarioMode && (
             <ul className="fuel-legend" aria-label="Fuel or material legend">
               {groups.map((group) => (

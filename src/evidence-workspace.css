@@ -1,0 +1,322 @@
+/* The same navy / violet materials used by the lunar landing. */
+:root {
+  --action-face: linear-gradient(164deg, #5a4c7c 0%, #3c3458 35%, #23233a 75%, #181b2c 100%);
+  --action-rim: linear-gradient(
+    145deg,
+    #dfcfff 0%,
+    #79729b 28%,
+    #383b59 51%,
+    #c2abe8 82%,
+    #7796a6 100%
+  );
+  --action-hover: linear-gradient(164deg, #695789 0%, #45375f 37%, #23243c 75%, #1b2032 100%);
+  --cover-close: #85e7ed;
+  --cover-wider: #bea0f9;
+  --cover-outside: #63718e;
+}
+button.primary,
+.button.primary,
+.button.lunar-primary {
+  border: 1px solid transparent;
+  color: #fff9ff;
+  background:
+    var(--action-face) padding-box,
+    var(--action-rim) border-box;
+  box-shadow:
+    inset 0 1px #ffffff26,
+    0 4px 10px #080a1460;
+}
+button.primary:hover,
+.button.primary:hover,
+.button.lunar-primary:hover {
+  border-color: transparent;
+  background:
+    var(--action-hover) padding-box,
+    var(--action-rim) border-box;
+  color: #fff;
+}
+.lunar-scene-controls button {
+  color: #e5dafb;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(165deg, #38334e, #1b2134 68%) padding-box,
+    var(--action-rim) border-box;
+}
+.lunar-scene-controls button:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(165deg, #4d4165, #1f273b 68%) padding-box,
+    var(--action-rim) border-box;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :is(.sky-research, .lunar-landing) :is(button, .button) {
+    transition:
+      transform 160ms ease,
+      color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  :is(.sky-research, .lunar-landing) :is(button, .button):hover:not(:disabled) {
+    transform: translateY(1px) scale(0.989);
+  }
+  :is(.sky-research, .lunar-landing) :is(button, .button):active:not(:disabled) {
+    transform: translateY(2px) scale(0.975);
+  }
+}
+
+.evidence-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 7px;
+  margin: 0 0 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #151b2d;
+}
+.evidence-steps a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 5px 10px;
+  color: #d6d8ef;
+  font-size: 13px;
+  font-weight: 650;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+.evidence-steps a:is([aria-current], :hover) {
+  background: #29263f;
+  border-color: #595071;
+  text-decoration: none;
+}
+.evidence-steps a span {
+  color: #c4a6fd;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.evidence-steps a svg {
+  color: #9bdfe9;
+}
+.scenario-start {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+  gap: 16px;
+}
+.scenario-start-card,
+.snapshot-readout,
+.coverage-band {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(128deg, #20243b, #161d2e);
+  padding: clamp(15px, 3vw, 24px);
+}
+.scenario-start-card h2,
+.snapshot-readout h2 {
+  margin: 0;
+}
+.scenario-start-card p {
+  color: var(--muted);
+  margin: 6px 0 14px;
+}
+.scenario-start-card .scenario-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  gap: 8px;
+}
+.scenario-start-card .scenario-presets a {
+  text-align: left;
+  min-height: 64px;
+  justify-content: space-between;
+  background: #1b2338;
+}
+.scenario-start-card .scenario-presets a:hover {
+  border-color: #9790bc;
+}
+.scenario-start-card .scenario-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.scenario-start-card .scenario-form > button {
+  justify-self: start;
+  align-self: end;
+}
+.snapshot-readout {
+  margin: 21px 0 0;
+}
+.snapshot-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.snapshot-title > svg {
+  color: var(--sky-violet);
+  margin-top: 3px;
+}
+.snapshot-title h2 {
+  font-size: 17px;
+}
+.snapshot-title p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+.snapshot-title a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  margin-left: auto;
+}
+.snapshot-readout dl,
+.coverage-band dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+}
+.snapshot-readout dl div {
+  border-top: 1px solid #505373;
+  padding-top: 8px;
+}
+.snapshot-readout dt,
+.coverage-band dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.snapshot-readout dd,
+.coverage-band dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 720;
+  color: #e6ddff;
+  font-variant-numeric: tabular-nums;
+}
+.coverage-band {
+  margin: 0 0 12px;
+}
+.coverage-band figcaption {
+  color: #f0ebff;
+  font-weight: 690;
+}
+.coverage-band-track {
+  display: flex;
+  overflow: hidden;
+  border-radius: 6px;
+  height: 11px;
+  margin-top: 12px;
+  background: #303c54;
+}
+[data-band='close'] {
+  --band: var(--cover-close);
+}
+[data-band='wider'] {
+  --band: var(--cover-wider);
+}
+[data-band='outside'] {
+  --band: var(--cover-outside);
+}
+.coverage-band-track span {
+  background: var(--band);
+}
+.coverage-band dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.coverage-band dt,
+.cabin-plot-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.coverage-band dt i,
+.cabin-plot-legend i {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--band);
+}
+.cabin-point {
+  fill: var(--band);
+  opacity: 0.83;
+  pointer-events: none;
+}
+.cabin-point[data-band='outside'] {
+  opacity: 0.55;
+}
+.cabin-cluster {
+  fill: none;
+  stroke: #d2cef29e;
+  stroke-dasharray: 2 2;
+  opacity: 0.44;
+  pointer-events: none;
+}
+.plot-point:is(:hover, :focus-visible) .cabin-cluster {
+  stroke: #f5f1ff;
+  opacity: 1;
+  stroke-width: 2px;
+}
+.cabin-plot-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.explorer-cabin {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3px 12px;
+  padding: 8px 12px;
+  margin: 0 0 16px;
+  border: 1px solid #514968;
+  background: #25243d;
+  border-radius: 10px;
+}
+.explorer-cabin a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+}
+
+@media (max-width: 690px) {
+  .scenario-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .evidence-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .snapshot-readout dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 420px) {
+  .scenario-start-card .scenario-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .coverage-band dl {
+    gap: 6px;
+  }
+  .coverage-band dt {
+    align-items: flex-start;
+    font-size: 11px;
+  }
+  .coverage-band dt i {
+    margin-top: 5px;
+  }
+  .snapshot-title {
+    flex-wrap: wrap;
+  }
+  .snapshot-title a {
+    margin-left: 26px;
+  }
+}

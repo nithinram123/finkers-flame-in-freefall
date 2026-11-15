@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { chartRecords, isTest } from '../lib/evidence.mjs';
 import { coverage, inWindow } from '../lib/habitat.mjs';
+import { readScenario, scenarioCoverage } from '../lib/scenario.mjs';
 import ConditionChart, { metrics } from './ConditionChart.jsx';
+import { EvidenceSteps } from './EvidenceWorkspace.jsx';
 import FilterMenu from './FilterMenu.jsx';
 import Records from './Records.jsx';
 import { PageTitle } from './ui.jsx';
@@ -37,8 +39,23 @@ export function Coverage({ records }) {
   );
 }
 
-export default function Explorer({ dataset, onInspect, initialAccession }) {
+export default function Explorer({ dataset, onInspect, initialAccession, query }) {
   const [filters, setFilters] = useState({ ...defaults, accession: initialAccession || '' });
+  const matchWindow = query?.get('scope');
+  const cabin = useMemo(
+    () =>
+      (matchWindow === 'close' || matchWindow === 'nearby') && query?.has('preset')
+        ? readScenario(query)
+        : null,
+    [query, matchWindow],
+  );
+  const selection = useMemo(() => {
+    if (!cabin) return null;
+    const matching = scenarioCoverage(dataset.records, cabin);
+    return new Set(
+      (matchWindow === 'close' ? matching.exact : matching.nearby).map(({ id }) => id),
+    );
+  }, [cabin, dataset, matchWindow]);
   const options = [
     ['', 'All investigations'],
     ...dataset.investigations
@@ -50,9 +67,11 @@ export default function Explorer({ dataset, onInspect, initialAccession }) {
     () =>
       dataset.records.filter(
         (record) =>
-          isTest(record) && (!filters.accession || record.accession === filters.accession),
+          isTest(record) &&
+          (!selection || selection.has(record.id)) &&
+          (!filters.accession || record.accession === filters.accession),
       ),
-    [dataset, filters.accession],
+    [dataset, filters.accession, selection],
   );
   const scope = useMemo(
     () => (oxygenRelevant ? eligible.filter((row) => row.oxygenBasis === filters.basis) : eligible),
@@ -84,6 +103,18 @@ export default function Explorer({ dataset, onInspect, initialAccession }) {
         title="What did NASA test?"
         description="Explore measured conditions and open any record to see the original NASA data."
       />
+      <EvidenceSteps cabin={cabin} current="explorer" />
+      {cabin && (
+        <section className="explorer-cabin" aria-label="Active cabin filter">
+          <span>
+            <strong>{cabin.name}</strong> · {selection.size}{' '}
+            {matchWindow === 'close' ? 'close' : 'nearby'} tests
+          </span>
+          <a href="/explorer">
+            Browse the full archive <X size={14} aria-hidden="true" />
+          </a>
+        </section>
+      )}
       <section aria-label="Chart filters" className="filters-panel">
         <div className="section-kicker">
           <SlidersHorizontal size={16} aria-hidden="true" /> Filter the evidence

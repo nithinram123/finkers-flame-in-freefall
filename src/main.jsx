@@ -5,6 +5,7 @@ import './styles.css';
 import './briefing.css';
 import './mission.css';
 import './sky.css';
+import './evidence-workspace.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

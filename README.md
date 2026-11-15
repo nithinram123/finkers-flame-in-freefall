@@ -65,6 +65,8 @@ Choose one of five cabin scenarios. ISS uses nominal conditions. Other presets a
 
 The chart groups nearby points by screen position without discarding any rows. Markers open the original values and source citation. Earth and nominal ISS share a reference. Data coverage counts and explicit gaps describe the supplied snapshot.
 
+The Fire Evidence Dashboard is the main entry to this workflow. Its explorer and Ask links carry the cabin selection. `GET /api/evidence` reads archive totals from the build’s NASA PSI snapshot. Add `?preset=moon` or pass the custom cabin query to get close, wider-only, and outside-window counts. The snapshot is bundled and its original retrieval date was not supplied.
+
 ## Enable Claude on Vercel
 
 1. Import the GitHub repository into your Vercel team.
@@ -74,7 +76,7 @@ The chart groups nearby points by screen position without discarding any rows. M
 
 For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.
 
-The request sends the question, selected scenario and up to 12 relevant public NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
+`POST /api/ask` searches the bundled NASA PSI records even without a Claude key. Named investigations, fuels and outcomes constrain retrieval and matching totals are computed from the snapshot. With a key configured, the request sends the question, selected scenario, computed totals and up to 12 original NASA records to Claude. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
 
 ## SI use and originality
 

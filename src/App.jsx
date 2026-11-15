@@ -229,7 +229,14 @@ export default function App() {
         page = <RecordDetail dataset={dataset} id={id} />;
         break;
       case 'explorer':
-        page = <Explorer key={id || 'all'} {...props} initialAccession={id} />;
+        page = (
+          <Explorer
+            key={(id || 'all') + query.toString()}
+            {...props}
+            initialAccession={id}
+            query={query}
+          />
+        );
         break;
       case 'neural':
         page = <Neural {...props} key={query.toString()} query={query} />;

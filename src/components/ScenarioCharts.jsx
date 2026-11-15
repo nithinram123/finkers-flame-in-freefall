@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import ConditionChart from './ConditionChart.jsx';
 import { PsiTag } from './PsiSources.jsx';
 import { kPaPerAtm } from '../lib/scenario.mjs';
+import { explorerUrl } from './EvidenceWorkspace.jsx';
 
 export function AtmosphereEvidence({ coverage, scenario, psi, onInspect }) {
   const { paired, exact, nearby, box, nearbyBox } = coverage;
@@ -26,8 +27,8 @@ export function AtmosphereEvidence({ coverage, scenario, psi, onInspect }) {
       <header className="plot-heading">
         <h2>Has NASA tested fire in this air?</h2>
         <p>
-          Each dot represents a test with both measurements. The shaded box marks ±2 oxygen
-          percentage points and ±0.05 atm around your cabin.
+          Each dot is a test with both measurements. The shaded box marks ±2 oxygen percentage
+          points and ±0.05 atm around your cabin. Select a group of dots to open its source rows.
         </p>
       </header>
       {nearby.length > 0 && (
@@ -44,6 +45,7 @@ export function AtmosphereEvidence({ coverage, scenario, psi, onInspect }) {
         records={fullChart ? paired : nearby}
         box={box}
         bounds={fullChart ? undefined : nearbyBox}
+        nearbyBox={nearbyBox}
         references={fullChart}
         onInspect={onInspect}
         mode="scenario"
@@ -59,6 +61,11 @@ export function AtmosphereEvidence({ coverage, scenario, psi, onInspect }) {
         Nearby means within ±6 oxygen percentage points and ±0.15 atm, including any tests inside
         the box.
       </p>
+      {nearby.length > 0 && (
+        <a className="button" href={explorerUrl(scenario)}>
+          Explore these {nearby.length} NASA records <ArrowUpRight size={16} aria-hidden="true" />
+        </a>
+      )}
       <div className="scenario-source-list">
         <h3>Open the original measurements</h3>
         <div className="scenario-evidence-switch" role="group" aria-label="Source match range">
@@ -142,7 +149,7 @@ export function OxygenRanges({ psi, oxygen }) {
       <header className="plot-heading">
         <h2 id={heading}>Which experiments reached this oxygen level?</h2>
         <p>
-          Bars show the lowest and highest measured ambient oxygen. Orange marks ranges that span
+          Bars show the lowest and highest measured ambient oxygen. Violet marks ranges that span
           your setting.
         </p>
       </header>
