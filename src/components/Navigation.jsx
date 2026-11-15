@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { presetLinks } from './missionDestinations.mjs';
 
@@ -43,6 +43,12 @@ export const routeTitles = Object.fromEntries(
 export default function Navigation({ active, openSearch }) {
   const [open, setOpen] = useState(null);
   const nav = useRef(null);
+  const focusTarget = useRef(null);
+  useLayoutEffect(() => {
+    if (!focusTarget.current) return;
+    document.getElementById(focusTarget.current)?.querySelector('a')?.focus();
+    focusTarget.current = null;
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const close = (event) => {
@@ -88,10 +94,12 @@ export default function Navigation({ active, openSearch }) {
               onKeyDown={(event) => {
                 if (event.key !== 'ArrowDown') return;
                 event.preventDefault();
-                setOpen(name);
-                requestAnimationFrame(() =>
-                  document.getElementById(id)?.querySelector('a')?.focus(),
-                );
+                if (open === name) {
+                  document.getElementById(id)?.querySelector('a')?.focus();
+                } else {
+                  focusTarget.current = id;
+                  setOpen(name);
+                }
               }}
             >
               {name} <ChevronDown size={14} aria-hidden="true" />
