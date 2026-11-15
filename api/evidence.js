@@ -1,6 +1,7 @@
 import { loadPsiSnapshot } from '../server/psi-snapshot.mjs';
 import { snapshotSummary } from '../src/lib/psi-summary.mjs';
 import { readScenario } from '../src/lib/scenario.mjs';
+import { checkPsiInvestigation } from '../server/psi-live.mjs';
 
 export default async function evidence(request, response) {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -11,6 +12,14 @@ export default async function evidence(request, response) {
   }
   try {
     const query = new URL(request.url || '', 'http://localhost').searchParams;
+    if (query.has('accession')) {
+      const accession = query.get('accession').trim().toUpperCase();
+      response.setHeader('Cache-Control', 'no-store');
+      const record = await checkPsiInvestigation(accession);
+      if (record) return response.end(JSON.stringify(record));
+      response.statusCode = 404;
+      return response.end(JSON.stringify({ message: 'Unknown PSI accession in this snapshot.' }));
+    }
     const cabin = query.has('preset') || query.has('oxygen') ? readScenario(query) : null;
     const snapshot = await loadPsiSnapshot();
     response.setHeader('Cache-Control', 'no-cache');

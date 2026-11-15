@@ -114,7 +114,7 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
         </Field>
         <button className="primary" type="submit" disabled={pending || !question.trim()}>
           <Search size={17} aria-hidden="true" />{' '}
-          {pending ? 'Reading the evidence…' : claudeStatus ? 'Ask Claude' : 'Find evidence'}
+          {pending ? 'Reading the evidence…' : 'Find NASA evidence'}
         </button>
       </form>
       <div className="suggestions">
@@ -137,6 +137,11 @@ export default function Ask({ dataset, habitat, onInspect, initialQuestion = '',
                 Answer by Claude{result.model ? ' · ' + result.model : ''}
               </p>
               <h2>{result.text}</h2>
+              {Number.isFinite(result.readout?.matches) && (
+                <p className="muted">
+                  {result.readout.matches.toLocaleString('en')} matching tests in the NASA snapshot
+                </p>
+              )}
               {result.claims.map((claim, index) => (
                 <div className="answer-claim" key={index}>
                   <p>{claim.text}</p>

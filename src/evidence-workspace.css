@@ -1,4 +1,153 @@
 /* The same navy / violet materials used by the lunar landing. */
+.research-brief,
+.judge-slide {
+  margin: 24px 0;
+  padding: clamp(18px, 4vw, 36px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: radial-gradient(ellipse at top left, #2c2544, transparent 65%), #161d2e;
+}
+.research-brief {
+  scroll-margin-top: 90px;
+}
+.research-brief h2,
+.research-brief h3 {
+  margin: 4px 0;
+}
+.research-brief header p,
+.brief-comparison p,
+.brief-comparison small,
+.brief-source span,
+.judge-slide p {
+  color: var(--muted);
+}
+.research-brief .eyebrow,
+.judge-slide header,
+.live-psi h3,
+.brief-actions,
+.brief-source,
+.brief-pagination,
+.brief-pagination ol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.brief-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 20px;
+}
+.brief-comparison article {
+  min-width: 0;
+  padding: clamp(12px, 3vw, 20px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #131a2acc;
+}
+.brief-comparison article > span,
+.judge-slide header,
+.research-brief .eyebrow {
+  color: var(--sky-violet);
+  font-weight: 650;
+}
+.brief-comparison article p,
+.brief-comparison dd {
+  margin: 0;
+}
+.brief-comparison dl {
+  display: flex;
+  gap: clamp(12px, 4vw, 36px);
+  flex-wrap: wrap;
+  margin: 12px 0 5px;
+}
+.brief-comparison dd {
+  color: var(--cover-close);
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.brief-comparison dl div + div dd {
+  color: var(--cover-wider);
+}
+.brief-window-bar {
+  display: flex;
+  block-size: 7px;
+  margin: 10px 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #34415b;
+}
+.brief-window-bar span:first-child {
+  background: var(--cover-close);
+}
+.brief-window-bar span:last-child {
+  background: var(--cover-wider);
+}
+.brief-source span {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.judge-slide {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-block-size: 340px;
+}
+.judge-slide header {
+  width: 100%;
+}
+.judge-slide header span {
+  margin-left: auto;
+}
+.judge-slide h2 {
+  max-width: 24ch;
+  margin: 24px 0 0;
+  font-size: clamp(1.8rem, 4.4vw, 3.4rem);
+}
+.judge-slide p {
+  max-width: 65ch;
+  line-height: 1.6;
+}
+.brief-pagination {
+  justify-content: center;
+  gap: 12px;
+}
+.brief-pagination ol {
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.brief-pagination ol a {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.brief-pagination ol a[aria-current] {
+  background: #393151;
+  border-color: var(--sky-violet);
+  color: white;
+}
+.live-psi {
+  padding: 16px;
+  margin-block: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.live-psi h3 {
+  margin-top: 0;
+}
+@media (max-width: 520px) {
+  .brief-comparison {
+    grid-template-columns: 1fr;
+  }
+}
 :root {
   --action-face: linear-gradient(164deg, #5a4c7c 0%, #3c3458 35%, #23233a 75%, #181b2c 100%);
   --action-rim: linear-gradient(

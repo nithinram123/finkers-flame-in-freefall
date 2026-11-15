@@ -19,6 +19,7 @@ import Insights, { ResearchGaps } from './components/Insights.jsx';
 
 const Explorer = lazy(() => import('./components/Explorer.jsx'));
 const Neural = lazy(() => import('./components/Neural.jsx'));
+const JudgeBriefing = lazy(() => import('./components/JudgeBriefing.jsx'));
 const titles = {
   ...routeTitles,
   habitats: 'NASA combustion evidence',
@@ -254,6 +255,9 @@ export default function App() {
         break;
       case 'research-gaps':
         page = <ResearchGaps dataset={dataset} />;
+        break;
+      case 'briefing':
+        page = <JudgeBriefing dataset={dataset} query={query} />;
         break;
       case 'data-sources':
       case 'methods':

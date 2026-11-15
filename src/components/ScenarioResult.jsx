@@ -1,9 +1,11 @@
 import { ArrowDown, Eye, Flame, FireExtinguisher } from 'lucide-react';
+import { useEffect } from 'react';
 import { HabitatResults } from './Habitat.jsx';
 import { AtmosphereEvidence, OxygenRanges } from './ScenarioCharts.jsx';
 import { PsiTag } from './PsiSources.jsx';
 import { PageTitle } from './ui.jsx';
 import { CoverageBand, EvidenceSteps, SnapshotReadout } from './EvidenceWorkspace.jsx';
+import ResearchBrief from './ResearchBrief.jsx';
 import { buildPsi } from '../lib/psi.mjs';
 import { scenarioCoverage } from '../lib/scenario.mjs';
 import { analystUrl } from '../lib/routes.mjs';
@@ -34,6 +36,12 @@ const safety = [
 ];
 
 export default function ScenarioResult({ dataset, scenario, onInspect, controls }) {
+  useEffect(() => {
+    const target = window.location.hash.slice(1);
+    if (target === 'research-brief' || target === 'atmosphere-evidence') {
+      document.getElementById(target)?.scrollIntoView();
+    }
+  }, []);
   const psi = buildPsi(dataset);
   const coverage = scenarioCoverage(dataset.records, scenario);
   const { exact, nearby } = coverage;
@@ -93,10 +101,21 @@ export default function ScenarioResult({ dataset, scenario, onInspect, controls 
       </section>
       <CoverageBand coverage={coverage} />
       {controls}
-      <a className="button scenario-jump" href="#atmosphere-evidence">
-        See matching NASA tests <ArrowDown size={16} aria-hidden="true" />
-      </a>
+      <nav className="brief-actions scenario-jump" aria-label="Cabin results">
+        <a className="button" href="#atmosphere-evidence">
+          See matching NASA tests <ArrowDown size={16} aria-hidden="true" />
+        </a>
+        <a className="button" href="#research-brief">
+          Compare cabins and export
+        </a>
+      </nav>
       <AtmosphereEvidence coverage={coverage} scenario={scenario} psi={psi} onInspect={onInspect} />
+      <ResearchBrief
+        dataset={dataset}
+        scenario={scenario}
+        coverage={coverage}
+        onInspect={onInspect}
+      />
       <OxygenRanges psi={psi} oxygen={scenario.oxygen} />
       <section className="scenario-risks" aria-label="Fire safety considerations">
         {safety.map(([area, label, Icon, line, informs]) => (

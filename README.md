@@ -70,8 +70,8 @@ The Fire Evidence Dashboard is the main entry to this workflow. Its explorer and
 ## Enable Claude on Vercel
 
 1. Import the GitHub repository into your Vercel team.
-2. In **Project Settings → Environment Variables**, add `ANTHROPIC_API_KEY` as a sensitive environment variable for Production and any Preview environment that should use Claude. Set `ANTHROPIC_MODEL` if you want to override the default Haiku model.
-3. Redeploy and check `GET /api/ask`. It reports `{"enabled":true}` when a key is configured. Ask a supported question such as “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row.
+2. In **Project Settings → Environment Variables**, add a sensitive Anthropic key for the environments that should use Claude. The server checks `NASASpaceAppAPIKey` first and then `ANTHROPIC_API_KEY`. Set `ANTHROPIC_MODEL` to override the default Haiku model.
+3. Redeploy and check `GET /api/ask`. Its `enabled` field indicates that a key is configured. Ask “Which FLEX tests report methanol extinction?” and open a citation to verify its NASA PSI row. The POST response includes `generationStatus` to distinguish a generated answer from source search and provider errors.
 4. Set an Anthropic workspace spend limit and configure request rate limits for `/api/ask` in Vercel before sharing a public deployment that uses a paid key.
 
 For local use, copy `.env.example` to `.env.local`, enter your key and restart `npm run dev`. Vite runs the same endpoint locally. Keep keys in the server environment. The key should never be stored in a `VITE_` variable or checked into Git.

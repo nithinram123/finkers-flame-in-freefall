@@ -65,6 +65,15 @@ export default function Methods({ dataset, claudeStatus }) {
               </dd>
             </div>
             <div>
+              <dt>Live investigation check</dt>
+              <dd>
+                <a href="/api/evidence?accession=PSI-69">GET /api/evidence?accession=PSI-69</a>{' '}
+                checks NASA’s current FLEX metadata and compares its listed filenames with the
+                bundled tables. The Sources tab of each investigation offers the same check. Charts
+                and research briefs use the dated CSV snapshot.
+              </dd>
+            </div>
+            <div>
               <dt>Ask the Evidence</dt>
               <dd>
                 <code>GET /api/ask</code> reports whether Claude is configured.

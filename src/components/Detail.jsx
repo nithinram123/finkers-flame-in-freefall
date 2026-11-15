@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { rangeLabel } from '../lib/evidence.mjs';
 import { Badge, Empty, Notice, PageTitle, SourceLink } from './ui.jsx';
 import Records from './Records.jsx';
+import LivePsiCheck from './LivePsiCheck.jsx';
 
 export default function Detail({ dataset, accession, selected, toggleCompare, onInspect }) {
   const [tab, setTab] = useState('Overview');
@@ -159,6 +160,7 @@ export default function Detail({ dataset, accession, selected, toggleCompare, on
               </a>
             </p>
           )}
+          <LivePsiCheck accession={accession} />
           <h2>Original experimental tables</h2>
           {tables.length ? (
             <ul>
