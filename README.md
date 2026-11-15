@@ -78,7 +78,7 @@ For local use, copy `.env.example` to `.env.local`, enter your key and restart `
 
 `POST /api/ask` searches the bundled NASA PSI records even without a model API key. Named investigations, fuels and outcomes constrain retrieval and matching totals are computed from the snapshot. With a key configured, the request sends the question, selected scenario, computed totals and up to 12 original NASA records to the configured model. Each returned statement must have at least one validated row identifier. This check verifies provenance; confirm the statement against its cited observations before relying on it.
 
-If model generation is unavailable or the snapshot cannot support a cited answer, Ask also searches the public NASA Technical Reports Server API with keywords from the question. It shows direct report citations and links to continue searching NASA. The backup uses no extra API key.
+If model generation is unavailable or the snapshot cannot support a cited answer, Ask searches NASA's public Technical Reports Server. With a NASA Open APIs key configured as `NASA_API_KEY` or `nasaopenapi`, Ask also looks for patents in NASA's Technology Transfer catalogue. The key stays on the server and is sent only to the NASA gateway. If the gateway is unavailable, the app queries NASA's public technology catalogue.
 
 ## SI use and originality
 

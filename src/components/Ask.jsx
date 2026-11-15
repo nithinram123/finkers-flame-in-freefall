@@ -74,6 +74,7 @@ export default function Ask({
         readout: answer.evidence,
         note: answer.message,
         nasaSearch: answer.nasaSearch,
+        nasaTechTransfer: answer.nasaTechTransfer,
         offline: answer.offline ? answer.answer : undefined,
         origin: 'NASA evidence search',
       });
@@ -233,6 +234,21 @@ export default function Ask({
                   </a>
                 )}
               </div>
+            </section>
+          )}
+          {result.nasaTechTransfer?.patents.length > 0 && (
+            <section className="answer-card" aria-labelledby="nasa-patent-heading">
+              <p className="answer-origin">{result.nasaTechTransfer.source}</p>
+              <h2 id="nasa-patent-heading">Related NASA technologies</h2>
+              <ul>
+                {result.nasaTechTransfer.patents.map(({ id, title, url }) => (
+                  <li key={id}>
+                    <a href={url} target="_blank" rel="noreferrer">
+                      {title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </section>
           )}
           {result.readout?.coverage && (

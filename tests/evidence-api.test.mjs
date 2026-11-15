@@ -224,6 +224,31 @@ test('when NASA is unreachable, Ask gives direct NASA search links and keeps the
   assert.match(answer.nasaSearch.siteSearchUrl, /^https:\/\/www\.nasa\.gov\/\?/);
 });
 
+test('the keyed NASA lookup only sends its credential to api.nasa.gov', async (t) => {
+  const requests = t.mock.method(globalThis, 'fetch', async (url, options) => {
+    const link = new URL(url);
+    if (link.hostname === 'api.nasa.gov') {
+      assert.equal(options.headers['X-Api-Key'], 'mock-nasa-key');
+      assert.equal(link.pathname, '/techtransfer/patent/fire');
+      assert.equal(link.search, '');
+      return new Response(null, { status: 302 });
+    }
+    assert.equal(link.origin, 'https://technology.nasa.gov');
+    assert.equal(options.headers['X-Api-Key'], undefined);
+    return Response.json({
+      results: [
+        ['LAR-TOPS-212', 'LAR-TOPS-212', 'Multilayered <span>Fire</span> Protection System'],
+      ],
+    });
+  });
+  const answer = await ask('What did PSI-999999 report about fire?', {
+    nasaopenapi: 'mock-nasa-key',
+  });
+  assert.equal(requests.mock.callCount(), 2);
+  assert.equal(answer.nasaTechTransfer.gatewayStatus, 302);
+  assert.equal(answer.nasaTechTransfer.patents[0].title, 'Multilayered Fire Protection System');
+});
+
 test('live PSI lookup confirms bundled filenames and retains provenance if NASA is unavailable', async (t) => {
   const file = dataset.tables.find((table) => table.accession === 'PSI-69').file;
   let online = true;

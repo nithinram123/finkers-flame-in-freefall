@@ -1,5 +1,7 @@
 import { loadPsiSnapshot } from '../server/psi-snapshot.mjs';
 import { lookupNasaReports } from '../server/nasa-reports.mjs';
+import { searchNasaTechTransfer } from '../server/nasa-techtransfer.mjs';
+import { nasaReportSearch } from '../src/lib/nasa-reports.mjs';
 import { analystEvidence, evidenceReadout, offlineAssessment } from '../src/lib/analyst.mjs';
 import { legacyScenario, readScenario } from '../src/lib/scenario.mjs';
 
@@ -94,11 +96,13 @@ function makeEvidence(rows) {
 
 export async function handleAsk(request, response, env = process.env, lookup = lookupNasaReports) {
   const provider = askProvider(env);
+  const nasaKey = env.nasaopenapi?.trim() || env.NASA_API_KEY?.trim();
   if (request.method === 'GET')
     return send(response, 200, {
       enabled: Boolean(provider),
       provider: provider?.name ?? null,
       backupProvider: 'NASA Technical Reports Server',
+      ...(nasaKey ? { nasaOpenApiConfigured: true } : {}),
     });
   if (request.method !== 'POST') {
     response.setHeader('Allow', 'GET, POST');
@@ -118,8 +122,12 @@ export async function handleAsk(request, response, env = process.env, lookup = l
     return send(response, 400, { message: 'Enter a question of up to 500 characters.' });
   let evidence;
   const fallback = async (status, message) => {
-    const nasaSearch = evidence.archive ? undefined : await lookup(question);
-    return sendOffline(response, evidence, status, message, nasaSearch);
+    const query = nasaKey && !evidence.archive ? nasaReportSearch(question).query : '';
+    const [nasaSearch, nasaTechTransfer] = await Promise.all([
+      evidence.archive ? undefined : lookup(question),
+      query ? searchNasaTechTransfer(query, nasaKey) : undefined,
+    ]);
+    return sendOffline(response, evidence, status, message, nasaSearch, nasaTechTransfer);
   };
   try {
     const dataset = await loadPsiSnapshot();
@@ -245,7 +253,7 @@ export async function handleAsk(request, response, env = process.env, lookup = l
   }
 }
 
-function sendOffline(response, evidence, generationStatus, message, nasaSearch) {
+function sendOffline(response, evidence, generationStatus, message, nasaSearch, nasaTechTransfer) {
   return send(response, 200, {
     answer: offlineAssessment(evidence),
     sources: evidence.rows.map(sourceOf),
@@ -256,6 +264,7 @@ function sendOffline(response, evidence, generationStatus, message, nasaSearch) 
     generationStatus,
     message,
     nasaSearch,
+    nasaTechTransfer,
   });
 }
 
