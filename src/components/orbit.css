@@ -81,20 +81,21 @@
   padding: clamp(18px, 4vw, 60px);
   padding-bottom: 24px;
   display: grid;
-  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.55fr);
+  grid-template-columns: minmax(300px, 0.92fr) minmax(0, 1.25fr);
   align-items: center;
   gap: clamp(16px, 3.2vw, 48px);
 }
 .orbit-intro h1 {
-  font-size: clamp(3.4rem, 7.4vw, 7.3rem);
-  line-height: 0.91;
+  font-size: clamp(3.05rem, 5.3vw, 5.95rem);
+  line-height: 0.99;
   letter-spacing: -0.04em;
   margin: 0;
   font-weight: 650;
+  text-wrap: balance;
 }
 .orbit-intro > p {
   margin: 22px 0 24px;
-  max-width: 33ch;
+  max-width: 43ch;
   color: var(--haze);
   font-size: clamp(1.04rem, 1.6vw, 1.28rem);
 }
@@ -126,10 +127,19 @@
   color: var(--ice);
   white-space: nowrap;
 }
-.orbit-page a.orbit-source-link {
+.orbit-intro .orbit-data-credit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin-top: 14px;
+  margin-bottom: 0;
   font-size: 13px;
   color: var(--haze);
+}
+.orbit-data-credit a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 .orbit-map {
   position: relative;
@@ -355,18 +365,16 @@
     align-items: start;
     gap: 20px;
   }
-  .orbit-intro h1 br {
-    display: none;
-  }
   .orbit-intro h1 {
-    font-size: clamp(2.9rem, 9vw, 5.5rem);
+    font-size: clamp(2.45rem, 7.7vw, 5rem);
+    max-width: 16ch;
   }
   .orbit-intro > p {
     margin-top: 12px;
     margin-bottom: 10px;
     max-width: 49ch;
   }
-  .orbit-page a.orbit-source-link {
+  .orbit-intro .orbit-data-credit {
     margin-top: 4px;
   }
   .orbit-map-caption {

@@ -15,32 +15,31 @@ export default function Home({ dataset, dataError }) {
     <div className="orbit-home">
       <section className="orbit-hero">
         <div className="orbit-intro">
-          <h1>
-            Flame in <br />
-            Freefall
-          </h1>
+          <h1>Has NASA tested fire in your cabin’s air?</h1>
           <p>
-            Explore what NASA’s combustion experiments can tell us about fire in a crewed habitat.
+            Pick a habitat or enter its oxygen and pressure. See which NASA fire tests match those
+            conditions, where the data runs out, and open the original measurements.
           </p>
           <div className="orbit-hero-actions">
-            <a className="orbit-action" href="#flight-path">
-              Follow the flight path <ArrowDown size={17} aria-hidden="true" />
+            <a className="orbit-action" href="/scenario">
+              Compare cabin conditions <ArrowRight size={17} aria-hidden="true" />
             </a>
             <a className="orbit-quiet-link" href={presetLinks.moon}>
-              Open Moon Base <ArrowUpRight size={17} aria-hidden="true" />
+              Try Moon Base <ArrowUpRight size={17} aria-hidden="true" />
             </a>
           </div>
-          <a className="orbit-source-link" href="/data-sources#apis">
-            <Database size={16} aria-hidden="true" /> NASA PSI snapshot and APIs
-          </a>
+          <p className="orbit-data-credit">
+            <Database size={16} aria-hidden="true" />
+            <a href="/data-sources#apis">NASA Physical Sciences Informatics</a>
+          </p>
         </div>
         <MissionMap />
       </section>
 
       <nav className="orbit-quick" aria-label="Quick destinations">
-        <strong>Quick destinations</strong>
-        <a href="/scenario">
-          Habitat Risk <ArrowUpRight size={15} aria-hidden="true" />
+        <strong>Explore the data</strong>
+        <a href="#flight-path">
+          How cabin matching works <ArrowDown size={15} aria-hidden="true" />
         </a>
         <a href="/explorer">
           Experiments <ArrowUpRight size={15} aria-hidden="true" />
@@ -105,8 +104,8 @@ export default function Home({ dataset, dataError }) {
                     : 'Loading NASA experiment counts…'}
                 </p>
               )}
-              <a href="/neural?preset=moon">
-                Inspect the original records <ArrowRight size={16} aria-hidden="true" />
+              <a href={presetLinks.moon}>
+                Open the Moon Base analysis <ArrowRight size={16} aria-hidden="true" />
               </a>
             </div>
           </li>
